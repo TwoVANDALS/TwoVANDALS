@@ -219,3 +219,25 @@ footer {
   0% { transform: scale(1); opacity: 0.02; }
   50% { transform: scale(1.3); opacity: 0.5; }
 }
+
+.pixel-trail {
+  position: fixed;
+  width: 6px;
+  height: 6px;
+  background: white;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.8;
+  animation: pixel-fade 0.8s forwards ease-out;
+}
+
+@keyframes pixel-fade {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+}
