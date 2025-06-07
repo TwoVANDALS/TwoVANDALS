@@ -262,3 +262,35 @@ footer {
     transform: scale(0.8);
   }
 }
+
+.audio-player {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #111;
+  border-top: 2px solid #0f0;
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  z-index: 10000;
+  font-family: 'VT323', monospace;
+  color: white;
+  gap: 0.5rem;
+}
+
+.audio-player button {
+  background: transparent;
+  color: white;
+  font-size: 1.5rem;
+  border: none;
+  cursor: pointer;
+}
+
+.audio-player input[type="range"] {
+  accent-color: lime;
+}
+
+.audio-player #seek {
+  flex: 1;
+}
