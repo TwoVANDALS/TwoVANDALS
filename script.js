@@ -1,4 +1,4 @@
-// Simple glitch effect on hover (extendable)
+// Glitch hover
 document.querySelectorAll('.btn, nav a').forEach(el => {
   el.addEventListener('mouseenter', () => {
     el.style.transform = 'skewX(-5deg)';
@@ -6,4 +6,14 @@ document.querySelectorAll('.btn, nav a').forEach(el => {
   el.addEventListener('mouseleave', () => {
     el.style.transform = 'none';
   });
+});
+
+// Loader timeout
+window.addEventListener("load", () => {
+  const loader = document.getElementById("loader");
+  if (loader) {
+    setTimeout(() => {
+      loader.style.display = "none";
+    }, 2500);
+  }
 });
