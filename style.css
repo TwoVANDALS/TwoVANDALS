@@ -466,3 +466,19 @@ nav a.active {
   background: #111;
   border-color: #0f0;
 }
+
+.like-btn {
+  border: 1px solid #fff;
+  background: transparent;
+  color: #fff;
+  font-size: 1.2rem;
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.like-btn.liked {
+  color: #f00;
+  font-weight: bold;
+  border-color: #f00;
+}
