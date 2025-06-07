@@ -7,6 +7,7 @@ body {
   overflow-x: hidden;
 }
 
+/* === LOADER === */
 #loader {
   position: fixed;
   inset: 0;
@@ -29,6 +30,7 @@ body {
   100% { text-shadow: 1px 0 lime; }
 }
 
+/* === BACKGROUND CANVAS === */
 canvas#snow-canvas {
   position: fixed;
   top: 0;
@@ -37,11 +39,12 @@ canvas#snow-canvas {
   pointer-events: none;
 }
 
+/* === HEADER === */
 header {
   text-align: center;
   padding: 1.2rem 1rem 0.2rem;
-  z-index: 10;
   position: relative;
+  z-index: 10;
 }
 
 .logo {
@@ -53,11 +56,11 @@ header {
 .motto {
   font-size: 1.1rem;
   opacity: 0.6;
-  margin-bottom: 0.6rem;
+  margin-bottom: 0.4rem;
 }
 
 nav {
-  margin-bottom: 0.5rem;
+  margin-top: 0.3rem;
 }
 
 nav a {
@@ -67,34 +70,7 @@ nav a {
   font-size: 1.2rem;
 }
 
-/* UNDERTALE style buttons */
-.pixel-btn {
-  font-family: 'Archivo Black', sans-serif;
-  font-size: 1.1rem;
-  padding: 0.8rem 1.4rem;
-  background: #000;
-  color: #fff;
-  border: 2px solid #fff;
-  cursor: pointer;
-  transition: transform 0.1s ease;
-  position: relative;
-  z-index: 5;
-}
-
-.pixel-btn:hover {
-  background: #fff;
-  color: #000;
-  transform: scale(1.02);
-}
-
-.pixel-btn:active {
-  animation: explode 0.3s forwards;
-}
-
-@keyframes explode {
-  0% { transform: scale(1); opacity: 1; }
-  100% { transform: scale(1.6); opacity: 0; }
-}
+/* === HERO === */
 .hero {
   position: relative;
   height: 70vh;
@@ -120,6 +96,7 @@ nav a {
   margin-bottom: 1.5rem;
 }
 
+/* === SECTION === */
 section {
   padding: 4rem 2rem;
   text-align: center;
@@ -158,111 +135,36 @@ footer {
   color: #777;
 }
 
-.audio-player {
-  position: fixed;
-  top: 1rem;
-  right: 1rem;
-  z-index: 99;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.audio-player input[type="range"] {
-  width: 100px;
-  accent-color: #fff;
-}
-
-/* Easter Eggs */
-.egg {
-  width: 20px;
-  height: 20px;
-  position: absolute;
-  opacity: 0.03;
-  transition: opacity 0.3s ease;
-  border-radius: 50%;
-  z-index: 1;
-}
-
-.egg:hover {
-  opacity: 1;
-}
-
-.egg-blood { left: 5vw; top: 90vh; background: red; }
-.egg-water { right: 4vw; top: 85vh; background: cyan; }
-.egg-electric { top: 20vh; left: 2vw; background: yellow; }
-.egg-fire { top: 15vh; right: 2vw; background: orange; }
-.egg-core { bottom: 5vh; right: 50vw; background: white; }
-
-/* Hidden reward */
-#secret-section {
-  display: none;
-  padding: 4rem 2rem;
-  background: #111;
-  color: #0f0;
-  font-family: 'VT323', monospace;
-  font-size: 1.8rem;
-}
-
-/* Cassette player container */
-.cassette-player {
-  position: fixed;
-  bottom: 1rem;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 999;
-}
-
-/* Cassette box */
-.cassette-body {
-  width: 200px;
-  height: 120px;
-  background: #222;
-  border: 4px solid #fff;
-  box-shadow: 0 0 8px #0f0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Window area for spools */
-.tape-window {
-  width: 140px;
-  height: 50px;
+/* === BUTTONS UNDERTALE-STYLE === */
+.pixel-btn {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 1.1rem;
+  padding: 0.8rem 1.4rem;
   background: #000;
-  border: 2px solid #444;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 10px;
+  color: #fff;
+  border: 2px solid #fff;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+  position: relative;
+  z-index: 5;
 }
 
-/* Spools (fake rotating discs) */
-.spool {
-  width: 30px;
-  height: 30px;
-  border: 3px solid #ccc;
-  border-radius: 50%;
-  background: repeating-conic-gradient(#999 0deg 10deg, #222 10deg 20deg);
-  animation: none;
+.pixel-btn:hover {
+  background: #fff;
+  color: #000;
+  transform: scale(1.02);
 }
 
-.playing .spool {
-  animation: spin 2s linear infinite;
+.pixel-btn:active {
+  animation: explode 0.3s forwards;
 }
 
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+@keyframes explode {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1.6); opacity: 0; }
 }
 
-/* Mobile adjustments */
-@media (max-width: 600px) {
-  .cassette-body {
-    transform: scale(0.8);
-  }
-}
-
+/* === AUDIO PLAYER FIXED === */
 .audio-player {
   position: fixed;
   bottom: 0;
@@ -293,4 +195,134 @@ footer {
 
 .audio-player #seek {
   flex: 1;
+}
+
+/* === MOBILE AUDIO PLAYER === */
+@media (max-width: 768px) {
+  .audio-player {
+    flex-wrap: wrap;
+    font-size: 1rem;
+    gap: 0.8rem;
+  }
+
+  .audio-player button {
+    font-size: 1.2rem;
+    flex: 0 0 auto;
+  }
+
+  .audio-player #current,
+  .audio-player #duration {
+    font-size: 0.9rem;
+    min-width: 40px;
+    text-align: center;
+  }
+
+  .audio-player #seek,
+  .audio-player #volume {
+    width: 100%;
+  }
+
+  .audio-player input[type="range"] {
+    appearance: none;
+    height: 4px;
+    background: #444;
+    border-radius: 2px;
+  }
+
+  .audio-player input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    background: #0f0;
+    border-radius: 50%;
+    border: none;
+    margin-top: -5px;
+  }
+
+  .audio-player input[type="range"]::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    background: #0f0;
+    border: none;
+    border-radius: 50%;
+  }
+}
+
+/* === CASSETTE PLAYER === */
+.cassette-player {
+  position: fixed;
+  bottom: 4.2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+}
+
+.cassette-body {
+  width: 200px;
+  height: 120px;
+  background: #222;
+  border: 4px solid #fff;
+  box-shadow: 0 0 8px #0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tape-window {
+  width: 140px;
+  height: 50px;
+  background: #000;
+  border: 2px solid #444;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+}
+
+.spool {
+  width: 30px;
+  height: 30px;
+  border: 3px solid #ccc;
+  border-radius: 50%;
+  background: repeating-conic-gradient(#999 0deg 10deg, #222 10deg 20deg);
+  animation: none;
+}
+
+.playing .spool {
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* === EASTER EGGS === */
+.egg {
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  opacity: 0.03;
+  transition: opacity 0.3s ease;
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.egg:hover {
+  opacity: 1;
+}
+
+.egg-blood { left: 5vw; top: 90vh; background: red; }
+.egg-water { right: 4vw; top: 85vh; background: cyan; }
+.egg-electric { top: 20vh; left: 2vw; background: yellow; }
+.egg-fire { top: 15vh; right: 2vw; background: orange; }
+.egg-core { bottom: 5vh; right: 50vw; background: white; }
+
+#secret-section {
+  display: none;
+  padding: 4rem 2rem;
+  background: #111;
+  color: #0f0;
+  font-family: 'VT323', monospace;
+  font-size: 1.8rem;
 }
