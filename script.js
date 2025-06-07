@@ -2,30 +2,51 @@ window.addEventListener("load", () => {
   document.getElementById("loader").style.display = "none";
 });
 
-// AUDIO
+// 🎧 AUDIO PLAYER CONTROLS (fixed player)
 document.addEventListener("DOMContentLoaded", () => {
-  const bgTrack = document.getElementById("bgTrack");
-  const playBtn = document.getElementById("playPauseBtn");
-  const volumeSlider = document.getElementById("volumeSlider");
+  const player = document.getElementById('player');
+  const playBtn = document.getElementById('playBtn');
+  const seek = document.getElementById('seek');
+  const current = document.getElementById('current');
+  const duration = document.getElementById('duration');
+  const volume = document.getElementById('volume');
 
-  bgTrack.volume = 0.5;
+  function formatTime(t) {
+    const min = Math.floor(t / 60);
+    const sec = Math.floor(t % 60).toString().padStart(2, '0');
+    return `${min}:${sec}`;
+  }
 
-  playBtn.addEventListener("click", () => {
-    if (bgTrack.paused) {
-      bgTrack.play();
-      playBtn.textContent = "⏸ Pause Trashwave Set";
+  playBtn.addEventListener('click', () => {
+    if (player.paused) {
+      player.play();
+      playBtn.textContent = '⏸';
     } else {
-      bgTrack.pause();
-      playBtn.textContent = "▶ Listen to a curated Trashwave set";
+      player.pause();
+      playBtn.textContent = '▶';
     }
   });
 
-  volumeSlider.addEventListener("input", e => {
-    bgTrack.volume = parseFloat(e.target.value);
+  player.addEventListener('loadedmetadata', () => {
+    seek.max = player.duration;
+    duration.textContent = formatTime(player.duration);
+  });
+
+  player.addEventListener('timeupdate', () => {
+    seek.value = player.currentTime;
+    current.textContent = formatTime(player.currentTime);
+  });
+
+  seek.addEventListener('input', () => {
+    player.currentTime = seek.value;
+  });
+
+  volume.addEventListener('input', () => {
+    player.volume = volume.value;
   });
 });
 
-// SNOW EFFECT
+// ❄️ SNOW / PARTICLE EFFECT
 const snowCanvas = document.getElementById('snow-canvas');
 const ctx = snowCanvas.getContext('2d');
 let snowflakes = [];
@@ -66,7 +87,7 @@ function updateSnow() {
 for (let i = 0; i < 100; i++) snowflakes.push(createSnowflake());
 updateSnow();
 
-// EASTER EGGS
+// 🥚 EASTER EGGS
 const eggs = document.querySelectorAll('.egg');
 let found = 0;
 eggs.forEach(egg => {
@@ -79,7 +100,7 @@ eggs.forEach(egg => {
         unlockSecret();
       }
     }
-    window.open(egg.href, '_blank');
+    if (egg.href) window.open(egg.href, '_blank');
   });
 });
 
@@ -91,58 +112,18 @@ function unlockSecret() {
   section.style.display = "block";
 }
 
+// 📼 CASSETTE VISUAL SYNC (only if present)
 const cassette = document.querySelector('.cassette-player');
-const leftSpool = cassette.querySelector('.left-spool');
-const rightSpool = cassette.querySelector('.right-spool');
+if (cassette) {
+  const leftSpool = cassette.querySelector('.left-spool');
+  const rightSpool = cassette.querySelector('.right-spool');
+  const mainAudio = document.getElementById('player');
 
-const audio = document.getElementById('bgTrack');
+  mainAudio.addEventListener('play', () => {
+    cassette.classList.add('playing');
+  });
 
-audio.addEventListener('play', () => {
-  cassette.classList.add('playing');
-});
-
-audio.addEventListener('pause', () => {
-  cassette.classList.remove('playing');
-});
-
-
-const audio = document.getElementById('player');
-const playBtn = document.getElementById('playBtn');
-const seek = document.getElementById('seek');
-const current = document.getElementById('current');
-const duration = document.getElementById('duration');
-const volume = document.getElementById('volume');
-
-playBtn.addEventListener('click', () => {
-  if (audio.paused) {
-    audio.play();
-    playBtn.textContent = '⏸';
-  } else {
-    audio.pause();
-    playBtn.textContent = '▶';
-  }
-});
-
-audio.addEventListener('loadedmetadata', () => {
-  seek.max = audio.duration;
-  duration.textContent = formatTime(audio.duration);
-});
-
-audio.addEventListener('timeupdate', () => {
-  seek.value = audio.currentTime;
-  current.textContent = formatTime(audio.currentTime);
-});
-
-seek.addEventListener('input', () => {
-  audio.currentTime = seek.value;
-});
-
-volume.addEventListener('input', () => {
-  audio.volume = volume.value;
-});
-
-function formatTime(t) {
-  const min = Math.floor(t / 60);
-  const sec = Math.floor(t % 60).toString().padStart(2, '0');
-  return `${min}:${sec}`;
+  mainAudio.addEventListener('pause', () => {
+    cassette.classList.remove('playing');
+  });
 }
