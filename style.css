@@ -1,188 +1,178 @@
-body {
+/* BASE STYLES */
+* {
+  box-sizing: border-box;
   margin: 0;
-  font-family: 'VT323', monospace;
-  background: #000;/* ========== 🧬 BADTRIP ANIMATIONS ========== */
+  padding: 0;
+}
 
 body {
-  cursor: url('https://cur.cursors-4u.net/cursors/cur-13/cur1153.cur'), auto;
+  font-family: 'VT323', monospace;
+  font-size: 20px;
+  background: #000;
+  color: #fff;
+  overflow-x: hidden;
+  cursor: url('assets/favicon.ico'), auto;
   animation: pulseBg 8s infinite ease-in-out alternate;
-  background-color: #000;
-  background-image: repeating-radial-gradient(circle, rgba(255, 0, 255, 0.05) 0px, transparent 10px);
 }
 
-/* Custom Cursor + Glitch Aura */
-html::after {
-  content: "";
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: repeating-linear-gradient(45deg, rgba(255, 0, 255, 0.05), transparent 5px);
-  pointer-events: none;
-  z-index: 999;
-  mix-blend-mode: difference;
-  animation: flicker 1.5s infinite;
+/* HEADINGS / UI */
+h1, h2, h3, p, a, .btn {
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
-/* Hero Glitch */
-.hero h1 {
-  animation: glitch 3s infinite;
-  color: #0ff;
-  text-shadow: 2px 0 #f0f, -2px 0 #ff0;
+/* HEADER */
+header {
+  padding: 1.5rem 1rem;
+  text-align: center;
 }
-
-/* Logo Shake */
 .logo {
-  animation: shake 2s infinite alternate;
-  filter: hue-rotate(120deg);
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 4rem;
+  animation: shake 3s infinite;
+  color: #0ff;
 }
-
-/* Mottos float */
 .motto {
+  opacity: 0.6;
+  font-size: 1.4rem;
   animation: floaty 4s ease-in-out infinite;
   color: #f0f;
 }
+nav a {
+  margin: 0 1rem;
+  text-decoration: none;
+  color: white;
+  font-size: 1.3rem;
+  transition: color 0.3s;
+}
+nav a:hover {
+  color: #0f0;
+}
 
-/* ========== ANIMATION KEYFRAMES ========== */
+/* HERO */
+.hero {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.hero h1 {
+  font-size: 2.5rem;
+  color: #fff;
+  animation: glitch 2s infinite;
+}
+.pixel-btn {
+  padding: 1rem 2rem;
+  border: 2px solid white;
+  background: transparent;
+  color: white;
+  font-size: 1.2rem;
+  transition: all 0.2s ease;
+}
+.pixel-btn:hover {
+  background: white;
+  color: black;
+}
+
+/* BLOB BACKGROUND */
+#blob-bg {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  transform: scale(2.5);
+  mix-blend-mode: screen;
+  animation: rotateBlob 30s infinite linear;
+}
+
+/* AUDIO PLAYER */
+.audio-player {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: #000;
+  color: #fff;
+  border-top: 2px solid #444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1rem;
+  gap: 1rem;
+  font-family: 'VT323', monospace;
+  font-size: 1.2rem;
+  z-index: 9999;
+  transition: transform 0.3s ease;
+}
+.audio-player.collapsed {
+  transform: translateY(100%);
+}
+.audio-player button,
+.audio-player input[type="range"] {
+  background: none;
+  border: 2px solid #fff;
+  color: #fff;
+  padding: 0.2rem 0.8rem;
+  cursor: pointer;
+}
+.audio-player button:hover {
+  background: #fff;
+  color: #000;
+}
+
+/* CANVASES */
+canvas#snow-canvas,
+canvas#glitch-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+#glitch-canvas {
+  mix-blend-mode: lighten;
+  opacity: 0.4;
+}
+
+/* CURSOR TRAIL */
+#cursor-trail {
+  position: fixed;
+  width: 16px;
+  height: 16px;
+  background: #0ff;
+  border-radius: 50%;
+  pointer-events: none;
+  mix-blend-mode: exclusion;
+  opacity: 0.5;
+  z-index: 999;
+}
+
+/* KEYFRAMES */
 @keyframes glitch {
   0%, 100% { transform: none; }
-  20% { transform: skewX(5deg) translateX(10px); color: #ff0; }
-  40% { transform: skewY(-5deg) translateY(-10px); color: #f0f; }
-  60% { transform: scale(1.1) rotate(1deg); }
-  80% { transform: translateX(-10px); color: #0ff; }
+  25% { transform: translateX(3px); color: #f0f; }
+  50% { transform: translateX(-3px); color: #ff0; }
+  75% { transform: translateY(-2px); color: #0ff; }
 }
-
 @keyframes shake {
   0% { transform: rotate(0deg); }
-  25% { transform: rotate(1deg) scale(1.01); }
+  25% { transform: rotate(1deg); }
   50% { transform: rotate(-1deg); }
-  75% { transform: rotate(1deg) scale(0.99); }
+  75% { transform: rotate(1deg); }
   100% { transform: rotate(0deg); }
 }
-
+@keyframes floaty {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0); }
+}
 @keyframes pulseBg {
   0% { background-color: #000; }
   50% { background-color: #111; }
   100% { background-color: #000; }
 }
-
-@keyframes flicker {
-  0% { opacity: 1; }
-  25% { opacity: 0.9; }
-  50% { opacity: 1; }
-  75% { opacity: 0.8; }
-  100% { opacity: 1; }
-}
-
-@keyframes floaty {
-  0% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
-  100% { transform: translateY(0); }
-}
-
-  color: #fff;
-  scroll-behavior: smooth;
-}
-
-.logo {
-  font-family: 'Archivo Black', sans-serif;
-  font-size: 3rem;
-  margin-bottom: 0.5rem;
-}
-
-header {
-  text-align: center;
-  padding: 2rem;
-}
-
-.motto {
-  font-size: 1.1rem;
-  opacity: 0.7;
-}
-
-nav a {
-  color: white;
-  margin: 0 1rem;
-  font-size: 1.2rem;
-  text-decoration: none;
-}
-
-.hero {
-  height: 90vh;
-  background: linear-gradient(to bottom, #000, #111);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-}
-
-.hero-content h1 {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-}
-
-.btn {
-  padding: 0.8rem 2rem;
-  font-size: 1.1rem;
-  color: #fff;
-  border: 2px solid #fff;
-  text-decoration: none;
-}
-
-section {
-  padding: 3rem 2rem;
-  text-align: center;
-}
-
-input[type="file"],
-button {
-  padding: 0.5rem 1rem;
-  margin-top: 1rem;
-  background: #111;
-  color: white;
-  border: 1px solid #fff;
-}
-
-#trackList {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  padding-top: 2rem;
-}
-
-.track-box {
-  background: #111;
-  border: 1px solid #333;
-  padding: 1rem;
-  border-radius: 8px;
-  max-width: 600px;
-  margin: auto;
-}
-
-.track-title {
-  font-size: 1.4rem;
-  margin-bottom: 0.5rem;
-}
-
-audio {
-  width: 100%;
-}
-
-.track-meta {
-  margin-top: 0.5rem;
-  font-size: 0.9rem;
-  opacity: 0.6;
-}
-
-footer {
-  background: #111;
-  padding: 2rem;
-  text-align: center;
-  color: #777;
-}
-
-.socials a {
-  display: inline-block;
-  margin: 0.5rem;
-  text-decoration: none;
-  color: #0f0;
+@keyframes rotateBlob {
+  0% { transform: rotate(0deg) scale(2.5); }
+  100% { transform: rotate(360deg) scale(2.5); }
 }
