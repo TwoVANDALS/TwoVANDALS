@@ -87,18 +87,19 @@ footer {
 .audio-player {
   position: fixed;
   bottom: 0;
-  left: 0;
-  right: 0;
+  width: 100%;
   background: #000;
-  border-top: 2px solid #0f0;
   color: #fff;
-  font-family: 'VT323', monospace;
-  padding: 0.8rem 1rem;
+  border-top: 2px solid #444;
   display: flex;
   align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
   gap: 1rem;
-  z-index: 1000;
-  transition: transform 0.4s ease;
+  font-family: 'VT323', monospace;
+  font-size: 1.2rem;
+  z-index: 9999;
+  transition: transform 0.3s ease;
 }
 
 .audio-player.collapsed {
@@ -107,81 +108,109 @@ footer {
 
 .audio-player button,
 .audio-player input[type="range"] {
-  appearance: none;
-  background: transparent;
-  border: none;
-  color: #0f0;
-  font-size: 1.1rem;
+  background: none;
+  border: 2px solid #fff;
+  color: #fff;
+  font-family: inherit;
+  font-size: 1.2rem;
+  padding: 0.2rem 0.8rem;
+  cursor: pointer;
+}
+
+.audio-player button:hover {
+  background: #fff;
+  color: #000;
 }
 
 .audio-player input[type="range"] {
   width: 100px;
   height: 4px;
-  background: #333;
+  appearance: none;
+  background: #555;
 }
 
 .audio-player input[type="range"]::-webkit-slider-thumb {
-  background: #0f0;
+  appearance: none;
   width: 14px;
   height: 14px;
+  background: #fff;
   border-radius: 50%;
+}
+
+.audio-player input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: #fff;
   border: none;
+  border-radius: 50%;
 }
 
 /* TRACK PLAYER */
 .track-player {
-  background: #0a0a0a;
-  border: 1px solid #111;
-  padding: 1rem;
-  margin: 1.2rem auto;
-  max-width: 700px;
+  background: #000;
   color: #fff;
+  border: 1px solid #444;
+  margin: 1rem auto;
+  padding: 1rem;
+  width: 90%;
+  max-width: 600px;
   font-family: 'VT323', monospace;
-  position: relative;
-  box-shadow: 0 0 10px rgba(0,255,0,0.1);
-  border-left: 4px solid #0f0;
 }
 
 .track-player h3 {
-  font-size: 1.3rem;
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 1.6rem;
   margin-bottom: 0.5rem;
-  color: #0f0;
 }
 
 .track-player .controls {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
   gap: 0.5rem;
+  flex-wrap: wrap;
   font-size: 1rem;
 }
 
-.track-player button.play-btn {
-  background: none;
-  border: 1px solid #0f0;
-  color: #0f0;
+.track-player .controls button {
+  font-size: 1.2rem;
   padding: 0.2rem 0.6rem;
+  border: 2px solid #fff;
+  background: none;
+  color: #fff;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
 }
 
-.track-player button.play-btn:hover {
-  background: #0f0;
+.track-player .controls button:hover {
+  background: #fff;
   color: #000;
 }
 
-.track-player input[type="range"] {
+.track-player .controls input[type="range"] {
   flex: 1;
   height: 4px;
-  background: #444;
+  background: #555;
+  appearance: none;
 }
 
-.track-player input[type="range"]::-webkit-slider-thumb {
+.track-player .controls input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
   width: 12px;
   height: 12px;
-  background: #0f0;
+  background: #fff;
+  border-radius: 50%;
+}
+
+.track-player .controls input[type="range"]::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  background: #fff;
   border-radius: 50%;
   border: none;
+}
+
+.track-player .time {
+  min-width: 40px;
+  text-align: center;
 }
 
 
@@ -216,14 +245,31 @@ footer {
 .egg-fire { bottom: 120px; right: 25%; background: orange; }
 .egg-core { bottom: 10px; right: 10%; background: #fff; }
 
+/* === TOGGLE BUTTON === */
 .toggle-btn {
+  font-size: 1rem;
   background: none;
   border: none;
-  color: #0f0;
-  font-size: 1.5rem;
+  color: #888;
   cursor: pointer;
-  transition: transform 0.3s ease;
+  transition: color 0.2s ease;
 }
+
 .toggle-btn:hover {
-  transform: rotate(180deg);
+  color: #fff;
+}
+
+/* === RESPONSIVE FIX === */
+@media (max-width: 768px) {
+  .audio-player {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 1rem;
+    padding: 0.8rem;
+  }
+
+  .track-player .controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
