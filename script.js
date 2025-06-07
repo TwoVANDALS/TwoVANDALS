@@ -2,51 +2,7 @@ window.addEventListener("load", () => {
   document.getElementById("loader").style.display = "none";
 });
 
-// 🎧 AUDIO PLAYER CONTROLS (fixed player)
-document.addEventListener("DOMContentLoaded", () => {
-  const player = document.getElementById('player');
-  const playBtn = document.getElementById('playBtn');
-  const seek = document.getElementById('seek');
-  const current = document.getElementById('current');
-  const duration = document.getElementById('duration');
-  const volume = document.getElementById('volume');
-
-  function formatTime(t) {
-    const min = Math.floor(t / 60);
-    const sec = Math.floor(t % 60).toString().padStart(2, '0');
-    return `${min}:${sec}`;
-  }
-
-  playBtn.addEventListener('click', () => {
-    if (player.paused) {
-      player.play();
-      playBtn.textContent = '⏸';
-    } else {
-      player.pause();
-      playBtn.textContent = '▶';
-    }
-  });
-
-  player.addEventListener('loadedmetadata', () => {
-    seek.max = player.duration;
-    duration.textContent = formatTime(player.duration);
-  });
-
-  player.addEventListener('timeupdate', () => {
-    seek.value = player.currentTime;
-    current.textContent = formatTime(player.currentTime);
-  });
-
-  seek.addEventListener('input', () => {
-    player.currentTime = seek.value;
-  });
-
-  volume.addEventListener('input', () => {
-    player.volume = volume.value;
-  });
-});
-
-// ❄️ SNOW / PARTICLE EFFECT
+// ❄️ SNOW EFFECT
 const snowCanvas = document.getElementById('snow-canvas');
 const ctx = snowCanvas.getContext('2d');
 let snowflakes = [];
@@ -83,72 +39,27 @@ function updateSnow() {
   });
   requestAnimationFrame(updateSnow);
 }
-
 for (let i = 0; i < 100; i++) snowflakes.push(createSnowflake());
 updateSnow();
 
-// 🥚 EASTER EGGS
-const eggs = document.querySelectorAll('.egg');
-let found = 0;
-eggs.forEach(egg => {
+// 👾 EASTER EGGS
+document.querySelectorAll('.egg').forEach(egg => {
   egg.addEventListener('click', (e) => {
     e.preventDefault();
     if (!egg.classList.contains('found')) {
       egg.classList.add('found');
-      found++;
-      if (found === eggs.length) {
-        unlockSecret();
+      if (document.querySelectorAll('.egg.found').length === document.querySelectorAll('.egg').length) {
+        const section = document.createElement('section');
+        section.id = "secret-section";
+        section.innerHTML = "<h2>You unlocked the core.</h2><p>This is only the beginning.</p>";
+        document.body.appendChild(section);
       }
     }
     if (egg.href) window.open(egg.href, '_blank');
   });
 });
 
-function unlockSecret() {
-  const section = document.createElement('section');
-  section.id = "secret-section";
-  section.innerHTML = "<h2>You unlocked the core.</h2><p>This is only the beginning.</p>";
-  document.body.appendChild(section);
-  section.style.display = "block";
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  const toggleBtn = document.getElementById('togglePlayer');
-  const audioPlayer = document.getElementById('audioPlayer');
-
-  toggleBtn.addEventListener('click', () => {
-    audioPlayer.classList.toggle('collapsed');
-    toggleBtn.textContent = audioPlayer.classList.contains('collapsed') ? '▲' : '▼';
-  });
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-  const bgTrack = document.getElementById('bgTrack');
-  const playPauseBtn = document.getElementById('playPauseBtn');
-  const volumeSlider = document.getElementById('volumeSlider');
-  const toggleBtn = document.getElementById('togglePlayer');
-  const audioPlayer = document.getElementById('audioPlayer');
-
-  playPauseBtn.addEventListener('click', () => {
-    if (bgTrack.paused) {
-      bgTrack.play();
-      playPauseBtn.textContent = '⏸ Playing Trashwave Set';
-    } else {
-      bgTrack.pause();
-      playPauseBtn.textContent = '▶ Listen to a curated Trashwave set';
-    }
-  });
-
-  volumeSlider.addEventListener('input', () => {
-    bgTrack.volume = volumeSlider.value;
-  });
-
-  toggleBtn.addEventListener('click', () => {
-    audioPlayer.classList.toggle('collapsed');
-    toggleBtn.textContent = audioPlayer.classList.contains('collapsed') ? '▲' : '▼';
-  });
-});
-
+// 🎧 AUDIO PLAYER (no duplication)
 document.addEventListener("DOMContentLoaded", () => {
   const audio = document.getElementById("bgTrack");
   const playPauseBtn = document.getElementById("playPauseBtn");
@@ -159,47 +70,40 @@ document.addEventListener("DOMContentLoaded", () => {
   const toggleBtn = document.getElementById("togglePlayer");
   const audioPlayer = document.getElementById("audioPlayer");
 
-  // Time formatting
   function formatTime(sec) {
     const minutes = Math.floor(sec / 60);
     const seconds = Math.floor(sec % 60).toString().padStart(2, "0");
     return `${minutes}:${seconds}`;
   }
 
-  // Play/Pause toggle
   playPauseBtn.addEventListener("click", () => {
     if (audio.paused) {
       audio.play();
-      playPauseBtn.textContent = "⏸ Pause";
+      playPauseBtn.textContent = "⏸ Playing Trashwave Set";
     } else {
       audio.pause();
-      playPauseBtn.textContent = "▶ Play Trashwave Set";
+      playPauseBtn.textContent = "▶ Listen to a curated Trashwave set";
     }
   });
 
-  // Volume control
   volumeSlider.addEventListener("input", () => {
     audio.volume = volumeSlider.value;
   });
 
-  // Load duration
   audio.addEventListener("loadedmetadata", () => {
     seekBar.max = Math.floor(audio.duration);
     durationEl.textContent = formatTime(audio.duration);
   });
 
-  // Update time
   audio.addEventListener("timeupdate", () => {
     seekBar.value = audio.currentTime;
     currentTimeEl.textContent = formatTime(audio.currentTime);
   });
 
-  // Seek control
   seekBar.addEventListener("input", () => {
     audio.currentTime = seekBar.value;
   });
 
-  // Collapse toggle
   toggleBtn.addEventListener("click", () => {
     audioPlayer.classList.toggle("collapsed");
     toggleBtn.textContent = audioPlayer.classList.contains("collapsed") ? "▲" : "▼";
