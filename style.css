@@ -277,3 +277,17 @@ footer {
   font-family: 'VT323', monospace;
   font-size: 1.8rem;
 }
+
+.audio-player {
+  background: #000;
+  border-top: 2px solid #fff;
+  box-shadow: 0 -1px 0 #222;
+}
+.audio-player button {
+  font-family: 'VT323', monospace;
+  color: #fff;
+  border: 1px solid #fff;
+  padding: 0.3rem 0.6rem;
+  background: none;
+  font-size: 1.3rem;
+}
