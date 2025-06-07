@@ -69,9 +69,12 @@ nav a:hover {
 }
 
 .hero h1 {
-  font-size: 3rem;
-  margin-bottom: 1.5rem;
+  font-size: 2.2rem;
+  margin-bottom: 1rem;
+  font-family: 'VT323', monospace;
+  letter-spacing: 1px;
 }
+
 
 .btn {
   padding: 1rem 2rem;
