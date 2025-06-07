@@ -4,16 +4,21 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TwoVANDALS</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=VT323&display=swap" rel="stylesheet" />
 </head>
 <body>
-  <!-- 🔥 GLITCH LOADER -->
-  <div id="loader"><div class="glitch-text">TwoVANDALS</div></div>
 
+  <!-- Loader -->
+  <div id="loader">
+    <div class="glitch-loader">TwoVANDALS</div>
+  </div>
+
+  <!-- Header -->
   <header>
     <div class="logo">TwoVANDALS</div>
-    <p class="motto">Trashwave is not a genre. It's a wound.</p>
+    <p class="motto">Trashwave is not a genre. It’s a wound.</p>
     <nav>
       <a href="#music">Music</a>
       <a href="#manifest">Manifest</a>
@@ -21,6 +26,7 @@
     </nav>
   </header>
 
+  <!-- Hero -->
   <section class="hero">
     <div class="overlay"></div>
     <div class="hero-content">
@@ -29,6 +35,7 @@
     </div>
   </section>
 
+  <!-- Music -->
   <section id="music" class="music">
     <h2>Popular Tracks</h2>
     <iframe width="100%" height="450" scrolling="no" frameborder="no" allow="autoplay"
@@ -36,15 +43,13 @@
     </iframe>
   </section>
 
+  <!-- Manifest -->
   <section id="manifest" class="manifest">
     <h2>Manifest</h2>
-    <p>
-      We promote nothing.<br />
-      We make noise.<br />
-      We live raw.
-    </p>
+    <p>We promote nothing.<br>We make noise.<br>We live raw.</p>
   </section>
 
+  <!-- Contact -->
   <section id="contacts" class="contacts">
     <h2>Contact</h2>
     <div class="socials">
@@ -53,24 +58,31 @@
       <a href="https://soundcloud.com/vandalstwo" target="_blank">SoundCloud</a>
     </div>
     <p>Email: <a href="mailto:vandalstwo@gmail.com">vandalstwo@gmail.com</a></p>
+
+    <div class="discord-links">
+      <p><strong>Trashwave Community Discord:</strong> <a href="https://discord.gg/tf2X2ThCBM" target="_blank">Join here</a></p>
+      <p><strong>TwoVANDALS Private Server:</strong> <a href="https://discord.gg/CyzsWeQCZ8" target="_blank">Invite-only</a></p>
+    </div>
   </section>
 
-  <!-- 🎮 Discord Pixel Trigger -->
-  <div id="discordTrigger" class="pixel-button">JOIN THE CORE</div>
-
-  <!-- 🕳️ Hidden Artist Easter Eggs -->
-  <div class="easter-eggs">
-    <a class="egg" style="left:5vw;top:92vh;" title="deadrazy" href="https://soundcloud.com/deadrazy"></a>
-    <a class="egg" style="left:12vw;top:91vh;" title="snybun" href="https://soundcloud.com/snybun"></a>
-    <a class="egg" style="left:20vw;top:92vh;" title="princesssguilt" href="https://soundcloud.com/princesssguilt"></a>
-    <a class="egg" style="left:28vw;top:91vh;" title="3_66_7" href="https://soundcloud.com/3_66_7"></a>
-    <a class="egg major" style="left:38vw;top:90vh;" title="vandal2012" href="https://soundcloud.com/vandal2012"></a>
-  </div>
-
+  <!-- Footer -->
   <footer>
     <p>© TwoVANDALS / Noise never sleeps.</p>
-    <p><a href="https://discord.gg/tf2X2ThCBM" target="_blank" class="alt-discord">Join Trashwave Community →</a></p>
   </footer>
+
+  <!-- Audio Player -->
+  <div class="audio-player">
+    <button id="playPauseBtn">▶ Listen to a curated Trashwave set</button>
+    <input id="volumeSlider" type="range" min="0" max="1" step="0.01" value="0.5" />
+  </div>
+  <audio id="bgTrack" src="ybuocfiewu.mp3" loop></audio>
+
+  <!-- Hidden Easter Eggs -->
+  <a href="https://soundcloud.com/deadrazy" class="egg egg-blood" title="deadrazy"></a>
+  <a href="https://soundcloud.com/snybun" class="egg egg-water" title="snybun"></a>
+  <a href="https://soundcloud.com/princesssguilt" class="egg egg-electric" title="princesssguilt"></a>
+  <a href="https://soundcloud.com/3_66_7" class="egg egg-fire" title="3_66_7"></a>
+  <a href="https://soundcloud.com/vandal2012" class="egg egg-core" title="vandal2012"></a>
 
   <script src="script.js"></script>
 </body>
