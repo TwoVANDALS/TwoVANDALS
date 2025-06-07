@@ -111,19 +111,3 @@ function unlockSecret() {
   document.body.appendChild(section);
   section.style.display = "block";
 }
-
-// 📼 CASSETTE VISUAL SYNC (only if present)
-const cassette = document.querySelector('.cassette-player');
-if (cassette) {
-  const leftSpool = cassette.querySelector('.left-spool');
-  const rightSpool = cassette.querySelector('.right-spool');
-  const mainAudio = document.getElementById('player');
-
-  mainAudio.addEventListener('play', () => {
-    cassette.classList.add('playing');
-  });
-
-  mainAudio.addEventListener('pause', () => {
-    cassette.classList.remove('playing');
-  });
-}
