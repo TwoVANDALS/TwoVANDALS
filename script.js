@@ -289,3 +289,18 @@ window.addEventListener("DOMContentLoaded", () => {
 
   sections.forEach(section => observer.observe(section));
 });
+
+// 🎵 Lazy load SoundCloud iframe
+const scSection = document.getElementById("music");
+const scIframe = document.getElementById("scPlayer");
+
+const scObserver = new IntersectionObserver((entries, obs) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting && scIframe.dataset.src) {
+      scIframe.src = scIframe.dataset.src;
+      obs.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.25 });
+
+if (scSection) scObserver.observe(scSection);
