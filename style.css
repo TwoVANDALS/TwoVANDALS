@@ -1,3 +1,4 @@
+/* === BASE === */
 body {
   margin: 0;
   font-family: 'VT323', monospace;
@@ -5,6 +6,7 @@ body {
   color: #fff;
 }
 
+/* === HEADER === */
 header {
   padding: 2rem;
   text-align: center;
@@ -37,6 +39,7 @@ nav a:hover {
   text-decoration: underline;
 }
 
+/* === HERO === */
 .hero {
   position: relative;
   height: 100vh;
@@ -77,6 +80,7 @@ nav a:hover {
   color: black;
 }
 
+/* === SECTIONS === */
 section {
   padding: 4rem 2rem;
   text-align: center;
@@ -102,6 +106,7 @@ section {
   color: #fff;
 }
 
+/* === FOOTER === */
 footer {
   padding: 2rem;
   text-align: center;
@@ -110,7 +115,43 @@ footer {
   color: #777;
 }
 
-/* 🔥 GLITCH LOADER */
+/* === HUGE CENTER LOGO === */
+.header-logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 6rem 0;
+}
+
+.glitch-center-logo {
+  width: 80vw;
+  max-width: 1000px;
+  height: auto;
+  filter: grayscale(1) contrast(3);
+  animation: glitch-anim 2s infinite;
+}
+
+/* === GLITCH EFFECT === */
+@keyframes glitch-anim {
+  0%   { transform: translate(0); filter: grayscale(1) contrast(2); }
+  10%  { transform: translate(-2px, 2px); filter: hue-rotate(10deg) contrast(3); }
+  20%  { transform: translate(2px, -1px); filter: hue-rotate(-10deg) contrast(1.5); }
+  30%  { transform: translate(-1px, 1px); filter: contrast(2) brightness(1.2); }
+  40%  { transform: translate(1px, -2px); filter: saturate(2) contrast(4); }
+  50%  { transform: translate(-2px, 2px); filter: contrast(3); }
+  100% { transform: translate(0); filter: grayscale(1) contrast(2); }
+}
+
+/* === HOVER EFFECTS === */
+nav a, .btn {
+  transition: transform 0.2s ease;
+}
+
+nav a:hover, .btn:hover {
+  transform: skewX(-5deg);
+}
+
+/* === GLITCH LOADER === */
 #loader {
   position: fixed;
   width: 100%;
@@ -130,69 +171,11 @@ footer {
 .glitch-text {
   position: relative;
   color: white;
-  animation: glitch 1s infinite;
-}
-
-@keyframes glitch {
-  0%   { text-shadow: 2px 0 red, -2px 0 blue; }
-  20%  { text-shadow: -2px 0 red, 2px 0 blue; }
-  40%  { text-shadow: 2px 2px green; }
-  60%  { text-shadow: -2px -2px lime; }
-  80%  { text-shadow: 2px -2px red; }
-  100% { text-shadow: -2px 2px blue; }
+  animation: glitch-anim 1s infinite;
 }
 
 @keyframes flicker {
   0% { opacity: 1; }
   80% { opacity: 1; }
   100% { opacity: 0; visibility: hidden; }
-}
-
-.glitch-img {
-  position: relative;
-  width: 1200px;         /* Увеличено */
-  max-width: 95%;
-  filter: grayscale(1) contrast(3);
-  animation: glitch-anim 2s infinite;
-  margin-top: 2rem;
-}
-
-}
-
-@keyframes glitch-anim {
-  0% {
-    transform: translate(0);
-    filter: grayscale(1) contrast(2);
-  }
-  10% {
-    transform: translate(-2px, 2px);
-    filter: hue-rotate(10deg) contrast(3);
-  }
-  20% {
-    transform: translate(2px, -1px);
-    filter: hue-rotate(-10deg) contrast(1.5);
-  }
-  30% {
-    transform: translate(-1px, 1px);
-    filter: contrast(2) brightness(1.2);
-  }
-  40% {
-    transform: translate(1px, -2px);
-    filter: saturate(2) contrast(4);
-  }
-  50% {
-    transform: translate(-2px, 2px);
-    filter: contrast(3);
-  }
-  100% {
-    transform: translate(0);
-    filter: grayscale(1) contrast(2);
-  }
-}
-
-.header-image {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 2rem;
 }
