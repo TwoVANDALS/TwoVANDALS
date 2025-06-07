@@ -150,10 +150,13 @@ footer {
 
 .glitch-img {
   position: relative;
-  width: 300px;
-  max-width: 90%;
-  filter: grayscale(1) contrast(2);
+  width: 1200px;         /* Увеличено */
+  max-width: 95%;
+  filter: grayscale(1) contrast(3);
   animation: glitch-anim 2s infinite;
+  margin-top: 2rem;
+}
+
 }
 
 @keyframes glitch-anim {
