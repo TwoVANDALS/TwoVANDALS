@@ -147,3 +147,10 @@ footer {
   80% { opacity: 1; }
   100% { opacity: 0; visibility: hidden; }
 }
+
+.logo img {
+  max-width: 300px;
+  height: auto;
+  filter: grayscale(1) contrast(2);
+  mix-blend-mode: difference;
+}
