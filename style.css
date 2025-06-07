@@ -148,6 +148,58 @@ footer {
   100% { opacity: 0; visibility: hidden; }
 }
 
+/* === PIXEL FREAKS / PARTICLE TRIGGER === */
+.secret-trigger {
+  font-family: 'VT323', monospace;
+  font-size: 2rem;
+  background: #000;
+  border: 2px dashed white;
+  color: #0f0;
+  width: fit-content;
+  margin: 5rem auto;
+  padding: 1rem 2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.secret-trigger:hover {
+  background: #111;
+  color: #f00;
+  transform: scale(1.05) rotate(-2deg);
+}
+
+/* === PASCHALKI: HIDDEN CLICKABLE AREAS === */
+.easter-eggs {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.egg {
+  width: 20px;
+  height: 20px;
+  margin: 2px;
+  display: inline-block;
+  background: #fff;
+  opacity: 0.01;
+  pointer-events: auto;
+}
+
+.egg:hover {
+  opacity: 0.5;
+}
+
+.egg.important {
+  background: red;
+  opacity: 0.02;
+}
+
+.egg.important:hover {
+  opacity: 0.7;
+}
+
+
 .secret-trigger {
   font-family: 'VT323', monospace;
   font-size: 2rem;
