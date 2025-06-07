@@ -2,72 +2,69 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TwoVANDALS</title>
+  <link rel="icon" href="favicon.ico" />
   <link rel="stylesheet" href="style.css" />
-  <link rel="icon" href="favicon.ico" type="image/x-icon" />
-  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=VT323&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=VT323&display=swap" rel="stylesheet">
 </head>
 <body>
 
-<!-- Loader -->
 <div id="loader">
-  <div class="glitch-title" data-text="TwoVANDALS">TwoVANDALS</div>
+  <div class="glitch-loader">TwoVANDALS</div>
 </div>
 
 <header>
-  <h1 class="glitch" data-text="TwoVANDALS">TwoVANDALS</h1>
+  <div class="logo">TwoVANDALS</div>
   <p class="motto">Trashwave is not a genre. It’s a wound.</p>
   <nav>
     <a href="#music">Music</a>
     <a href="#manifest">Manifest</a>
-    <a href="#upload">Upload</a>
+    <a href="#contacts">Contact</a>
   </nav>
 </header>
 
 <section class="hero">
+  <div class="overlay"></div>
   <div class="hero-content">
-    <h2>100+ tracks. No explanation.</h2>
+    <h1>100+ tracks. No explanation.</h1>
     <a href="https://soundcloud.com/vandalstwo" target="_blank" class="btn">LISTEN</a>
   </div>
-</section>
-
-<section id="music">
-  <h2>Popular Tracks</h2>
-  <iframe width="100%" height="166" scrolling="no" frameborder="no"
-    src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/vandalstwo&color=%23000000"></iframe>
-</section>
-
-<section id="manifest">
-  <h2>Manifest</h2>
-  <p>We promote nothing.<br>We make noise.<br>We live raw.</p>
 </section>
 
 <section id="upload">
   <h2>Upload Your Trashwave</h2>
   <input type="file" id="fileInput" accept="audio/*" />
-  <button id="uploadBtn" class="btn">Upload</button>
-  <div id="uploadStatus"></div>
+  <button id="uploadBtn">Upload</button>
+  <p id="uploadStatus"></p>
 </section>
 
 <section id="track-feed">
   <h2>Uploaded Trashwave</h2>
   <div id="trackList"></div>
-
-  <template id="audio-template">
-    <div class="track-player">
-      <h3 class="track-title"></h3>
-      <audio preload="metadata"></audio>
-      <div class="controls">
-        <button class="play-btn">▶</button>
-        <input class="seek-bar" type="range" min="0" value="0" step="1" />
-        <span class="time current-time">0:00</span> / 
-        <span class="time duration">0:00</span>
-        <input class="volume-bar" type="range" min="0" max="1" step="0.01" value="0.5" />
-      </div>
-    </div>
-  </template>
 </section>
+
+<template id="track-template">
+  <div class="track-box">
+    <h3 class="track-title"></h3>
+    <audio preload="metadata" controls></audio>
+    <div class="track-meta">
+      <span class="track-date"></span>
+    </div>
+  </div>
+</template>
+
+<section id="contacts">
+  <h2>Contacts</h2>
+  <div class="socials">
+    <a href="https://discord.gg/tf2X2ThCBM" target="_blank">Join Trashwave Community</a>
+    <a href="https://discord.gg/CyzsWeQCZ8" target="_blank">Our Discord (Invite-only)</a>
+  </div>
+</section>
+
+<footer>
+  <p>© TwoVANDALS / Noise never sleeps.</p>
+</footer>
 
 <script type="module" src="script.js"></script>
 </body>
