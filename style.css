@@ -134,24 +134,12 @@ footer {
 }
 
 @keyframes glitch {
-  0% {
-    text-shadow: 2px 0 red, -2px 0 blue;
-  }
-  20% {
-    text-shadow: -2px 0 red, 2px 0 blue;
-  }
-  40% {
-    text-shadow: 2px 2px green;
-  }
-  60% {
-    text-shadow: -2px -2px lime;
-  }
-  80% {
-    text-shadow: 2px -2px red;
-  }
-  100% {
-    text-shadow: -2px 2px blue;
-  }
+  0%   { text-shadow: 2px 0 red, -2px 0 blue; }
+  20%  { text-shadow: -2px 0 red, 2px 0 blue; }
+  40%  { text-shadow: 2px 2px green; }
+  60%  { text-shadow: -2px -2px lime; }
+  80%  { text-shadow: 2px -2px red; }
+  100% { text-shadow: -2px 2px blue; }
 }
 
 @keyframes flicker {
