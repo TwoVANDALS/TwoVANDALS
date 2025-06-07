@@ -1,4 +1,4 @@
-// Glitch hover
+// Hover Glitch FX
 document.querySelectorAll('.btn, nav a').forEach(el => {
   el.addEventListener('mouseenter', () => {
     el.style.transform = 'skewX(-5deg)';
@@ -8,7 +8,7 @@ document.querySelectorAll('.btn, nav a').forEach(el => {
   });
 });
 
-// Glitch loader logic
+// Loader
 window.addEventListener("load", () => {
   const loader = document.getElementById("loader");
   if (loader) {
@@ -18,41 +18,35 @@ window.addEventListener("load", () => {
   }
 });
 
-// 🧨 Discord Particle Explosion
-document.getElementById('discord-trigger').addEventListener('click', () => {
-  const particles = [];
-  const count = 30;
-  const origin = document.getElementById('discord-trigger');
+// Discord Explosion Trigger
+document.getElementById('discordTrigger').addEventListener('click', () => {
+  const origin = document.getElementById('discordTrigger');
   const rect = origin.getBoundingClientRect();
-  for (let i = 0; i < count; i++) {
-    const particle = document.createElement('div');
-    particle.classList.add('particle');
-    particle.style.position = 'fixed';
-    particle.style.left = rect.left + rect.width / 2 + 'px';
-    particle.style.top = rect.top + rect.height / 2 + 'px';
-    particle.style.width = '5px';
-    particle.style.height = '5px';
-    particle.style.background = '#0f0';
-    particle.style.opacity = 1;
-    particle.style.zIndex = 9999;
-    document.body.appendChild(particle);
-    particles.push(particle);
 
-    const dx = (Math.random() - 0.5) * 200;
-    const dy = (Math.random() - 0.5) * 200;
+  for (let i = 0; i < 50; i++) {
+    const p = document.createElement('div');
+    p.style.position = 'fixed';
+    p.style.width = '6px';
+    p.style.height = '6px';
+    p.style.background = 'lime';
+    p.style.left = rect.left + rect.width / 2 + 'px';
+    p.style.top = rect.top + rect.height / 2 + 'px';
+    p.style.zIndex = 10000;
+    document.body.appendChild(p);
 
-    particle.animate([
+    const dx = (Math.random() - 0.5) * 400;
+    const dy = (Math.random() - 0.5) * 400;
+    const anim = p.animate([
       { transform: 'translate(0, 0)', opacity: 1 },
       { transform: `translate(${dx}px, ${dy}px)`, opacity: 0 }
     ], {
-      duration: 1000,
+      duration: 800,
       easing: 'ease-out'
     });
-
-    setTimeout(() => particle.remove(), 1000);
+    anim.onfinish = () => p.remove();
   }
 
   setTimeout(() => {
     window.open('https://discord.gg/CyzsWeQCZ8', '_blank');
-  }, 800);
+  }, 700);
 });
