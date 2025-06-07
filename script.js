@@ -1,15 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // Glitch Hover
-  document.querySelectorAll('.btn, nav a').forEach(el => {
-    el.addEventListener('mouseenter', () => el.style.transform = 'skewX(-5deg)');
-    el.addEventListener('mouseleave', () => el.style.transform = 'none');
-  });
-
-  // Loader
+  // Glitch loader
   const loader = document.getElementById("loader");
   if (loader) setTimeout(() => loader.style.display = "none", 2500);
 
-  // Discord Particle Effect
+  // Discord click explosion
   const trigger = document.getElementById('discordTrigger');
   if (trigger) {
     trigger.addEventListener('click', () => {
@@ -38,4 +32,14 @@ document.addEventListener('DOMContentLoaded', () => {
       }, 700);
     });
   }
+
+  // Mouse pixel trail
+  document.addEventListener('mousemove', e => {
+    const p = document.createElement('div');
+    p.classList.add('pixel-trail');
+    p.style.left = `${e.clientX}px`;
+    p.style.top = `${e.clientY}px`;
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 800);
+  });
 });
