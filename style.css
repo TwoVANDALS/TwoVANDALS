@@ -1,0 +1,200 @@
+/* === BASE === */
+body {
+  margin: 0;
+  font-family: 'VT323', monospace;
+  background: #000;
+  color: #fff;
+}
+
+/* === HEADER === */
+header {
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 2.5rem;
+}
+
+.motto {
+  font-size: 1rem;
+  letter-spacing: 1px;
+  opacity: 0.7;
+}
+
+nav {
+  margin-top: 1rem;
+}
+
+nav a {
+  color: #fff;
+  text-decoration: none;
+  margin: 0 1rem;
+  font-size: 1.2rem;
+  position: relative;
+}
+
+nav a:hover {
+  text-decoration: underline;
+}
+
+/* === HERO === */
+.hero {
+  position: relative;
+  height: 100vh;
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hero .overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.hero-content {
+  position: relative;
+  text-align: center;
+  z-index: 2;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.btn {
+  padding: 1rem 2rem;
+  border: 2px solid white;
+  color: white;
+  text-decoration: none;
+  font-size: 1.2rem;
+  transition: all 0.2s ease;
+}
+
+.btn:hover {
+  background: white;
+  color: black;
+}
+
+/* === SECTIONS === */
+section {
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.music iframe {
+  margin-top: 2rem;
+}
+
+.manifest p {
+  font-size: 1.5rem;
+  font-family: 'Archivo Black', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-top: 2rem;
+}
+
+.contacts .socials a {
+  display: inline-block;
+  margin: 0.5rem 1rem;
+  font-size: 1.2rem;
+  text-decoration: none;
+  color: #fff;
+}
+
+/* === FOOTER === */
+footer {
+  padding: 2rem;
+  text-align: center;
+  background: #111;
+  font-size: 0.9rem;
+  color: #777;
+}
+
+.alt-discord {
+  color: #0ff;
+  font-size: 1rem;
+  font-family: 'VT323', monospace;
+  text-decoration: none;
+}
+.alt-discord:hover {
+  color: #fff;
+  text-shadow: 0 0 5px cyan;
+}
+
+/* === PIXEL BUTTON === */
+.pixel-button {
+  font-family: 'VT323', monospace;
+  font-size: 2rem;
+  padding: 1rem 2rem;
+  margin: 5rem auto;
+  background: black;
+  border: 3px dashed lime;
+  color: lime;
+  cursor: pointer;
+  display: block;
+  text-align: center;
+  width: fit-content;
+  transition: all 0.3s ease;
+}
+.pixel-button:hover {
+  background: lime;
+  color: black;
+}
+
+/* === GLITCH LOADER === */
+#loader {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  font-size: 3rem;
+  font-family: 'Archivo Black', sans-serif;
+  letter-spacing: 4px;
+  animation: flicker 2.5s linear forwards;
+}
+.glitch-text {
+  animation: glitch-anim 1s infinite;
+}
+
+@keyframes flicker {
+  0% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; visibility: hidden; }
+}
+
+@keyframes glitch-anim {
+  0%   { transform: translate(0); filter: grayscale(1) contrast(2); }
+  10%  { transform: translate(-2px, 2px); filter: hue-rotate(10deg) contrast(3); }
+  20%  { transform: translate(2px, -1px); filter: hue-rotate(-10deg) contrast(1.5); }
+  30%  { transform: translate(-1px, 1px); filter: contrast(2) brightness(1.2); }
+  40%  { transform: translate(1px, -2px); filter: saturate(2) contrast(4); }
+  50%  { transform: translate(-2px, 2px); filter: contrast(3); }
+  100% { transform: translate(0); filter: grayscale(1) contrast(2); }
+}
+
+/* === EASTER EGGS === */
+.easter-eggs .egg {
+  position: fixed;
+  width: 20px;
+  height: 20px;
+  background: white;
+  opacity: 0.015;
+  z-index: 999;
+}
+.easter-eggs .egg:hover {
+  opacity: 0.5;
+}
+.egg.major {
+  background: red;
+  opacity: 0.02;
+}
