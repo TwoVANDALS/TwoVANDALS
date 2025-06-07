@@ -90,3 +90,17 @@ function unlockSecret() {
   document.body.appendChild(section);
   section.style.display = "block";
 }
+
+const cassette = document.querySelector('.cassette-player');
+const leftSpool = cassette.querySelector('.left-spool');
+const rightSpool = cassette.querySelector('.right-spool');
+
+const audio = document.getElementById('bgTrack');
+
+audio.addEventListener('play', () => {
+  cassette.classList.add('playing');
+});
+
+audio.addEventListener('pause', () => {
+  cassette.classList.remove('playing');
+});
