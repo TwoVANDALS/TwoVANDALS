@@ -183,6 +183,22 @@ async function loadTracks(fileList) {
     const currentTimeEl = clone.querySelector(".current-time");
     const durationEl = clone.querySelector(".duration");
 
+    const deleteBtn = clone.querySelector(".delete-btn");
+
+deleteBtn.addEventListener("click", async () => {
+  const confirmDelete = confirm(`Delete track "${file.name}"?`);
+  if (!confirmDelete) return;
+
+  const { error } = await supabase.storage.from('tracks').remove([file.name]);
+  if (error) {
+    alert("❌ Error deleting track: " + error.message);
+  } else {
+    alert(`🗑️ Deleted: ${file.name}`);
+    await listTracks(); // обновим список
+  }
+});
+
+
     title.textContent = name.replace(/\.[^/.]+$/, "");
     audio.src = file.url || file.publicUrl;
 
