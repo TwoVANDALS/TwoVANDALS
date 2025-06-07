@@ -105,8 +105,8 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   toggleBtn.addEventListener("click", () => {
-    audioPlayer.classList.toggle("collapsed");
-    toggleBtn.textContent = audioPlayer.classList.contains("collapsed") ? "▲" : "▼";
+    const isCollapsed = audioPlayer.classList.toggle("collapsed");
+    toggleBtn.textContent = isCollapsed ? "▲" : "▼";
   });
 });
 
@@ -150,7 +150,6 @@ async function loadTracks(fileList) {
       return `${m}:${ss}`;
     };
 
-    // Handle play toggle
     playBtn.addEventListener("click", () => {
       if (audio.paused) {
         document.querySelectorAll("audio").forEach(a => {
@@ -172,13 +171,12 @@ async function loadTracks(fileList) {
       playBtn.textContent = "▶";
     });
 
-    // Properly wait for metadata
     audio.addEventListener("loadedmetadata", () => {
       if (isFinite(audio.duration)) {
         seek.max = Math.floor(audio.duration);
         durationEl.textContent = formatTime(audio.duration);
       } else {
-        audio.currentTime = 1e101; // Force metadata
+        audio.currentTime = 1e101;
         audio.ontimeupdate = () => {
           audio.ontimeupdate = null;
           audio.currentTime = 0;
@@ -204,14 +202,6 @@ async function loadTracks(fileList) {
     listContainer.appendChild(clone);
   }
 }
-
-const toggleBtn = document.getElementById('togglePlayer');
-const playerBar = document.getElementById('audioPlayer');
-
-toggleBtn.addEventListener('click', () => {
-  playerBar.classList.toggle('collapsed');
-  toggleBtn.textContent = playerBar.classList.contains('collapsed') ? '▲' : '▼';
-});
 
 window.addEventListener("DOMContentLoaded", () => {
   const loader = document.getElementById("loader-screen");
