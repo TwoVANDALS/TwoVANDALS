@@ -111,139 +111,135 @@
 
   const supabase = createClient(
     'https://qqffjsnlsbzhzhlvbexb.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFxZmZqc25sc2J6aHpobHZiZXhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkzMTM1MTksImV4cCI6MjA2NDg4OTUxOX0.LFrwLA5njJYak5RQ25Kd14TZE64HCV8WSsx31riL-0g'
-  )
-async function listTracks() {
-  const { data: files, error } = await supabase.storage.from('tracks').list('', {
-    limit: 100,
-    sortBy: { column: 'created_at', order: 'desc' }
-  });
-  if (error) {
-    console.error('Fetch error:', error);
-    return;
-  }
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+  );
 
-  const trackList = document.getElementById('trackList');
-  trackList.innerHTML = '';
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-  for (const file of files) {
-    const { data } = supabase.storage.from('tracks').getPublicUrl(file.name);
-    const audioUrl = data.publicUrl;
-    const uploadDate = new Date(file.created_at).toLocaleString();
-
-    // 🎵 Название = имя файла без расширения
-    const title = file.name.replace(/\.[^/.]+$/, "");
-
-    // 📦 Создаем кастомный блок
-    const block = document.createElement('div');
-    block.classList.add('track-player');
-    block.innerHTML = `
-      <h3>${title}</h3>
-      <p class="upload-time">${uploadDate}</p>
-      <audio src="${audioUrl}"></audio>
-      <button class="play-btn">▶</button>
-      <input type="range" class="seek-bar" min="0" step="1" value="0" />
-      <input type="range" class="volume-bar" min="0" max="1" step="0.01" value="0.5" />
-      <canvas class="wave-canvas"></canvas>
-    `;
-    trackList.appendChild(block);
-  }
-
-  initializePlayers(); // запускаем кастомную логику
-}
-
-  function initializePlayers() {
-  document.querySelectorAll('.track-player').forEach(player => {
-    const audio = player.querySelector('audio');
-    const playBtn = player.querySelector('.play-btn');
-    const seek = player.querySelector('.seek-bar');
-    const volume = player.querySelector('.volume-bar');
-    const canvas = player.querySelector('.wave-canvas');
-    const ctx = canvas.getContext('2d');
-
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
-
-    playBtn.addEventListener('click', () => {
-      if (audio.paused) {
-        document.querySelectorAll('audio').forEach(a => { if (a !== audio) a.pause(); });
-        audio.play();
-        playBtn.textContent = '⏸';
-      } else {
-        audio.pause();
-        playBtn.textContent = '▶';
-      }
+  async function listTracks() {
+    const { data: files, error } = await supabase.storage.from('tracks').list('', {
+      limit: 100
     });
 
-    audio.addEventListener('loadedmetadata', () => {
-      seek.max = Math.floor(audio.duration);
-    });
+    if (error) return console.error('Fetch error:', error);
 
-    audio.addEventListener('timeupdate', () => {
-      seek.value = audio.currentTime;
-    });
+    const trackList = document.getElementById('trackList');
+    trackList.innerHTML = '';
 
-    seek.addEventListener('input', () => {
-      audio.currentTime = seek.value;
-    });
+    for (const file of files) {
+      const { data } = supabase.storage.from('tracks').getPublicUrl(file.name);
+      const audioUrl = data.publicUrl;
 
-    volume.addEventListener('input', () => {
-      audio.volume = volume.value;
-    });
-
-    // WAVES
-    const audioCtx = new AudioContext();
-    const analyser = audioCtx.createAnalyser();
-    const source = audioCtx.createMediaElementSource(audio);
-    const dataArray = new Uint8Array(analyser.frequencyBinCount);
-    analyser.fftSize = 64;
-    source.connect(analyser);
-    analyser.connect(audioCtx.destination);
-
-    function drawWaves() {
-      requestAnimationFrame(drawWaves);
-      analyser.getByteFrequencyData(dataArray);
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const barWidth = canvas.width / dataArray.length;
-      for (let i = 0; i < dataArray.length; i++) {
-        const val = dataArray[i] / 255;
-        const height = val * canvas.height;
-        ctx.fillStyle = `rgba(0, 255, 0, ${val})`;
-        ctx.fillRect(i * barWidth, canvas.height - height, barWidth - 1, height);
-      }
+      const title = file.name.replace(/\.[^/.]+$/, "");
+      const block = document.createElement('div');
+      block.classList.add('track-player');
+      block.innerHTML = `
+        <h3>${title}</h3>
+        <audio src="${audioUrl}"></audio>
+        <button class="play-btn">▶</button>
+        <input type="range" class="seek-bar" min="0" step="1" value="0" />
+        <input type="range" class="volume-bar" min="0" max="1" step="0.01" value="0.5" />
+        <canvas class="wave-canvas"></canvas>
+      `;
+      trackList.appendChild(block);
     }
 
-    audio.addEventListener('play', () => {
-      if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
-      }
-      drawWaves();
-    });
-  });
-}
+    initializePlayers();
+  }
 
-  
-  const uploadBtn = document.getElementById('uploadBtn')
-  const fileInput = document.getElementById('fileInput')
-  const uploadStatus = document.getElementById('uploadStatus')
-  const trackList = document.getElementById('trackList')
+  function initializePlayers() {
+    document.querySelectorAll('.track-player').forEach(player => {
+      const audio = player.querySelector('audio');
+      const playBtn = player.querySelector('.play-btn');
+      const seek = player.querySelector('.seek-bar');
+      const volume = player.querySelector('.volume-bar');
+      const canvas = player.querySelector('.wave-canvas');
+      const ctx = canvas.getContext('2d');
+
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+
+      const analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 64;
+      const source = audioCtx.createMediaElementSource(audio);
+      source.connect(analyser);
+      analyser.connect(audioCtx.destination);
+
+      const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+      playBtn.addEventListener('click', () => {
+        if (audio.paused) {
+          document.querySelectorAll('audio').forEach(a => {
+            if (a !== audio) a.pause();
+          });
+          audio.play();
+          playBtn.textContent = '⏸';
+          if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+          }
+        } else {
+          audio.pause();
+          playBtn.textContent = '▶';
+        }
+      });
+
+      audio.addEventListener('loadedmetadata', () => {
+        seek.max = Math.floor(audio.duration);
+      });
+
+      audio.addEventListener('timeupdate', () => {
+        seek.value = audio.currentTime;
+      });
+
+      seek.addEventListener('input', () => {
+        audio.currentTime = seek.value;
+      });
+
+      volume.addEventListener('input', () => {
+        audio.volume = volume.value;
+      });
+
+      function drawWaves() {
+        requestAnimationFrame(drawWaves);
+        analyser.getByteFrequencyData(dataArray);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const barWidth = canvas.width / dataArray.length;
+        for (let i = 0; i < dataArray.length; i++) {
+          const val = dataArray[i] / 255;
+          const height = val * canvas.height;
+          ctx.fillStyle = `rgba(0, 255, 0, ${val})`;
+          ctx.fillRect(i * barWidth, canvas.height - height, barWidth - 1, height);
+        }
+      }
+
+      audio.addEventListener('play', () => {
+        drawWaves();
+      });
+    });
+  }
+
+  const uploadBtn = document.getElementById('uploadBtn');
+  const fileInput = document.getElementById('fileInput');
+  const uploadStatus = document.getElementById('uploadStatus');
 
   uploadBtn.addEventListener('click', async () => {
-    const file = fileInput.files[0]
-    if (!file) return alert('Choose a file first!')
-    const { error } = await supabase.storage
-      .from('tracks')
-      .upload(file.name, file, {
-        cacheControl: '3600',
-        upsert: false
-      })
+    const file = fileInput.files[0];
+    if (!file) return alert('Choose a file first!');
 
-    if (error) return uploadStatus.innerText = `Error: ${error.message}`
-    uploadStatus.innerText = `Uploaded ${file.name}`
-    await listTracks()
-  })
+    const { error } = await supabase.storage.from('tracks').upload(file.name, file, {
+      cacheControl: '3600',
+      upsert: false
+    });
 
-  listTracks()
+    if (error) {
+      uploadStatus.innerText = `Error: ${error.message}`;
+    } else {
+      uploadStatus.innerText = `Uploaded: ${file.name}`;
+      await listTracks();
+    }
+  });
+
+  listTracks();
 </script>
 
 </body>
