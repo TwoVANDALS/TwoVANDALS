@@ -176,6 +176,46 @@ async function loadTracks(fileList) {
 
     const clone = template.content.cloneNode(true);
     const audio = clone.querySelector("audio");
+    const canvas = clone.querySelector(".visualizer");
+const ctx = canvas.getContext("2d");
+
+let audioCtx, analyser, source, animationId;
+
+function drawBars() {
+  const bufferLength = analyser.frequencyBinCount;
+  const dataArray = new Uint8Array(bufferLength);
+  analyser.getByteFrequencyData(dataArray);
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const barWidth = (canvas.width / bufferLength) * 2.5;
+  let x = 0;
+
+  for (let i = 0; i < bufferLength; i++) {
+    const barHeight = dataArray[i] / 2;
+    ctx.fillStyle = `rgb(${barHeight + 50},50,50)`;
+    ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+    x += barWidth + 1;
+  }
+
+  animationId = requestAnimationFrame(drawBars);
+}
+
+audio.addEventListener("play", () => {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioCtx.createAnalyser();
+    source = audioCtx.createMediaElementSource(audio);
+    source.connect(analyser);
+    analyser.connect(audioCtx.destination);
+    analyser.fftSize = 256;
+  }
+  drawBars();
+});
+
+audio.addEventListener("pause", () => {
+  cancelAnimationFrame(animationId);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+});
     const title = clone.querySelector(".track-title");
     const playBtn = clone.querySelector(".play-btn");
     const seek = clone.querySelector(".seek-bar");
