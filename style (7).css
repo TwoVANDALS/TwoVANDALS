@@ -1,0 +1,444 @@
+/* ========== GLOBAL ========== */
+body {
+  font-family: 'VT323', monospace;
+  margin: 0;
+  padding: 0;
+  font-family: 'VT323', monospace;
+  font-size: 20px;
+  background: #000;
+  color: #fff;
+  overflow-x: hidden;
+}
+
+h2, h3, p, a, .btn, .motto, .track-title {
+  font-family: inherit;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* ========== HEADER ========== */
+header {
+  padding: 1.5rem 1rem 0.5rem;
+  text-align: center;
+}
+
+.logo {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 3.5rem;
+  letter-spacing: 2px;
+}
+
+.motto {
+  font-size: 1.2rem;
+  opacity: 0.6;
+}
+
+nav {
+  margin-top: 1rem;
+}
+
+nav a {
+  color: #fff;
+  text-decoration: none;
+  margin: 0 1rem;
+  font-size: 1.3rem;
+  transition: color 0.2s ease;
+}
+
+nav a:hover {
+  color: #0f0;
+}
+
+/* ========== HERO BLOCK ========== */
+.hero {
+  position: relative;
+  height: 90vh;
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hero .overlay {
+  display: none;
+}
+
+.hero-content {
+  text-align: center;
+  z-index: 2;
+}
+
+.hero h1 {
+  font-size: 2.2rem;
+  margin-bottom: 1rem;
+  font-family: 'VT323', monospace;
+  letter-spacing: 1px;
+}
+
+
+.btn {
+  padding: 1rem 2rem;
+  border: 2px solid white;
+  color: white;
+  background: none;
+  text-decoration: none;
+  font-size: 1.2rem;
+  transition: all 0.2s ease;
+}
+
+.btn:hover {
+  background: white;
+  color: black;
+}
+
+/* ========== SECTION ========== */
+section {
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.music iframe {
+  margin-top: 2rem;
+  border: none;
+}
+
+/* ========== MANIFEST ========== */
+.manifest h2 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.manifest p {
+  font-size: 2rem;
+  font-family: 'Archivo Black', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  line-height: 2.8rem;
+  margin-top: 1rem;
+}
+
+/* ========== CONTACTS ========== */
+.contacts .socials a {
+  display: inline-block;
+  margin: 0.5rem 1rem;
+  font-size: 1.2rem;
+  text-decoration: none;
+  color: #fff;
+}
+
+.discord-links a {
+  display: inline-block;
+  padding: 0.6rem 1.2rem;
+  margin: 0.5rem;
+  font-size: 1.1rem;
+  font-family: 'VT323', monospace;
+  background: transparent;
+  border: 2px solid #fff;
+  color: #fff;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.discord-links a:hover {
+  background: #fff;
+  color: #000;
+}
+
+/* ========== AUDIO PLAYER ========== */
+.audio-player {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: #000;
+  color: #fff;
+  border-top: 2px solid #444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1rem;
+  gap: 1rem;
+  font-family: 'VT323', monospace;
+  font-size: 1.2rem;
+  z-index: 9999;
+  transition: transform 0.3s ease;
+}
+
+.audio-player.collapsed {
+  transform: translateY(100%);
+}
+
+.audio-player button,
+.audio-player input[type="range"] {
+  background: none;
+  border: 2px solid #fff;
+  color: #fff;
+  font-family: inherit;
+  font-size: 1.2rem;
+  padding: 0.2rem 0.8rem;
+  cursor: pointer;
+}
+
+.audio-player button:hover {
+  background: #fff;
+  color: #000;
+}
+
+.audio-player input[type="range"] {
+  width: 100px;
+  height: 4px;
+  appearance: none;
+  background: #555;
+}
+
+.audio-player input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: #fff;
+  border-radius: 50%;
+}
+
+/* TOGGLE BUTTON */
+.toggle-btn {
+  font-size: 1rem;
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.toggle-btn:hover {
+  color: #fff;
+}
+
+/* ========== TRACK PLAYER ========== */
+.track-player {
+  background: #000;
+  color: #fff;
+  border: 1px solid #444;
+  margin: 1rem auto;
+  padding: 1rem;
+  width: 90%;
+  max-width: 600px;
+  font-family: 'VT323', monospace;
+}
+
+.track-player h3 {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 1.6rem;
+  margin-bottom: 0.5rem;
+}
+
+.track-player .controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  font-size: 1rem;
+}
+
+.track-player .controls button {
+  font-size: 1.2rem;
+  padding: 0.2rem 0.6rem;
+  border: 2px solid #fff;
+  background: none;
+  color: #fff;
+  cursor: pointer;
+}
+
+.track-player .controls button:hover {
+  background: #fff;
+  color: #000;
+}
+
+.track-player .controls input[type="range"] {
+  flex: 1;
+  height: 4px;
+  background: #555;
+  appearance: none;
+}
+
+.track-player .controls input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  background: #fff;
+  border-radius: 50%;
+}
+
+.track-player .time {
+  min-width: 40px;
+  text-align: center;
+}
+
+/* ========== FOOTER ========== */
+footer {
+  padding: 2rem;
+  text-align: center;
+  background: #111;
+  font-size: 0.9rem;
+  color: #777;
+}
+
+/* ========== EASTER EGGS ========== */
+.egg {
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  background-size: cover;
+  opacity: 0.4;
+  z-index: 10;
+  transition: 0.3s ease;
+  filter: grayscale(1);
+}
+
+.egg:hover {
+  opacity: 1;
+  transform: scale(1.2) rotate(5deg);
+  filter: none;
+}
+
+.egg-blood { top: 10%; left: 5%; background-image: url('icons/blood.png'); }
+.egg-water { bottom: 15%; right: 5%; background-image: url('icons/water.png'); }
+.egg-electric { top: 30%; right: 3%; background-image: url('icons/electric.png'); }
+.egg-fire { bottom: 20%; left: 8%; background-image: url('icons/fire.png'); }
+.egg-core { bottom: 5%; right: 5%; background-image: url('icons/core.png'); }
+
+/* ========== MOBILE ========== */
+@media (max-width: 768px) {
+  .audio-player {
+    flex-wrap: wrap;
+    font-size: 1rem;
+    gap: 0.5rem;
+  }
+
+  .track-player .controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  nav a {
+    display: block;
+    margin: 0.5rem 0;
+  }
+}
+
+
+canvas#snow-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+
+#loader-screen {
+  position: fixed;
+  inset: 0;
+  background: black;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  font-family: 'VT323', monospace;
+  font-size: 3rem;
+  letter-spacing: 3px;
+  transition: opacity 0.4s ease;
+}
+
+#loader-screen.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  html {
+    font-size: 18px;
+    overflow-x: hidden;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+  }
+
+  .logo {
+    font-size: 2.5rem;
+    line-height: 1.2;
+  }
+
+  .motto {
+    font-size: 1rem;
+    padding: 0 1rem;
+  }
+
+  nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  nav a {
+    font-size: 1.2rem;
+    margin: 0.3rem 0;
+  }
+
+  .hero h1 {
+    font-size: 1.6rem;
+    padding: 0 1rem;
+  }
+
+  .btn {
+    font-size: 1rem;
+    padding: 0.6rem 1.2rem;
+  }
+
+  section {
+    padding: 2rem 1rem;
+  }
+
+  .manifest p {
+    font-size: 1.2rem;
+    line-height: 2rem;
+    padding: 0 1rem;
+  }
+
+  .discord-links a {
+    display: block;
+    margin: 0.6rem auto;
+    width: 90%;
+    text-align: center;
+  }
+
+  .audio-player {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .track-player {
+    width: 95%;
+    margin: 1rem auto;
+    padding: 1rem;
+  }
+
+  .track-player h3 {
+    font-size: 1.2rem;
+  }
+
+  .track-player .controls {
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .track-player input[type="range"] {
+    width: 100%;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
