@@ -85,18 +85,20 @@ footer {
 
 /* AUDIO PLAYER */
 .audio-player {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #111;
-  padding: 1rem;
-  gap: 1rem;
   position: fixed;
   bottom: 0;
-  width: 100%;
+  left: 0;
+  right: 0;
+  background: #000;
   border-top: 2px solid #0f0;
-  z-index: 999;
-  transition: transform 0.3s ease;
+  color: #fff;
+  font-family: 'VT323', monospace;
+  padding: 0.8rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  z-index: 1000;
+  transition: transform 0.4s ease;
 }
 
 .audio-player.collapsed {
@@ -105,76 +107,83 @@ footer {
 
 .audio-player button,
 .audio-player input[type="range"] {
-  background: #000;
-  color: #fff;
+  appearance: none;
+  background: transparent;
   border: none;
-  font-family: 'VT323', monospace;
-}
-
-.audio-player button {
-  font-size: 1.2rem;
-  cursor: pointer;
-  background: none;
-  padding: 0.3rem 0.8rem;
-  border: 1px solid #555;
-}
-
-.audio-player button:hover {
-  background: #0f0;
-  color: #000;
+  color: #0f0;
+  font-size: 1.1rem;
 }
 
 .audio-player input[type="range"] {
-  width: 120px;
+  width: 100px;
+  height: 4px;
+  background: #333;
 }
 
-#volumeSlider {
-  accent-color: #0f0;
+.audio-player input[type="range"]::-webkit-slider-thumb {
+  background: #0f0;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: none;
 }
 
 /* TRACK PLAYER */
 .track-player {
-  background: #111;
-  margin: 2rem auto;
+  background: #0a0a0a;
+  border: 1px solid #111;
   padding: 1rem;
-  border: 1px solid #333;
-  width: 90%;
-  max-width: 600px;
-  box-shadow: 0 0 8px #0f0;
+  margin: 1.2rem auto;
+  max-width: 700px;
+  color: #fff;
+  font-family: 'VT323', monospace;
   position: relative;
+  box-shadow: 0 0 10px rgba(0,255,0,0.1);
+  border-left: 4px solid #0f0;
 }
 
-.track-title {
-  font-size: 1.2rem;
-  font-family: 'Archivo Black', sans-serif;
-  margin-bottom: 1rem;
+.track-player h3 {
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+  color: #0f0;
 }
 
 .track-player .controls {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 0.8rem;
-  justify-content: center;
+  gap: 0.5rem;
+  font-size: 1rem;
 }
 
-.track-player .play-btn {
-  font-size: 1.4rem;
+.track-player button.play-btn {
   background: none;
-  border: 1px solid #fff;
-  padding: 0.3rem 0.7rem;
+  border: 1px solid #0f0;
+  color: #0f0;
+  padding: 0.2rem 0.6rem;
   cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.track-player button.play-btn:hover {
+  background: #0f0;
+  color: #000;
 }
 
 .track-player input[type="range"] {
-  width: 150px;
-  accent-color: #0f0;
+  flex: 1;
+  height: 4px;
+  background: #444;
 }
 
-.time {
-  font-size: 0.9rem;
-  color: #ccc;
+.track-player input[type="range"]::-webkit-slider-thumb {
+  width: 12px;
+  height: 12px;
+  background: #0f0;
+  border-radius: 50%;
+  border: none;
 }
+
 
 /* DISCORD LINKS */
 .discord-links {
@@ -207,13 +216,14 @@ footer {
 .egg-fire { bottom: 120px; right: 25%; background: orange; }
 .egg-core { bottom: 10px; right: 10%; background: #fff; }
 
-/* SNOW EFFECT CANVAS */
-#snow-canvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 0;
+.toggle-btn {
+  background: none;
+  border: none;
+  color: #0f0;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+.toggle-btn:hover {
+  transform: rotate(180deg);
 }
