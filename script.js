@@ -371,7 +371,7 @@ window.addEventListener("DOMContentLoaded", () => {
       });
     },
     {
-      rootMargin: "-40% 0px -55% 0px",
+      rootMargin: "-30% 0px -60% 0px",
       threshold: 0.1
     }
   );
