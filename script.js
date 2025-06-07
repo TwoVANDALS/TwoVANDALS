@@ -119,3 +119,88 @@ document.addEventListener("click", e => {
     clickAudio.play().catch(() => {});
   }
 });
+
+async function loadTracks(fileList) {
+  const listContainer = document.getElementById("trackList");
+  const template = document.getElementById("audio-template");
+
+  listContainer.innerHTML = "";
+
+  for (const file of fileList) {
+    const name = file.name || "Unknown";
+    if (!name.match(/\.(mp3|wav)$/i)) continue;
+
+    const clone = template.content.cloneNode(true);
+    const audio = clone.querySelector("audio");
+    const title = clone.querySelector(".track-title");
+    const playBtn = clone.querySelector(".play-btn");
+    const seek = clone.querySelector(".seek-bar");
+    const volume = clone.querySelector(".volume-bar");
+    const currentTimeEl = clone.querySelector(".current-time");
+    const durationEl = clone.querySelector(".duration");
+
+    title.textContent = name.replace(/\.[^/.]+$/, "");
+    audio.src = file.url || file.publicUrl;
+
+    let isPlaying = false;
+
+    const formatTime = (s) => {
+      const m = Math.floor(s / 60);
+      const ss = Math.floor(s % 60).toString().padStart(2, "0");
+      return `${m}:${ss}`;
+    };
+
+    // Handle play toggle
+    playBtn.addEventListener("click", () => {
+      if (audio.paused) {
+        document.querySelectorAll("audio").forEach(a => {
+          if (a !== audio) a.pause();
+        });
+        audio.play();
+      } else {
+        audio.pause();
+      }
+    });
+
+    audio.addEventListener("play", () => {
+      isPlaying = true;
+      playBtn.textContent = "⏸";
+    });
+
+    audio.addEventListener("pause", () => {
+      isPlaying = false;
+      playBtn.textContent = "▶";
+    });
+
+    // Properly wait for metadata
+    audio.addEventListener("loadedmetadata", () => {
+      if (isFinite(audio.duration)) {
+        seek.max = Math.floor(audio.duration);
+        durationEl.textContent = formatTime(audio.duration);
+      } else {
+        audio.currentTime = 1e101; // Force metadata
+        audio.ontimeupdate = () => {
+          audio.ontimeupdate = null;
+          audio.currentTime = 0;
+          seek.max = Math.floor(audio.duration);
+          durationEl.textContent = formatTime(audio.duration);
+        };
+      }
+    });
+
+    audio.addEventListener("timeupdate", () => {
+      seek.value = audio.currentTime;
+      currentTimeEl.textContent = formatTime(audio.currentTime);
+    });
+
+    seek.addEventListener("input", () => {
+      audio.currentTime = seek.value;
+    });
+
+    volume.addEventListener("input", () => {
+      audio.volume = volume.value;
+    });
+
+    listContainer.appendChild(clone);
+  }
+}
