@@ -1,52 +1,44 @@
-// Hover Glitch FX
-document.querySelectorAll('.btn, nav a').forEach(el => {
-  el.addEventListener('mouseenter', () => {
-    el.style.transform = 'skewX(-5deg)';
-  });
-  el.addEventListener('mouseleave', () => {
-    el.style.transform = 'none';
-  });
-});
-
-// Loader
-window.addEventListener("load", () => {
+document.addEventListener('DOMContentLoaded', () => {
+  // Loader
   const loader = document.getElementById("loader");
-  if (loader) {
-    setTimeout(() => {
-      loader.style.display = "none";
-    }, 2500);
-  }
-});
+  if (loader) setTimeout(() => loader.style.display = "none", 2000);
 
-// Discord Explosion Trigger
-document.getElementById('discordTrigger').addEventListener('click', () => {
-  const origin = document.getElementById('discordTrigger');
-  const rect = origin.getBoundingClientRect();
-
-  for (let i = 0; i < 50; i++) {
+  // Pixel trail
+  document.addEventListener('mousemove', e => {
     const p = document.createElement('div');
-    p.style.position = 'fixed';
-    p.style.width = '6px';
-    p.style.height = '6px';
-    p.style.background = 'lime';
-    p.style.left = rect.left + rect.width / 2 + 'px';
-    p.style.top = rect.top + rect.height / 2 + 'px';
-    p.style.zIndex = 10000;
+    p.classList.add('pixel-trail');
+    p.style.left = `${e.clientX}px`;
+    p.style.top = `${e.clientY}px`;
     document.body.appendChild(p);
+    setTimeout(() => p.remove(), 800);
+  });
 
-    const dx = (Math.random() - 0.5) * 400;
-    const dy = (Math.random() - 0.5) * 400;
-    const anim = p.animate([
-      { transform: 'translate(0, 0)', opacity: 1 },
-      { transform: `translate(${dx}px, ${dy}px)`, opacity: 0 }
-    ], {
-      duration: 800,
-      easing: 'ease-out'
+  // Discord explosion
+  const trigger = document.getElementById('discordTrigger');
+  if (trigger) {
+    trigger.addEventListener('click', () => {
+      const rect = trigger.getBoundingClientRect();
+      for (let i = 0; i < 30; i++) {
+        const el = document.createElement('div');
+        el.style.position = 'fixed';
+        el.style.width = '6px';
+        el.style.height = '6px';
+        el.style.background = 'white';
+        el.style.left = `${rect.left + rect.width / 2}px`;
+        el.style.top = `${rect.top + rect.height / 2}px`;
+        el.style.zIndex = 9999;
+        document.body.appendChild(el);
+
+        const dx = (Math.random() - 0.5) * 300;
+        const dy = (Math.random() - 0.5) * 300;
+        el.animate([
+          { transform: 'translate(0, 0)', opacity: 1 },
+          { transform: `translate(${dx}px, ${dy}px)`, opacity: 0 }
+        ], { duration: 1000, easing: 'ease-out' }).onfinish = () => el.remove();
+      }
+      setTimeout(() => {
+        window.open('https://discord.gg/CyzsWeQCZ8', '_blank');
+      }, 600);
     });
-    anim.onfinish = () => p.remove();
   }
-
-  setTimeout(() => {
-    window.open('https://discord.gg/CyzsWeQCZ8', '_blank');
-  }, 700);
 });
