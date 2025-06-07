@@ -212,3 +212,22 @@ toggleBtn.addEventListener('click', () => {
   playerBar.classList.toggle('collapsed');
   toggleBtn.textContent = playerBar.classList.contains('collapsed') ? '▲' : '▼';
 });
+
+window.addEventListener("DOMContentLoaded", () => {
+  const loader = document.getElementById("loader-screen");
+  const text = document.getElementById("loader-text");
+  const final = "TwoVANDALS";
+  let index = 1;
+
+  const interval = setInterval(() => {
+    if (index < final.length) {
+      text.textContent += final[index];
+      index++;
+    } else {
+      clearInterval(interval);
+      setTimeout(() => {
+        loader.classList.add("hidden");
+      }, 500);
+    }
+  }, 150);
+});
