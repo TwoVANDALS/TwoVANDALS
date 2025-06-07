@@ -148,3 +148,60 @@ document.addEventListener("DOMContentLoaded", () => {
     toggleBtn.textContent = audioPlayer.classList.contains('collapsed') ? '▲' : '▼';
   });
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+  const audio = document.getElementById("bgTrack");
+  const playPauseBtn = document.getElementById("playPauseBtn");
+  const volumeSlider = document.getElementById("volumeSlider");
+  const seekBar = document.getElementById("seekBar");
+  const currentTimeEl = document.getElementById("currentTime");
+  const durationEl = document.getElementById("duration");
+  const toggleBtn = document.getElementById("togglePlayer");
+  const audioPlayer = document.getElementById("audioPlayer");
+
+  // Time formatting
+  function formatTime(sec) {
+    const minutes = Math.floor(sec / 60);
+    const seconds = Math.floor(sec % 60).toString().padStart(2, "0");
+    return `${minutes}:${seconds}`;
+  }
+
+  // Play/Pause toggle
+  playPauseBtn.addEventListener("click", () => {
+    if (audio.paused) {
+      audio.play();
+      playPauseBtn.textContent = "⏸ Pause";
+    } else {
+      audio.pause();
+      playPauseBtn.textContent = "▶ Play Trashwave Set";
+    }
+  });
+
+  // Volume control
+  volumeSlider.addEventListener("input", () => {
+    audio.volume = volumeSlider.value;
+  });
+
+  // Load duration
+  audio.addEventListener("loadedmetadata", () => {
+    seekBar.max = Math.floor(audio.duration);
+    durationEl.textContent = formatTime(audio.duration);
+  });
+
+  // Update time
+  audio.addEventListener("timeupdate", () => {
+    seekBar.value = audio.currentTime;
+    currentTimeEl.textContent = formatTime(audio.currentTime);
+  });
+
+  // Seek control
+  seekBar.addEventListener("input", () => {
+    audio.currentTime = seekBar.value;
+  });
+
+  // Collapse toggle
+  toggleBtn.addEventListener("click", () => {
+    audioPlayer.classList.toggle("collapsed");
+    toggleBtn.textContent = audioPlayer.classList.contains("collapsed") ? "▲" : "▼";
+  });
+});
