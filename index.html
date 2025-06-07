@@ -242,7 +242,18 @@
       }
     });
 
-    listTracks();
+    const trackFeed = document.getElementById("track-feed");
+
+const trackObserver = new IntersectionObserver((entries, obs) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      listTracks();
+      obs.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.25 });
+
+if (trackFeed) trackObserver.observe(trackFeed);
   </script>
 
 </body>
