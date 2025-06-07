@@ -291,3 +291,59 @@ footer {
   background: none;
   font-size: 1.3rem;
 }
+
+.audio-player {
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+.audio-player.collapsed {
+  transform: translateY(100%);
+  opacity: 0.2;
+}
+
+.toggle-btn {
+  position: absolute;
+  top: -1.8rem;
+  right: 1rem;
+  font-size: 1.2rem;
+  background: none;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-family: 'VT323', monospace;
+  z-index: 2;
+}
+
+.audio-player {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #000;
+  border-top: 2px solid #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0.8rem 1rem;
+  z-index: 10000;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+.audio-player.collapsed {
+  transform: translateY(100%);
+  opacity: 0.3;
+}
+
+.toggle-btn {
+  position: absolute;
+  top: -1.8rem;
+  right: 1rem;
+  font-size: 1.2rem;
+  background: none;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-family: 'VT323', monospace;
+  z-index: 2;
+}
