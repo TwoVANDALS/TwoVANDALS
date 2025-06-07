@@ -204,3 +204,11 @@ async function loadTracks(fileList) {
     listContainer.appendChild(clone);
   }
 }
+
+const toggleBtn = document.getElementById('togglePlayer');
+const playerBar = document.getElementById('audioPlayer');
+
+toggleBtn.addEventListener('click', () => {
+  playerBar.classList.toggle('collapsed');
+  toggleBtn.textContent = playerBar.classList.contains('collapsed') ? '▲' : '▼';
+});
