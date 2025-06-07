@@ -4,42 +4,100 @@ body {
   background: #000;
   color: #fff;
   font-size: 20px;
-  line-height: 1.6;
   overflow-x: hidden;
 }
 
+#loader {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.glitch-loader {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 4rem;
+  animation: glitch 1s infinite alternate;
+}
+
+@keyframes glitch {
+  0% { text-shadow: 2px 0 red; }
+  50% { text-shadow: -2px 0 blue; }
+  100% { text-shadow: 1px 0 lime; }
+}
+
+canvas#snow-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
 header {
-  padding: 2rem;
   text-align: center;
+  padding: 1.2rem 1rem 0.2rem;
+  z-index: 10;
+  position: relative;
 }
 
 .logo {
   font-family: 'Archivo Black', sans-serif;
   font-size: 3rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.2rem;
 }
 
 .motto {
-  font-size: 1.2rem;
-  letter-spacing: 1px;
-  opacity: 0.7;
+  font-size: 1.1rem;
+  opacity: 0.6;
+  margin-bottom: 0.6rem;
 }
 
 nav {
-  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
 }
 
 nav a {
   color: #fff;
   text-decoration: none;
-  margin: 0 1rem;
-  font-size: 1.3rem;
+  margin: 0 1.2rem;
+  font-size: 1.2rem;
 }
 
+/* UNDERTALE style buttons */
+.pixel-btn {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 1.1rem;
+  padding: 0.8rem 1.4rem;
+  background: #000;
+  color: #fff;
+  border: 2px solid #fff;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+  position: relative;
+  z-index: 5;
+}
+
+.pixel-btn:hover {
+  background: #fff;
+  color: #000;
+  transform: scale(1.02);
+}
+
+.pixel-btn:active {
+  animation: explode 0.3s forwards;
+}
+
+@keyframes explode {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
 .hero {
   position: relative;
   height: 70vh;
-  background: #000;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -60,20 +118,6 @@ nav a {
 .hero h1 {
   font-size: 2.5rem;
   margin-bottom: 1.5rem;
-}
-
-.btn {
-  padding: 1rem 2rem;
-  border: 2px solid white;
-  color: white;
-  text-decoration: none;
-  font-size: 1.2rem;
-  transition: all 0.2s ease;
-}
-
-.btn:hover {
-  background: white;
-  color: black;
 }
 
 section {
@@ -124,17 +168,6 @@ footer {
   gap: 0.5rem;
 }
 
-.audio-player button {
-  font-family: 'Archivo Black', sans-serif;
-  background: #111;
-  border: 1px solid #fff;
-  color: #fff;
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-  font-size: 0.9rem;
-  text-transform: uppercase;
-}
-
 .audio-player input[type="range"] {
   width: 100px;
   accent-color: #fff;
@@ -145,69 +178,28 @@ footer {
   width: 20px;
   height: 20px;
   position: absolute;
-  opacity: 0.05;
+  opacity: 0.03;
   transition: opacity 0.3s ease;
+  border-radius: 50%;
+  z-index: 1;
 }
 
 .egg:hover {
   opacity: 1;
 }
 
-/* Blood */
-.egg-blood {
-  left: 5vw;
-  top: 92vh;
-  background: red;
-}
+.egg-blood { left: 5vw; top: 90vh; background: red; }
+.egg-water { right: 4vw; top: 85vh; background: cyan; }
+.egg-electric { top: 20vh; left: 2vw; background: yellow; }
+.egg-fire { top: 15vh; right: 2vw; background: orange; }
+.egg-core { bottom: 5vh; right: 50vw; background: white; }
 
-/* Water */
-.egg-water {
-  left: 90vw;
-  top: 85vh;
-  background: cyan;
-}
-
-/* Electric */
-.egg-electric {
-  top: 20vh;
-  left: 0.5vw;
-  background: yellow;
-}
-
-/* Fire */
-.egg-fire {
-  right: 1vw;
-  top: 10vh;
-  background: orange;
-}
-
-/* Core */
-.egg-core {
-  bottom: 5vh;
-  right: 50vw;
-  background: white;
-}
-
-/* Loader */
-#loader {
-  position: fixed;
-  inset: 0;
-  background: #000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-}
-
-.glitch-loader {
-  font-family: 'Archivo Black', sans-serif;
-  font-size: 4rem;
-  color: #fff;
-  animation: glitch 1s infinite alternate;
-}
-
-@keyframes glitch {
-  0% { text-shadow: 2px 0 red; }
-  50% { text-shadow: -2px 0 blue; }
-  100% { text-shadow: 1px 0 lime; }
+/* Hidden reward */
+#secret-section {
+  display: none;
+  padding: 4rem 2rem;
+  background: #111;
+  color: #0f0;
+  font-family: 'VT323', monospace;
+  font-size: 1.8rem;
 }
