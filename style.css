@@ -492,3 +492,17 @@ nav a.active {
   border-top: 1px solid #333;
   border-bottom: 1px solid #333;
 }
+
+section {
+  padding: 100px 20px;
+  border-top: 2px dashed #444;
+  margin-top: 40px;
+}
+
+section h2 {
+  margin-bottom: 20px;
+  font-size: 2em;
+  color: #f0f0f0;
+  border-bottom: 2px solid #888;
+  display: inline-block;
+}
