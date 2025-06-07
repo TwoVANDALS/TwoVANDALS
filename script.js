@@ -109,3 +109,13 @@ document.addEventListener("DOMContentLoaded", () => {
     toggleBtn.textContent = audioPlayer.classList.contains("collapsed") ? "▲" : "▼";
   });
 });
+
+const clickAudio = document.getElementById("clickSound");
+
+document.addEventListener("click", e => {
+  const isButton = e.target.closest("button, .pixel-btn, .egg, a");
+  if (isButton) {
+    clickAudio.currentTime = 0;
+    clickAudio.play().catch(() => {});
+  }
+});
