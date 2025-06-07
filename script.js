@@ -304,3 +304,59 @@ const scObserver = new IntersectionObserver((entries, obs) => {
 }, { threshold: 0.25 });
 
 if (scSection) scObserver.observe(scSection);
+
+// 🖱️ Drag & Drop Upload
+document.addEventListener("DOMContentLoaded", () => {
+  const dropZone = document.getElementById("upload-area");
+  const fileInput = document.getElementById("fileInput");
+  const uploadStatus = document.getElementById("uploadStatus");
+
+  function handleFile(file) {
+    if (!file.name.match(/\.(mp3|wav)$/i)) {
+      uploadStatus.textContent = "❌ Only .mp3 or .wav allowed.";
+      return;
+    }
+
+    // 🔥 Supabase upload
+    import('https://esm.sh/@supabase/supabase-js').then(({ createClient }) => {
+      const supabase = createClient(
+        'https://qqffjsnlsbzhzhlvbexb.supabase.co',
+        'YOUR_ANON_KEY' // замените своим ключом
+      );
+
+      supabase.storage.from('tracks').upload(file.name, file, {
+        cacheControl: '3600',
+        upsert: false
+      }).then(({ error }) => {
+        if (error) {
+          uploadStatus.textContent = `❌ Error: ${error.message}`;
+        } else {
+          uploadStatus.textContent = `✅ Uploaded: ${file.name}`;
+        }
+      });
+    });
+  }
+
+  dropZone.addEventListener("dragover", e => {
+    e.preventDefault();
+    dropZone.classList.add("dragging");
+  });
+
+  dropZone.addEventListener("dragleave", () => {
+    dropZone.classList.remove("dragging");
+  });
+
+  dropZone.addEventListener("drop", e => {
+    e.preventDefault();
+    dropZone.classList.remove("dragging");
+    const file = e.dataTransfer.files[0];
+    if (file) handleFile(file);
+  });
+
+  // 👆 Поддержка обычной кнопки
+  document.getElementById("uploadBtn").addEventListener("click", () => {
+    const file = fileInput.files[0];
+    if (file) handleFile(file);
+    else uploadStatus.textContent = "❗ Choose a file first.";
+  });
+});
