@@ -1,56 +1,111 @@
-#upload {
-  text-align: center;
-  padding: 2rem;
-}
-#upload input[type="file"] {
-  margin-top: 1rem;
-}
-#uploadStatus {
-  margin-top: 1rem;
-  color: lime;
-}
-
-#track-feed {
-  padding: 2rem;
-  text-align: center;
-}
-
-.track-player {
-  background: #111;
-  padding: 1rem;
-  margin: 1rem auto;
-  max-width: 600px;
-  border: 2px solid #fff;
-  border-radius: 5px;
+body {
+  margin: 0;
   font-family: 'VT323', monospace;
+  background: #000;
+  color: #fff;
+  scroll-behavior: smooth;
 }
 
-.track-title {
-  font-size: 1.5rem;
+.logo {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+header {
+  text-align: center;
+  padding: 2rem;
+}
+
+.motto {
+  font-size: 1.1rem;
+  opacity: 0.7;
+}
+
+nav a {
+  color: white;
+  margin: 0 1rem;
+  font-size: 1.2rem;
+  text-decoration: none;
+}
+
+.hero {
+  height: 90vh;
+  background: linear-gradient(to bottom, #000, #111);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.hero-content h1 {
+  font-size: 2.5rem;
   margin-bottom: 1rem;
 }
 
-.controls {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.play-btn {
-  font-size: 1.5rem;
-  background: transparent;
+.btn {
+  padding: 0.8rem 2rem;
+  font-size: 1.1rem;
   color: #fff;
-  border: 1px solid #fff;
-  padding: 0.3rem 0.6rem;
-  cursor: pointer;
+  border: 2px solid #fff;
+  text-decoration: none;
 }
 
-input[type="range"] {
-  width: 100px;
+section {
+  padding: 3rem 2rem;
+  text-align: center;
 }
-.time {
-  font-size: 1rem;
-  color: #aaa;
+
+input[type="file"],
+button {
+  padding: 0.5rem 1rem;
+  margin-top: 1rem;
+  background: #111;
+  color: white;
+  border: 1px solid #fff;
+}
+
+#trackList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding-top: 2rem;
+}
+
+.track-box {
+  background: #111;
+  border: 1px solid #333;
+  padding: 1rem;
+  border-radius: 8px;
+  max-width: 600px;
+  margin: auto;
+}
+
+.track-title {
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+}
+
+audio {
+  width: 100%;
+}
+
+.track-meta {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  opacity: 0.6;
+}
+
+footer {
+  background: #111;
+  padding: 2rem;
+  text-align: center;
+  color: #777;
+}
+
+.socials a {
+  display: inline-block;
+  margin: 0.5rem;
+  text-decoration: none;
+  color: #0f0;
 }
