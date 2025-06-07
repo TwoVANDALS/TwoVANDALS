@@ -102,7 +102,7 @@
 
   const supabase = createClient(
     'https://qqffjsnlsbzhzhlvbexb.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFxZmZqc25sc2J6aHpobHZiZXhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkzMTM1MTksImV4cCI6MjA2NDg4OTUxOX0.LFrwLA5njJYak5RQ25Kd14TZE64HCV8WSsx31riL-0g'
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
   );
 
   const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -117,105 +117,85 @@
       return;
     }
 
-    const trackList = document.getElementById('trackList');
-    trackList.innerHTML = '';
+    const listContainer = document.getElementById("trackList");
+    const template = document.getElementById("audio-template");
+    listContainer.innerHTML = "";
 
     for (const file of files) {
-      // 🎯 Показываем только mp3 и wav
       if (!file.name.match(/\.(mp3|wav)$/i)) continue;
 
       const { data } = supabase.storage.from('tracks').getPublicUrl(file.name);
       const audioUrl = data.publicUrl;
 
-      const title = file.name.replace(/\.[^/.]+$/, "");
-      const block = document.createElement('div');
-      block.classList.add('track-player');
-      block.innerHTML = `
-        <h3>${title}</h3>
-        <audio src="${audioUrl}"></audio>
-        <button class="play-btn">▶</button>
-        <input type="range" class="seek-bar" min="0" step="1" value="0" />
-        <input type="range" class="volume-bar" min="0" max="1" step="0.01" value="0.5" />
-        <canvas class="wave-canvas"></canvas>
-      `;
-      trackList.appendChild(block);
-    }
+      const clone = template.content.cloneNode(true);
+      const audio = clone.querySelector("audio");
+      const title = clone.querySelector(".track-title");
+      const playBtn = clone.querySelector(".play-btn");
+      const seek = clone.querySelector(".seek-bar");
+      const volume = clone.querySelector(".volume-bar");
+      const currentTimeEl = clone.querySelector(".current-time");
+      const durationEl = clone.querySelector(".duration");
 
-    initializePlayers();
-  }
+      title.textContent = file.name.replace(/\.[^/.]+$/, "");
+      audio.src = audioUrl;
 
-  function initializePlayers() {
-    document.querySelectorAll('.track-player').forEach(player => {
-      const audio = player.querySelector('audio');
-      const playBtn = player.querySelector('.play-btn');
-      const seek = player.querySelector('.seek-bar');
-      const volume = player.querySelector('.volume-bar');
-      const canvas = player.querySelector('.wave-canvas');
-      const ctx = canvas.getContext('2d');
+      const formatTime = s => {
+        const m = Math.floor(s / 60);
+        const ss = Math.floor(s % 60).toString().padStart(2, "0");
+        return `${m}:${ss}`;
+      };
 
-      canvas.width = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
-
-      const analyser = audioCtx.createAnalyser();
-      analyser.fftSize = 64;
-      const source = audioCtx.createMediaElementSource(audio);
-      source.connect(analyser);
-      analyser.connect(audioCtx.destination);
-
-      const dataArray = new Uint8Array(analyser.frequencyBinCount);
-
-      playBtn.addEventListener('click', () => {
+      playBtn.addEventListener("click", () => {
+        document.querySelectorAll("audio").forEach(a => {
+          if (a !== audio) a.pause();
+        });
         if (audio.paused) {
-          document.querySelectorAll('audio').forEach(a => {
-            if (a !== audio) a.pause();
-          });
           audio.play();
-          playBtn.textContent = '⏸';
-          if (audioCtx.state === 'suspended') {
-            audioCtx.resume();
-          }
         } else {
           audio.pause();
-          playBtn.textContent = '▶';
         }
       });
 
-      audio.addEventListener('loadedmetadata', () => {
-        seek.max = Math.floor(audio.duration);
+      audio.addEventListener("play", () => {
+        playBtn.textContent = "⏸";
       });
 
-      audio.addEventListener('timeupdate', () => {
+      audio.addEventListener("pause", () => {
+        playBtn.textContent = "▶";
+      });
+
+      audio.addEventListener("loadedmetadata", () => {
+        if (isFinite(audio.duration)) {
+          seek.max = Math.floor(audio.duration);
+          durationEl.textContent = formatTime(audio.duration);
+        } else {
+          audio.currentTime = 1e101;
+          audio.ontimeupdate = () => {
+            audio.ontimeupdate = null;
+            audio.currentTime = 0;
+            seek.max = Math.floor(audio.duration);
+            durationEl.textContent = formatTime(audio.duration);
+          };
+        }
+      });
+
+      audio.addEventListener("timeupdate", () => {
         seek.value = audio.currentTime;
+        currentTimeEl.textContent = formatTime(audio.currentTime);
       });
 
-      seek.addEventListener('input', () => {
+      seek.addEventListener("input", () => {
         audio.currentTime = seek.value;
       });
 
-      volume.addEventListener('input', () => {
+      volume.addEventListener("input", () => {
         audio.volume = volume.value;
       });
 
-      function drawWaves() {
-        requestAnimationFrame(drawWaves);
-        analyser.getByteFrequencyData(dataArray);
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        const barWidth = canvas.width / dataArray.length;
-        for (let i = 0; i < dataArray.length; i++) {
-          const val = dataArray[i] / 255;
-          const height = val * canvas.height;
-          ctx.fillStyle = `rgba(255, 255, 255, ${val})`;
-          ctx.fillRect(i * barWidth, canvas.height - height, barWidth - 1, height);
-        }
-      }
-
-      audio.addEventListener('play', () => {
-        drawWaves();
-      });
-    });
+      listContainer.appendChild(clone);
+    }
   }
 
-  // ⬆ Upload
   const uploadBtn = document.getElementById('uploadBtn');
   const fileInput = document.getElementById('fileInput');
   const uploadStatus = document.getElementById('uploadStatus');
