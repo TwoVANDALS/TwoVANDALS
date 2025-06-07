@@ -248,55 +248,6 @@ footer {
   }
 }
 
-/* === CASSETTE PLAYER === */
-.cassette-player {
-  position: fixed;
-  bottom: 4.2rem;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 999;
-}
-
-.cassette-body {
-  width: 200px;
-  height: 120px;
-  background: #222;
-  border: 4px solid #fff;
-  box-shadow: 0 0 8px #0f0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.tape-window {
-  width: 140px;
-  height: 50px;
-  background: #000;
-  border: 2px solid #444;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 10px;
-}
-
-.spool {
-  width: 30px;
-  height: 30px;
-  border: 3px solid #ccc;
-  border-radius: 50%;
-  background: repeating-conic-gradient(#999 0deg 10deg, #222 10deg 20deg);
-  animation: none;
-}
-
-.playing .spool {
-  animation: spin 2s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
-
 /* === EASTER EGGS === */
 .egg {
   width: 20px;
