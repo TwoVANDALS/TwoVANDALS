@@ -1,6 +1,7 @@
 /* ========== GLOBAL ========== */
 body {
   margin: 0;
+  padding: 0;
   font-family: 'VT323', monospace;
   font-size: 20px;
   background: #000;
@@ -317,4 +318,34 @@ footer {
     display: block;
     margin: 0.5rem 0;
   }
+}
+
+
+canvas#snow-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+
+#loader-screen {
+  position: fixed;
+  inset: 0;
+  background: black;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  font-family: 'VT323', monospace;
+  font-size: 3rem;
+  letter-spacing: 3px;
+  transition: opacity 0.4s ease;
+}
+
+#loader-screen.hidden {
+  opacity: 0;
+  pointer-events: none;
 }
