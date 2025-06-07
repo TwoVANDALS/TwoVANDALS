@@ -189,3 +189,10 @@ footer {
     filter: grayscale(1) contrast(2);
   }
 }
+
+.header-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 2rem;
+}
