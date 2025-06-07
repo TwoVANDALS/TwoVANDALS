@@ -129,6 +129,11 @@ document.addEventListener("DOMContentLoaded", () => {
   toggleBtn.addEventListener("click", () => {
     const isCollapsed = audioPlayer.classList.toggle("collapsed");
     toggleBtn.textContent = isCollapsed ? "▲" : "▼";
+    if (!isCollapsed) {
+      setTimeout(() => {
+        audioPlayer.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 200);
+    }
   });
 
   // 🔁 Кнопки переключения треков
