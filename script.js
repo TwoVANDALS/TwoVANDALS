@@ -186,6 +186,39 @@ async function loadTracks(fileList) {
     title.textContent = name.replace(/\.[^/.]+$/, "");
     audio.src = file.url || file.publicUrl;
 
+    const likeBtn = clone.querySelector(".like-btn");
+const likeCount = clone.querySelector(".like-count");
+
+const likeKey = `liked_${file.name}`;
+const hasLiked = localStorage.getItem(likeKey);
+
+if (hasLiked) {
+  likeBtn.classList.add("liked");
+}
+
+supabase
+  .from('likes')
+  .select('likes')
+  .eq('filename', file.name)
+  .single()
+  .then(({ data }) => {
+    likeCount.textContent = data?.likes || 0;
+  });
+
+likeBtn.addEventListener("click", async () => {
+  if (localStorage.getItem(likeKey)) return;
+
+  const { data, error } = await supabase.rpc("increment_like", {
+    filename_input: file.name
+  });
+
+  if (!error) {
+    likeCount.textContent = data.likes;
+    localStorage.setItem(likeKey, "1");
+    likeBtn.classList.add("liked");
+  }
+});
+
     let isPlaying = false;
 
     const formatTime = (s) => {
