@@ -450,3 +450,8 @@ canvas#snow-canvas {
 html {
   scroll-behavior: smooth;
 }
+
+nav a.active {
+  color: #0f0;
+  font-weight: bold;
+}
