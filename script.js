@@ -111,3 +111,40 @@ function unlockSecret() {
   document.body.appendChild(section);
   section.style.display = "block";
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  const toggleBtn = document.getElementById('togglePlayer');
+  const audioPlayer = document.getElementById('audioPlayer');
+
+  toggleBtn.addEventListener('click', () => {
+    audioPlayer.classList.toggle('collapsed');
+    toggleBtn.textContent = audioPlayer.classList.contains('collapsed') ? '▲' : '▼';
+  });
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  const bgTrack = document.getElementById('bgTrack');
+  const playPauseBtn = document.getElementById('playPauseBtn');
+  const volumeSlider = document.getElementById('volumeSlider');
+  const toggleBtn = document.getElementById('togglePlayer');
+  const audioPlayer = document.getElementById('audioPlayer');
+
+  playPauseBtn.addEventListener('click', () => {
+    if (bgTrack.paused) {
+      bgTrack.play();
+      playPauseBtn.textContent = '⏸ Playing Trashwave Set';
+    } else {
+      bgTrack.pause();
+      playPauseBtn.textContent = '▶ Listen to a curated Trashwave set';
+    }
+  });
+
+  volumeSlider.addEventListener('input', () => {
+    bgTrack.volume = volumeSlider.value;
+  });
+
+  toggleBtn.addEventListener('click', () => {
+    audioPlayer.classList.toggle('collapsed');
+    toggleBtn.textContent = audioPlayer.classList.contains('collapsed') ? '▲' : '▼';
+  });
+});
