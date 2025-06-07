@@ -97,5 +97,63 @@
 </div>
   
   <script src="script.js"></script>
+
+  <section id="upload-area">
+  <h2>Upload Your Trashwave</h2>
+  <input type="file" id="fileInput" accept="audio/*" />
+  <button id="uploadBtn">Upload</button>
+  <div id="uploadStatus"></div>
+  <ul id="trackList"></ul>
+</section>
+
+<script type="module">
+  import { createClient } from 'https://esm.sh/@supabase/supabase-js'
+
+  const supabase = createClient(
+    'https://YOUR_PROJECT_ID.supabase.co',
+    'YOUR_ANON_KEY'
+  )
+
+  const uploadBtn = document.getElementById('uploadBtn')
+  const fileInput = document.getElementById('fileInput')
+  const uploadStatus = document.getElementById('uploadStatus')
+  const trackList = document.getElementById('trackList')
+
+  async function listTracks() {
+    const { data, error } = await supabase.storage.from('tracks').list('', {
+      limit: 100,
+      sortBy: { column: 'name', order: 'desc' }
+    })
+
+    if (error) return console.error(error)
+    trackList.innerHTML = ''
+    for (let file of data) {
+      const { data: url } = await supabase.storage
+        .from('tracks')
+        .getPublicUrl(file.name)
+      const li = document.createElement('li')
+      li.innerHTML = `<audio controls src="${url.publicUrl}"></audio>`
+      trackList.appendChild(li)
+    }
+  }
+
+  uploadBtn.addEventListener('click', async () => {
+    const file = fileInput.files[0]
+    if (!file) return alert('Choose a file first!')
+    const { error } = await supabase.storage
+      .from('tracks')
+      .upload(file.name, file, {
+        cacheControl: '3600',
+        upsert: false
+      })
+
+    if (error) return uploadStatus.innerText = `Error: ${error.message}`
+    uploadStatus.innerText = `Uploaded ${file.name}`
+    await listTracks()
+  })
+
+  listTracks()
+</script>
+
 </body>
 </html>
