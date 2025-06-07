@@ -10,32 +10,30 @@
 </head>
 <body>
 
-  <!-- Loader -->
   <div id="loader">
     <div class="glitch-loader">TwoVANDALS</div>
   </div>
 
-  <!-- Header -->
+  <canvas id="snow-canvas"></canvas>
+
   <header>
     <div class="logo">TwoVANDALS</div>
     <p class="motto">Trashwave is not a genre. It’s a wound.</p>
     <nav>
-      <a href="#music">Music</a>
-      <a href="#manifest">Manifest</a>
-      <a href="#contacts">Contact</a>
+      <a href="#music" class="nav-btn">Music</a>
+      <a href="#manifest" class="nav-btn">Manifest</a>
+      <a href="#contacts" class="nav-btn">Contact</a>
     </nav>
   </header>
 
-  <!-- Hero -->
   <section class="hero">
     <div class="overlay"></div>
     <div class="hero-content">
       <h1>100+ tracks. No explanation.</h1>
-      <a href="https://soundcloud.com/vandalstwo" target="_blank" class="btn">LISTEN</a>
+      <a href="https://soundcloud.com/vandalstwo" target="_blank" class="btn pixel-btn">LISTEN</a>
     </div>
   </section>
 
-  <!-- Music -->
   <section id="music" class="music">
     <h2>Popular Tracks</h2>
     <iframe width="100%" height="450" scrolling="no" frameborder="no" allow="autoplay"
@@ -43,13 +41,11 @@
     </iframe>
   </section>
 
-  <!-- Manifest -->
   <section id="manifest" class="manifest">
     <h2>Manifest</h2>
     <p>We promote nothing.<br>We make noise.<br>We live raw.</p>
   </section>
 
-  <!-- Contact -->
   <section id="contacts" class="contacts">
     <h2>Contact</h2>
     <div class="socials">
@@ -65,16 +61,15 @@
     </div>
   </section>
 
-  <!-- Footer -->
   <footer>
     <p>© TwoVANDALS / Noise never sleeps.</p>
   </footer>
 
-  <!-- Audio Player -->
   <div class="audio-player">
-    <button id="playPauseBtn">▶ Listen to a curated Trashwave set</button>
+    <button id="playPauseBtn" class="pixel-btn">▶ Listen to a curated Trashwave set</button>
     <input id="volumeSlider" type="range" min="0" max="1" step="0.01" value="0.5" />
   </div>
+
   <audio id="bgTrack" src="ybuocfiewu.mp3" loop></audio>
 
   <!-- Hidden Easter Eggs -->
