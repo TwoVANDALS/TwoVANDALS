@@ -2,7 +2,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js';
 
 const supabase = createClient(
   'https://qqffjsnlsbzhzhlvbexb.supabase.co',
-  'YOUR_PUBLIC_ANON_KEY'
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFxZmZqc25sc2J6aHpobHZiZXhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkzMTM1MTksImV4cCI6MjA2NDg4OTUxOX0.LFrwLA5njJYak5RQ25Kd14TZE64HCV8WSsx31riL-0g'
 );
 
 const fileInput = document.getElementById("fileInput");
