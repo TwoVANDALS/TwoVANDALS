@@ -353,3 +353,88 @@ canvas#snow-canvas {
   opacity: 0;
   pointer-events: none;
 }
+
+@media (max-width: 768px) {
+  html {
+    font-size: 18px;
+    overflow-x: hidden;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+  }
+
+  .logo {
+    font-size: 2.5rem;
+    line-height: 1.2;
+  }
+
+  .motto {
+    font-size: 1rem;
+    padding: 0 1rem;
+  }
+
+  nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  nav a {
+    font-size: 1.2rem;
+    margin: 0.3rem 0;
+  }
+
+  .hero h1 {
+    font-size: 1.6rem;
+    padding: 0 1rem;
+  }
+
+  .btn {
+    font-size: 1rem;
+    padding: 0.6rem 1.2rem;
+  }
+
+  section {
+    padding: 2rem 1rem;
+  }
+
+  .manifest p {
+    font-size: 1.2rem;
+    line-height: 2rem;
+    padding: 0 1rem;
+  }
+
+  .discord-links a {
+    display: block;
+    margin: 0.6rem auto;
+    width: 90%;
+    text-align: center;
+  }
+
+  .audio-player {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .track-player {
+    width: 95%;
+    margin: 1rem auto;
+    padding: 1rem;
+  }
+
+  .track-player h3 {
+    font-size: 1.2rem;
+  }
+
+  .track-player .controls {
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .track-player input[type="range"] {
+    width: 100%;
+  }
+}
