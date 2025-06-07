@@ -111,7 +111,7 @@
 
   const supabase = createClient(
     'https://qqffjsnlsbzhzhlvbexb.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFxZmZqc25sc2J6aHpobHZiZXhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkzMTM1MTksImV4cCI6MjA2NDg4OTUxOX0.LFrwLA5njJYak5RQ25Kd14TZE64HCV8WSsx31riL-0g'
+    'your_anon_key_here'
   );
 
   const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -121,12 +121,18 @@
       limit: 100
     });
 
-    if (error) return console.error('Fetch error:', error);
+    if (error) {
+      console.error('Fetch error:', error);
+      return;
+    }
 
     const trackList = document.getElementById('trackList');
     trackList.innerHTML = '';
 
     for (const file of files) {
+      // 🎯 Показываем только mp3 и wav
+      if (!file.name.match(/\.(mp3|wav)$/i)) continue;
+
       const { data } = supabase.storage.from('tracks').getPublicUrl(file.name);
       const audioUrl = data.publicUrl;
 
@@ -207,7 +213,7 @@
         for (let i = 0; i < dataArray.length; i++) {
           const val = dataArray[i] / 255;
           const height = val * canvas.height;
-          ctx.fillStyle = `rgba(0, 255, 0, ${val})`;
+          ctx.fillStyle = `rgba(255, 255, 255, ${val})`;
           ctx.fillRect(i * barWidth, canvas.height - height, barWidth - 1, height);
         }
       }
@@ -218,6 +224,7 @@
     });
   }
 
+  // ⬆ Upload
   const uploadBtn = document.getElementById('uploadBtn');
   const fileInput = document.getElementById('fileInput');
   const uploadStatus = document.getElementById('uploadStatus');
@@ -225,6 +232,7 @@
   uploadBtn.addEventListener('click', async () => {
     const file = fileInput.files[0];
     if (!file) return alert('Choose a file first!');
+    if (!file.name.match(/\.(mp3|wav)$/i)) return alert('Only .mp3 or .wav allowed!');
 
     const { error } = await supabase.storage.from('tracks').upload(file.name, file, {
       cacheControl: '3600',
@@ -232,9 +240,9 @@
     });
 
     if (error) {
-      uploadStatus.innerText = `Error: ${error.message}`;
+      uploadStatus.innerText = `Upload Error: ${error.message}`;
     } else {
-      uploadStatus.innerText = `Uploaded: ${file.name}`;
+      uploadStatus.innerText = `✅ Uploaded: ${file.name}`;
       await listTracks();
     }
   });
