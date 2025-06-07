@@ -377,6 +377,16 @@ window.addEventListener("DOMContentLoaded", () => {
   );
 
   sections.forEach(section => observer.observe(section));
+  // Принудительно активируем первый раздел
+const firstVisible = [...sections].find(sec =>
+  sec.getBoundingClientRect().top >= 0
+);
+if (firstVisible) {
+  const id = firstVisible.getAttribute("id");
+  const link = document.querySelector(`nav a[href="#${id}"]`);
+  navLinks.forEach(a => a.classList.remove("active"));
+  if (link) link.classList.add("active");
+}
 });
 
 // 🎵 Lazy load SoundCloud iframe
