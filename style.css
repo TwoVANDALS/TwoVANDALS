@@ -10,8 +10,8 @@ body {
   overflow-x: hidden;
 }
 
-h1, h2, h3 {
-  font-family: 'Archivo Black', sans-serif;
+h2, h3, p, a, .btn, .motto, .track-title {
+  font-family: inherit;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
