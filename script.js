@@ -8,7 +8,7 @@ document.querySelectorAll('.btn, nav a').forEach(el => {
   });
 });
 
-// Loader timeout
+// Glitch loader logic
 window.addEventListener("load", () => {
   const loader = document.getElementById("loader");
   if (loader) {
