@@ -3,428 +3,217 @@ body {
   font-family: 'VT323', monospace;
   background: #000;
   color: #fff;
-  font-size: 20px;
   overflow-x: hidden;
 }
 
-/* === LOADER === */
-#loader {
-  position: fixed;
-  inset: 0;
-  background: #000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
-
-.glitch-loader {
-  font-family: 'Archivo Black', sans-serif;
-  font-size: 4rem;
-  animation: glitch 1s infinite alternate;
-}
-
-@keyframes glitch {
-  0% { text-shadow: 2px 0 red; }
-  50% { text-shadow: -2px 0 blue; }
-  100% { text-shadow: 1px 0 lime; }
-}
-
-/* === BACKGROUND CANVAS === */
-canvas#snow-canvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 0;
-  pointer-events: none;
-}
-
-/* === HEADER === */
 header {
+  padding: 2rem 1rem 1rem;
   text-align: center;
-  padding: 1.2rem 1rem 0.2rem;
-  position: relative;
-  z-index: 10;
 }
 
 .logo {
   font-family: 'Archivo Black', sans-serif;
-  font-size: 3rem;
-  margin-bottom: 0.2rem;
+  font-size: 3.5rem;
+  letter-spacing: 2px;
 }
 
 .motto {
-  font-size: 1.1rem;
+  font-size: 1.2rem;
+  margin-top: 0.5rem;
   opacity: 0.6;
-  margin-bottom: 0.4rem;
 }
 
 nav {
-  margin-top: 0.3rem;
+  margin-top: 1rem;
 }
 
 nav a {
   color: #fff;
   text-decoration: none;
-  margin: 0 1.2rem;
+  margin: 0 1rem;
   font-size: 1.2rem;
+  transition: color 0.2s ease;
 }
 
-/* === HERO === */
+nav a:hover {
+  color: #0f0;
+}
+
 .hero {
-  position: relative;
-  height: 70vh;
+  height: 90vh;
+  background: radial-gradient(ellipse at center, #000 60%, #111 100%);
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-}
-
-.hero .overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-}
-
-.hero-content {
-  position: relative;
   text-align: center;
-  z-index: 2;
 }
 
 .hero h1 {
-  font-size: 2.5rem;
-  margin-bottom: 1.5rem;
-}
-
-/* === SECTION === */
-section {
-  padding: 4rem 2rem;
-  text-align: center;
-}
-
-.music iframe {
-  margin-top: 2rem;
-}
-
-.manifest p {
-  font-size: 1.6rem;
+  font-size: 2rem;
+  margin-bottom: 2rem;
   font-family: 'Archivo Black', sans-serif;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  margin-top: 2rem;
 }
 
-.contacts .socials a {
-  display: inline-block;
-  margin: 0.5rem 1rem;
-  font-size: 1.3rem;
-  text-decoration: none;
-  color: #fff;
-}
-
-.discord-links p {
-  margin: 1rem 0;
-  font-size: 1.1rem;
-}
-
-footer {
-  padding: 2rem;
-  text-align: center;
-  background: #111;
-  font-size: 1rem;
-  color: #777;
-}
-
-/* === BUTTONS UNDERTALE-STYLE === */
-.pixel-btn {
-  font-family: 'Archivo Black', sans-serif;
-  font-size: 1.1rem;
-  padding: 0.8rem 1.4rem;
-  background: #000;
-  color: #fff;
+.btn {
+  padding: 1rem 2rem;
   border: 2px solid #fff;
-  cursor: pointer;
-  transition: transform 0.1s ease;
-  position: relative;
-  z-index: 5;
-}
-
-.pixel-btn:hover {
-  background: #fff;
-  color: #000;
-  transform: scale(1.02);
-}
-
-.pixel-btn:active {
-  animation: explode 0.3s forwards;
-}
-
-@keyframes explode {
-  0% { transform: scale(1); opacity: 1; }
-  100% { transform: scale(1.6); opacity: 0; }
-}
-
-/* === AUDIO PLAYER FIXED === */
-.audio-player {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: #000;
-  border-top: 2px solid #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.7rem;
-  padding: 0.8rem 1rem;
-  font-family: 'VT323', monospace;
-  z-index: 9999;
-  transition: transform 0.4s ease, opacity 0.4s ease;
-}
-
-.audio-player button,
-.audio-player input[type="range"] {
   background: none;
-  border: 1px solid white;
   color: white;
-}
-
-.audio-player button {
-  padding: 0.4rem 0.7rem;
-  font-size: 1rem;
-  cursor: pointer;
-}
-
-.audio-player input[type="range"] {
-  accent-color: white;
-  height: 4px;
-}
-
-.audio-player span {
-  min-width: 45px;
-  text-align: center;
-}
-
-.audio-player.collapsed {
-  transform: translateY(100%);
-  opacity: 0.2;
-}
-
-.audio-player.collapsed:hover {
-  transform: translateY(0);
-  opacity: 1;
-}
-
-.toggle-btn {
-  position: absolute;
-  top: -1.5rem;
-  right: 1rem;
   font-size: 1.2rem;
-  border: none;
-}
-
-/* === MOBILE AUDIO PLAYER === */
-@media (max-width: 768px) {
-  .audio-player {
-    flex-direction: column;
-    align-items: stretch;
-    padding: 1rem;
-    gap: 0.6rem;
-    font-size: 1rem;
-  }
-
-  .audio-player button {
-    width: 100%;
-    font-size: 1rem;
-    padding: 0.6rem;
-  }
-
-  .audio-player #currentTime,
-  .audio-player #duration {
-    font-size: 0.9rem;
-    display: inline-block;
-    width: 48px;
-    text-align: center;
-  }
-
-  .audio-player #seekBar,
-  .audio-player #volumeSlider {
-    width: 100%;
-    height: 6px;
-  }
-
-  .audio-player input[type="range"] {
-    appearance: none;
-    background: #222;
-    border-radius: 3px;
-    height: 6px;
-  }
-
-  .audio-player input[type="range"]::-webkit-slider-thumb {
-    appearance: none;
-    width: 14px;
-    height: 14px;
-    background: white;
-    border-radius: 50%;
-    margin-top: -4px;
-  }
-
-  .audio-player input[type="range"]::-moz-range-thumb {
-    width: 14px;
-    height: 14px;
-    background: white;
-    border-radius: 50%;
-  }
-
-  .toggle-btn {
-    position: absolute;
-    top: -1.5rem;
-    right: 1rem;
-    font-size: 1.4rem;
-    background: transparent;
-    border: none;
-  }
-}
-
-/* === EASTER EGGS === */
-.egg {
-  width: 20px;
-  height: 20px;
-  position: absolute;
-  opacity: 0.03;
-  transition: opacity 0.3s ease;
-  border-radius: 50%;
-  z-index: 1;
-}
-
-.egg:hover {
-  opacity: 1;
-}
-
-.egg-blood { left: 5vw; top: 90vh; background: red; }
-.egg-water { right: 4vw; top: 85vh; background: cyan; }
-.egg-electric { top: 20vh; left: 2vw; background: yellow; }
-.egg-fire { top: 15vh; right: 2vw; background: orange; }
-.egg-core { bottom: 5vh; right: 50vw; background: white; }
-
-#secret-section {
-  display: none;
-  padding: 4rem 2rem;
-  background: #111;
-  color: #0f0;
-  font-family: 'VT323', monospace;
-  font-size: 1.8rem;
-}
-
-#upload-area {
-  background: #000;
-  color: #fff;
-  text-align: center;
-  font-family: 'VT323', monospace;
-  padding: 3rem;
-}
-
-#upload-area input,
-#upload-area button {
-  background: #111;
-  border: 1px solid #333;
-  color: #fff;
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
-  margin: 1rem;
-}
-
-#uploadStatus {
-  margin-top: 1rem;
-  font-size: 1.1rem;
-  color: #0f0;
-}
-
-#trackList {
-  list-style: none;
-  padding: 0;
-  margin-top: 2rem;
-}
-
-#trackList li {
-  margin: 1rem 0;
-}
-
-audio {
-  width: 90%;
-  max-width: 400px;
-}
-
-.track-player {
-  background: #111;
-  border: 1px solid #444;
-  border-radius: 8px;
-  padding: 1rem;
-  margin: 1rem 0;
-  color: white;
-  font-family: 'VT323', monospace;
-  transition: background 0.2s ease;
-}
-
-.track-title {
-  font-size: 1.3rem;
-  margin-bottom: 0.6rem;
-  font-family: 'Archivo Black', sans-serif;
-}
-
-.controls {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.play-btn {
-  background: none;
-  border: 2px solid #fff;
-  color: #fff;
-  padding: 0.4rem 1rem;
-  font-size: 1rem;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.play-btn:hover {
+.btn:hover {
   background: #fff;
   color: #000;
 }
 
-.seek-bar,
-.volume-bar {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 100%;
-  height: 6px;
-  border-radius: 3px;
-  background: #444;
-  outline: none;
+section {
+  padding: 4rem 1rem;
+  text-align: center;
 }
 
-.seek-bar::-webkit-slider-thumb,
-.volume-bar::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  height: 12px;
-  width: 12px;
-  border-radius: 50%;
-  background: #fff;
+footer {
+  background: #111;
+  color: #777;
+  padding: 2rem;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+/* AUDIO PLAYER */
+.audio-player {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #111;
+  padding: 1rem;
+  gap: 1rem;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  border-top: 2px solid #0f0;
+  z-index: 999;
+  transition: transform 0.3s ease;
+}
+
+.audio-player.collapsed {
+  transform: translateY(100%);
+}
+
+.audio-player button,
+.audio-player input[type="range"] {
+  background: #000;
+  color: #fff;
+  border: none;
+  font-family: 'VT323', monospace;
+}
+
+.audio-player button {
+  font-size: 1.2rem;
   cursor: pointer;
+  background: none;
+  padding: 0.3rem 0.8rem;
+  border: 1px solid #555;
+}
+
+.audio-player button:hover {
+  background: #0f0;
+  color: #000;
+}
+
+.audio-player input[type="range"] {
+  width: 120px;
+}
+
+#volumeSlider {
+  accent-color: #0f0;
+}
+
+/* TRACK PLAYER */
+.track-player {
+  background: #111;
+  margin: 2rem auto;
+  padding: 1rem;
+  border: 1px solid #333;
+  width: 90%;
+  max-width: 600px;
+  box-shadow: 0 0 8px #0f0;
+  position: relative;
+}
+
+.track-title {
+  font-size: 1.2rem;
+  font-family: 'Archivo Black', sans-serif;
+  margin-bottom: 1rem;
+}
+
+.track-player .controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  justify-content: center;
+}
+
+.track-player .play-btn {
+  font-size: 1.4rem;
+  background: none;
+  border: 1px solid #fff;
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+}
+
+.track-player input[type="range"] {
+  width: 150px;
+  accent-color: #0f0;
 }
 
 .time {
   font-size: 0.9rem;
-  opacity: 0.7;
+  color: #ccc;
 }
 
-.wave-canvas {
-  width: 100%;
-  height: 40px;
-  background: #0a0a0a;
+/* DISCORD LINKS */
+.discord-links {
   margin-top: 1rem;
-  border-radius: 6px;
-  border: 1px solid #222;
+  font-size: 1rem;
+}
+
+.discord-links a {
+  color: #0f0;
+  text-decoration: none;
+}
+
+.discord-links a:hover {
+  text-decoration: underline;
+}
+
+/* EASTER EGGS */
+.egg {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  z-index: 50;
+  opacity: 0.7;
+  cursor: pointer;
+}
+
+.egg-blood { top: 80%; left: 10%; background: red; }
+.egg-water { top: 75%; right: 15%; background: #00f; }
+.egg-electric { bottom: 80px; left: 40%; background: cyan; }
+.egg-fire { bottom: 120px; right: 25%; background: orange; }
+.egg-core { bottom: 10px; right: 10%; background: #fff; }
+
+/* SNOW EFFECT CANVAS */
+#snow-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
 }
