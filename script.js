@@ -104,3 +104,45 @@ audio.addEventListener('play', () => {
 audio.addEventListener('pause', () => {
   cassette.classList.remove('playing');
 });
+
+
+const audio = document.getElementById('player');
+const playBtn = document.getElementById('playBtn');
+const seek = document.getElementById('seek');
+const current = document.getElementById('current');
+const duration = document.getElementById('duration');
+const volume = document.getElementById('volume');
+
+playBtn.addEventListener('click', () => {
+  if (audio.paused) {
+    audio.play();
+    playBtn.textContent = '⏸';
+  } else {
+    audio.pause();
+    playBtn.textContent = '▶';
+  }
+});
+
+audio.addEventListener('loadedmetadata', () => {
+  seek.max = audio.duration;
+  duration.textContent = formatTime(audio.duration);
+});
+
+audio.addEventListener('timeupdate', () => {
+  seek.value = audio.currentTime;
+  current.textContent = formatTime(audio.currentTime);
+});
+
+seek.addEventListener('input', () => {
+  audio.currentTime = seek.value;
+});
+
+volume.addEventListener('input', () => {
+  audio.volume = volume.value;
+});
+
+function formatTime(t) {
+  const min = Math.floor(t / 60);
+  const sec = Math.floor(t % 60).toString().padStart(2, '0');
+  return `${min}:${sec}`;
+}
