@@ -355,3 +355,24 @@ audio {
   max-width: 400px;
 }
 
+.track-player {
+  border: 2px solid white;
+  background: #111;
+  padding: 1rem;
+  margin: 1.5rem auto;
+  text-align: center;
+  width: 320px;
+  font-family: 'VT323', monospace;
+}
+
+.track-player h3 {
+  color: #0f0;
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+}
+
+.track-player .upload-time {
+  font-size: 0.8rem;
+  color: #888;
+  margin-bottom: 0.5rem;
+}
