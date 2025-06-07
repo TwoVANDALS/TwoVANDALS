@@ -86,15 +86,6 @@
   <a href="https://soundcloud.com/princesssguilt" class="egg egg-electric" title="princesssguilt"></a>
   <a href="https://soundcloud.com/3_66_7" class="egg egg-fire" title="3_66_7"></a>
   <a href="https://soundcloud.com/vandal2012" class="egg egg-core" title="vandal2012"></a>
-
-<div class="cassette-player">
-  <div class="cassette-body">
-    <div class="tape-window">
-      <div class="spool left-spool"></div>
-      <div class="spool right-spool"></div>
-    </div>
-  </div>
-</div>
   
   <script src="script.js"></script>
 
@@ -256,4 +247,19 @@
 <section id="track-feed">
   <h2> Uploaded Trashwave</h2>
   <div id="trackList"></div>
+
+<template id="audio-template">
+  <div class="track-player">
+    <h3 class="track-title"></h3>
+    <audio preload="metadata"></audio>
+    <div class="controls">
+      <button class="play-btn">▶</button>
+      <input class="seek-bar" type="range" min="0" value="0" step="1" />
+      <span class="time current-time">0:00</span> / 
+      <span class="time duration">0:00</span>
+      <input class="volume-bar" type="range" min="0" max="1" step="0.01" value="0.5" />
+    </div>
+  </div>
+</template>
+
 </section>
