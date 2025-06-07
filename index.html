@@ -103,7 +103,7 @@
   <input type="file" id="fileInput" accept="audio/*" />
   <button id="uploadBtn">Upload</button>
   <div id="uploadStatus"></div>
-  <ul id="trackList"></ul>
+  <div id="trackList"></div>
 </section>
 
 <script type="module">
@@ -227,24 +227,6 @@ async function listTracks() {
   const fileInput = document.getElementById('fileInput')
   const uploadStatus = document.getElementById('uploadStatus')
   const trackList = document.getElementById('trackList')
-
-  async function listTracks() {
-    const { data, error } = await supabase.storage.from('tracks').list('', {
-      limit: 100,
-      sortBy: { column: 'name', order: 'desc' }
-    })
-
-    if (error) return console.error(error)
-    trackList.innerHTML = ''
-    for (let file of data) {
-      const { data: url } = await supabase.storage
-        .from('tracks')
-        .getPublicUrl(file.name)
-      const li = document.createElement('li')
-      li.innerHTML = `<audio controls src="${url.publicUrl}"></audio>`
-      trackList.appendChild(li)
-    }
-  }
 
   uploadBtn.addEventListener('click', async () => {
     const file = fileInput.files[0]
