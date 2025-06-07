@@ -1,4 +1,5 @@
 body {
+  font-size: 20px;
   margin: 0;
   font-family: 'VT323', monospace;
   background: #000;
@@ -215,18 +216,22 @@ footer {
 
 
 /* DISCORD LINKS */
-.discord-links {
-  margin-top: 1rem;
-  font-size: 1rem;
-}
-
 .discord-links a {
-  color: #0f0;
+  display: inline-block;
+  padding: 0.6rem 1.2rem;
+  margin: 0.5rem 0.5rem;
+  font-size: 1.1rem;
+  font-family: 'VT323', monospace;
+  background: transparent;
+  border: 2px solid #fff;
+  color: #fff;
   text-decoration: none;
+  transition: all 0.2s ease;
 }
 
 .discord-links a:hover {
-  text-decoration: underline;
+  background: #fff;
+  color: #000;
 }
 
 /* EASTER EGGS */
