@@ -69,11 +69,33 @@ document.addEventListener("DOMContentLoaded", () => {
   const durationEl = document.getElementById("duration");
   const toggleBtn = document.getElementById("togglePlayer");
   const audioPlayer = document.getElementById("audioPlayer");
+  const prevBtn = document.getElementById("prevTrackBtn");
+  const nextBtn = document.getElementById("nextTrackBtn");
+  const trackTitle = document.getElementById("trackTitle");
+
+  // 🔊 Плейлист
+  const playlist = [
+    "ybuocfiewu.mp3", // замените на актуальные пути или Supabase URLs
+    "track2.mp3",
+    "track3.mp3"
+  ];
+  let currentIndex = 0;
 
   function formatTime(sec) {
     const minutes = Math.floor(sec / 60);
     const seconds = Math.floor(sec % 60).toString().padStart(2, "0");
     return `${minutes}:${seconds}`;
+  }
+
+  function loadTrack(index) {
+    if (index < 0) index = playlist.length - 1;
+    if (index >= playlist.length) index = 0;
+    currentIndex = index;
+    audio.src = playlist[currentIndex];
+    trackTitle.textContent = `Track ${currentIndex + 1}`;
+    audio.load();
+    audio.play();
+    playPauseBtn.textContent = "⏸ Playing Trashwave Set";
   }
 
   playPauseBtn.addEventListener("click", () => {
@@ -108,6 +130,23 @@ document.addEventListener("DOMContentLoaded", () => {
     const isCollapsed = audioPlayer.classList.toggle("collapsed");
     toggleBtn.textContent = isCollapsed ? "▲" : "▼";
   });
+
+  // 🔁 Кнопки переключения треков
+  prevBtn.addEventListener("click", () => {
+    loadTrack(currentIndex - 1);
+  });
+
+  nextBtn.addEventListener("click", () => {
+    loadTrack(currentIndex + 1);
+  });
+
+  // 🔄 Автопереход на следующий трек
+  audio.addEventListener("ended", () => {
+    loadTrack(currentIndex + 1);
+  });
+
+  // 🟢 Инициализация
+  loadTrack(currentIndex);
 });
 
 const clickAudio = document.getElementById("clickSound");
