@@ -22,7 +22,7 @@ let drumPattern = drumTracks.map(() => Array(steps).fill(false));
 const synth = new Tone.PolySynth(Tone.MonoSynth, {
   oscillator: { type: synthType.value.toLowerCase() || "sawtooth" },
   envelope: { attack: 0.01, decay: 0.2, sustain: 0.4, release: 0.8 },
-  portamento: 0.05 // 🎛️ глайд
+  portamento: 0.05 // 🎛глайд
 }).toDestination();
 
 const samples = {
