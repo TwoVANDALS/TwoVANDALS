@@ -1,15 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>TRASHWAVE CREATOR</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="tone.min.js"></script>
-</head>
-<body>
-  <h1>🎛️ TRASHWAVE CREATOR</h1>
-  <p>Create your own noisy chaos.</p>
-
   <div class="controls">
     <label>Synth Type: 
       <select id="synthType">
@@ -28,11 +18,35 @@
     <button id="exportBtn">🎶 Export WAV</button>
   </div>
 
-  <h2>🥁 Drums</h2>
+<!-- DRUM SEQUENCER -->
+<div style="display: flex; justify-content: center; align-items: flex-start;">
+  <div class="grid-labels drum-labels">
+    <div>Kick</div>
+    <div>Snare</div>
+    <div>Hat</div>
+  </div>
   <div id="drumGrid" class="grid"></div>
+</div>
 
-  <h2>🎹 Synth</h2>
+<!-- SYNTH SEQUENCER -->
+<div style="display: flex; justify-content: center; align-items: flex-start;">
+  <div class="grid-labels synth-labels">
+    <div>C</div>
+    <div>B</div>
+    <div>A#</div>
+    <div>A</div>
+    <div>G#</div>
+    <div>G</div>
+    <div>F#</div>
+    <div>F</div>
+    <div>E</div>
+    <div>D#</div>
+    <div>D</div>
+    <div>C#</div>
+  </div>
   <div id="synthGrid" class="grid"></div>
+</div>
+
 
   <script type="module" src="script.js"></script>
 </body>
