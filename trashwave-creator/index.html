@@ -1,22 +1,33 @@
-<section id="tw-studio">
-  <h2>🎛 Trashwave Studio</h2>
-  <div id="studio-window">
-    <div class="track" id="drum-track">
-      <h3>🥁 Drums</h3>
-      <div class="grid" id="drumGrid"></div>
-    </div>
-    <div class="track" id="synth-track">
-      <h3>🎹 Synth</h3>
-      <select id="synthSelect">
-        <option value="sine">Sine</option>
-        <option value="triangle">Triangle</option>
-        <option value="square">Square</option>
-        <option value="sawtooth">Sawtooth</option>
-      </select>
-      <div class="grid" id="synthGrid"></div>
-    </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>🎛 Trashwave Creator</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>🎛 TRASHWAVE CREATOR</h1>
+  <p>CREATE YOUR OWN NOISY CHAOS IN THE BROWSER.</p>
+
+  <div class="controls">
+    <select id="synthSelect">
+      <option value="sine">Sine</option>
+      <option value="triangle">Triangle</option>
+      <option value="square">Square</option>
+      <option value="sawtooth">Sawtooth</option>
+    </select>
     <button id="playStudioBtn">▶️ PLAY</button>
     <button id="saveStudioBtn">💾 Save Pattern</button>
     <button id="exportAudioBtn">🎵 Export to WAV</button>
   </div>
-</section>
+
+  <h2>🥁 Drums</h2>
+  <div id="drumGrid" class="grid"></div>
+
+  <h2>🎹 Synth</h2>
+  <div id="synthGrid" class="grid"></div>
+
+  <script src="tone.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
