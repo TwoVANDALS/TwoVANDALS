@@ -5,7 +5,6 @@ const drumTracks = ["kick", "snare", "hat"];
 let currentStep = 0;
 let metronomeEnabled = false;
 
-// === TONE SETUP ===
 Tone.Transport.bpm.value = 120;
 Tone.Transport.loop = true;
 Tone.Transport.loopEnd = "1m";
@@ -16,61 +15,24 @@ const drumGrid = document.getElementById("drumGrid");
 const bpmInput = document.getElementById("bpm");
 const synthType = document.getElementById("synthType");
 const toggleMetronomeBtn = document.getElementById("toggleMetronome");
+const playBtn = document.getElementById("playBtn");
+const stopBtn = document.getElementById("stopBtn");
 
-// === PATTERNS ===
+// === STATE ===
 let synthPattern = Array.from({ length: synthRows }, () => Array(steps).fill(false));
 let drumPattern = drumTracks.map(() => Array(steps).fill(false));
 
-// === SAMPLES ===
+// === AUDIO ===
+const synth = new Tone.PolySynth(Tone.Synth, {
+  oscillator: { type: synthType.value }
+}).toDestination();
+
 const samples = {
-  kick: [
-    "trashkit/Kicks from Dark Web 1.wav",
-    "trashkit/Kicks from Dark Web 10.wav",
-    "trashkit/Kicks from Dark Web 2.wav"
-  ],
-  snare: [
-    "trashkit/snare5.wav",
-    "trashkit/SD-09(Echo).wav",
-    "trashkit/SD-10(Slash).wav"
-  ],
-  hat: [
-    "trashkit/HH-14.wav",
-    "trashkit/HH-22.wav",
-    "trashkit/Open hat 2.wav"
-  ],
-  metronome: ["samples/metronome.wav"]
+  kick: new Tone.Player("samples/trashkit/kick.wav").toDestination(),
+  snare: new Tone.Player("samples/trashkit/snare.wav").toDestination(),
+  hat: new Tone.Player("samples/trashkit/hat.wav").toDestination(),
+  metronome: new Tone.Player("samples/trashkit/metronome.wav").toDestination()
 };
-
-let selectedSample = {
-  kick: 0,
-  snare: 0,
-  hat: 0
-};
-
-let samplePlayers = {
-  kick: new Tone.Player(samples.kick[0]).toDestination(),
-  snare: new Tone.Player(samples.snare[0]).toDestination(),
-  hat: new Tone.Player(samples.hat[0]).toDestination(),
-  metronome: new Tone.Player(samples.metronome[0]).toDestination()
-};
-
-// === BUILD SELECTS ===
-document.querySelectorAll(".sample-select").forEach(select => {
-  const track = select.dataset.track;
-  samples[track].forEach((src, i) => {
-    const opt = document.createElement("option");
-    opt.value = i;
-    opt.textContent = src.split("/").pop();
-    select.appendChild(opt);
-  });
-
-  select.addEventListener("change", e => {
-    const index = parseInt(e.target.value);
-    selectedSample[track] = index;
-    samplePlayers[track].dispose();
-    samplePlayers[track] = new Tone.Player(samples[track][index]).toDestination();
-  });
-});
 
 // === GRID CREATION ===
 function createGrid(grid, pattern) {
@@ -94,14 +56,15 @@ function createGrid(grid, pattern) {
   });
 }
 
+// === CREATE DRUM GRID ===
 createGrid(drumGrid, drumPattern);
 
-// === NOTE LABELS ===
+// === CREATE SYNTH GRID + NOTE LABELS ===
 const noteLabels = document.getElementById("noteLabels");
 noteLabels.innerHTML = "";
 const midiStart = 84;
-const noteNames = [];
 
+const noteNames = [];
 for (let i = 0; i < synthRows; i++) {
   const midi = midiStart - i;
   const note = Tone.Frequency(midi, "midi").toNote();
@@ -113,23 +76,18 @@ for (let i = 0; i < synthRows; i++) {
 
 createGrid(synthGrid, synthPattern);
 
-// === SYNTH SETUP ===
-const synth = new Tone.PolySynth(Tone.Synth, {
-  oscillator: { type: synthType.value }
-}).toDestination();
-
-// === SEQUENCER ===
+// === STEP SEQUENCER ===
 Tone.Transport.scheduleRepeat(time => {
   bpmInput.value = Tone.Transport.bpm.value;
   document.querySelectorAll(".cell").forEach(c => c.classList.remove("playing"));
 
   if (metronomeEnabled && currentStep % 4 === 0) {
-    samplePlayers.metronome.start(time);
+    samples.metronome.start(time);
   }
 
   drumPattern.forEach((track, i) => {
     if (track[currentStep]) {
-      samplePlayers[drumTracks[i]].start(time);
+      samples[drumTracks[i]].start(time);
       const row = drumGrid.children[i];
       row.children[currentStep].classList.add("playing");
     }
@@ -153,16 +111,22 @@ Tone.Transport.scheduleRepeat(time => {
 }, "16n");
 
 // === CONTROLS ===
-document.getElementById("playBtn").addEventListener("click", async () => {
+playBtn.addEventListener("click", async () => {
   await Tone.start();
   Tone.Transport.bpm.value = parseInt(bpmInput.value, 10);
   currentStep = 0;
   Tone.Transport.start();
+
+  playBtn.classList.add("active");
+  stopBtn.classList.remove("active");
 });
 
-document.getElementById("stopBtn").addEventListener("click", () => {
+stopBtn.addEventListener("click", () => {
   Tone.Transport.stop();
   currentStep = 0;
+
+  stopBtn.classList.add("active");
+  playBtn.classList.remove("active");
 });
 
 bpmInput.addEventListener("input", e => {
