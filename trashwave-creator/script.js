@@ -1,8 +1,9 @@
 // === CONFIG ===
 const steps = 16;
-const synthRows = 24; // увеличенный диапазон нот (2 октавы)
+const synthRows = 18;
 const drumTracks = ["kick", "snare", "hat"];
 let currentStep = 0;
+let metronomeEnabled = false;
 
 Tone.Transport.bpm.value = 120;
 Tone.Transport.loop = true;
@@ -13,95 +14,97 @@ const synthGrid = document.getElementById("synthGrid");
 const drumGrid = document.getElementById("drumGrid");
 const bpmInput = document.getElementById("bpm");
 const synthType = document.getElementById("synthType");
+const toggleMetronomeBtn = document.getElementById("toggleMetronome");
 
 // === STATE ===
 let synthPattern = Array.from({ length: synthRows }, () => Array(steps).fill(false));
 let drumPattern = drumTracks.map(() => Array(steps).fill(false));
 
 // === AUDIO ===
-const synth = new Tone.PolySynth(Tone.MonoSynth, {
-  oscillator: { type: synthType.value.toLowerCase() || "sawtooth" },
-  envelope: { attack: 0.01, decay: 0.2, sustain: 0.4, release: 0.8 },
-  portamento: 0.05 // 🎛глайд
+const synth = new Tone.PolySynth(Tone.Synth, {
+  oscillator: { type: synthType.value }
 }).toDestination();
 
 const samples = {
   kick: new Tone.Player("samples/kick.wav").toDestination(),
   snare: new Tone.Player("samples/snare.wav").toDestination(),
   hat: new Tone.Player("samples/hat.wav").toDestination(),
+  metronome: new Tone.Player("samples/metronome.wav").toDestination()
 };
 
-// === Метроном
-const metronome = new Tone.MembraneSynth().toDestination();
-
-// === GRID ===
+// === GRID CREATION ===
 function createGrid(grid, pattern, isSynth = false) {
   grid.innerHTML = "";
   pattern.forEach((row, rowIndex) => {
     const rowEl = document.createElement("div");
     rowEl.classList.add("row");
-
     row.forEach((_, colIndex) => {
       const cell = document.createElement("div");
       cell.classList.add("cell");
-
-      if (colIndex % 4 === 0) {
-        cell.classList.add("bar-marker");
-      }
-
+      if (colIndex % 4 === 0) cell.classList.add("bar-marker");
       cell.dataset.row = rowIndex;
       cell.dataset.col = colIndex;
       cell.addEventListener("click", () => {
         pattern[rowIndex][colIndex] = !pattern[rowIndex][colIndex];
         cell.classList.toggle("active");
       });
-
       rowEl.appendChild(cell);
     });
-
     grid.appendChild(rowEl);
   });
 }
 
+// === CREATE DRUM GRID ===
 createGrid(drumGrid, drumPattern);
+
+// === CREATE SYNTH GRID + NOTES LABELS ===
+const noteLabels = document.getElementById("synthLabels");
+noteLabels.innerHTML = "";
+const midiStart = 72; // C5 top
+
+const noteNames = [];
+for (let i = 0; i < synthRows; i++) {
+  const midi = midiStart - i;
+  const note = Tone.Frequency(midi, "midi").toNote();
+  noteNames.push(note);
+  const label = document.createElement("div");
+  label.textContent = note;
+  noteLabels.appendChild(label);
+}
 createGrid(synthGrid, synthPattern, true);
 
-// === STEP LOGIC ===
+// === STEP SEQUENCER ===
 Tone.Transport.scheduleRepeat(time => {
   bpmInput.value = Tone.Transport.bpm.value;
-  document.querySelectorAll(".cell").forEach(cell => cell.classList.remove("playing"));
+  document.querySelectorAll(".cell").forEach(c => c.classList.remove("playing"));
 
-  // 🎵 Ударные
+  // Metronome
+  if (metronomeEnabled && currentStep % 4 === 0) {
+    samples.metronome.start(time);
+  }
+
+  // Drums
   drumPattern.forEach((track, i) => {
     if (track[currentStep]) {
       samples[drumTracks[i]].start(time);
-      const index = i * steps + currentStep;
-      if (drumGrid.children[i]) {
-        drumGrid.children[i].children[currentStep]?.classList.add("playing");
-      }
+      const row = drumGrid.children[i];
+      row.children[currentStep].classList.add("playing");
     }
   });
 
-  // 🎹 Синт
+  // Synth
   const notes = [];
   synthPattern.forEach((row, y) => {
     if (row[currentStep]) {
-      const note = Tone.Frequency(36 + (synthRows - 1 - y), "midi").toNote(); // 🔊 поддержка баса
-      notes.push(note);
-      synthGrid.children[y].children[currentStep]?.classList.add("playing");
+      notes.push(noteNames[y]);
+      const rowEl = synthGrid.children[y];
+      rowEl.children[currentStep].classList.add("playing");
     }
   });
 
   if (notes.length) {
-    synth.set({ oscillator: { type: synthType.value.toLowerCase() } });
-    notes.forEach(note => {
-      synth.triggerAttackRelease(note, "8n", time);
-    });
-  }
-
-  // 🎯 Метроном
-  if (currentStep % 4 === 0) {
-    metronome.triggerAttackRelease("C2", "8n", time);
+    synth.set({ oscillator: { type: synthType.value } });
+    synth.triggerAttackRelease(notes, "16n", time);
   }
 
   currentStep = (currentStep + 1) % steps;
@@ -122,4 +125,13 @@ document.getElementById("stopBtn").addEventListener("click", () => {
 
 bpmInput.addEventListener("input", e => {
   Tone.Transport.bpm.value = parseInt(e.target.value, 10);
+});
+
+synthType.addEventListener("change", () => {
+  synth.set({ oscillator: { type: synthType.value } });
+});
+
+toggleMetronomeBtn.addEventListener("click", () => {
+  metronomeEnabled = !metronomeEnabled;
+  toggleMetronomeBtn.classList.toggle("active", metronomeEnabled);
 });
