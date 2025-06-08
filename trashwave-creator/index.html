@@ -1,44 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
   <title>Trashwave Creator</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <script src="tone.min.js"></script>
 </head>
 <body>
 
   <h1>Trashwave Sequencer</h1>
 
   <div class="controls">
-    <label>BPM: <input type="number" id="bpm" value="120" /></label>
-    <label>Synth:
-      <select id="synthType">
-        <option value="sine">Sine</option>
-        <option value="square">Square</option>
-        <option value="sawtooth">Sawtooth</option>
-        <option value="triangle">Triangle</option>
-      </select>
-    </label>
     <button id="playBtn">▶ Play</button>
     <button id="stopBtn">■ Stop</button>
-    <button id="saveBtn">💾 Save</button>
-    <button id="exportBtn">📤 Export</button>
+    <label>BPM: <input type="number" id="bpm" min="30" max="300" value="120"></label>
+    <label>Synth: 
+      <select id="synthType">
+        <option>sawtooth</option>
+        <option>square</option>
+        <option>triangle</option>
+        <option>sine</option>
+      </select>
+    </label>
+    <button id="toggleMetronome">🎚 Metronome</button>
   </div>
 
-  <!-- Synth Grid -->
+  <!-- GRID CONTAINER -->
   <div class="grid-container">
-    <div id="noteLabels" class="labels"></div>
-    <div id="synthGrid" class="grid synth"></div>
+    <div class="grid-labels" id="drumLabels">
+      <div>KICK</div>
+      <div>SNARE</div>
+      <div>HAT</div>
+    </div>
+    <div id="drumGrid"></div>
   </div>
 
-  <!-- Drum Grid -->
   <div class="grid-container">
-    <div id="drumLabels" class="labels"></div>
-    <div id="drumGrid" class="grid drums"></div>
+    <div class="grid-labels" id="synthLabels"></div>
+    <div id="synthGrid"></div>
   </div>
 
-  <script src="tone.min.js"></script>
-  <script src="script.js" defer></script>
+  <script src="script.js"></script>
 </body>
 </html>
