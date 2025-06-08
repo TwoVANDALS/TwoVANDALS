@@ -83,3 +83,40 @@ document.getElementById("saveStudioBtn").addEventListener("click", () => {
 
   URL.revokeObjectURL(url);
 });
+
+let recorder;
+let audioChunks = [];
+
+const exportBtn = document.getElementById("exportAudioBtn");
+
+exportBtn.addEventListener("click", async () => {
+  await Tone.start();
+
+  const dest = Tone.context.createMediaStreamDestination();
+  synth.connect(dest);
+  drumSampler.connect(dest); // если есть ударные
+
+  recorder = new MediaRecorder(dest.stream);
+  audioChunks = [];
+
+  recorder.ondataavailable = e => audioChunks.push(e.data);
+  recorder.onstop = () => {
+    const blob = new Blob(audioChunks, { type: "audio/wav" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "trashwave-track.wav";
+    a.click();
+  };
+
+  recorder.start();
+  Tone.Transport.stop();
+  Tone.Transport.start("+0.1");
+
+  // 🎯 Записываем ровно 8 тактов (регулируется)
+  setTimeout(() => {
+    Tone.Transport.stop();
+    recorder.stop();
+  }, 8000); // 8 сек
+});
