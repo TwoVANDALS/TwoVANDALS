@@ -65,3 +65,21 @@ document.getElementById("playStudioBtn").addEventListener("click", async () => {
   currentStep = 0;
   Tone.Transport.start();
 });
+
+document.getElementById("saveStudioBtn").addEventListener("click", () => {
+  const patternData = {
+    drums: drumPattern,
+    synth: synthPattern,
+    synthType: document.getElementById("synthSelect").value
+  };
+
+  const blob = new Blob([JSON.stringify(patternData, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "trashwave-pattern.json";
+  a.click();
+
+  URL.revokeObjectURL(url);
+});
