@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trashwave Creator</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="tone.min.js"></script>
+</head>
+<body>
+
+  <h1>TrashMachine</h1>
+
+  <!-- Controls -->
+  <div class="controls">
+    <button id="playBtn">▶ Play</button>
+    <button id="stopBtn">■ Stop</button>
+    <label>BPM: <input type="number" id="bpm" value="120" min="30" max="300"></label>
+    <label>
+      Synth: 
+      <select id="synthType">
+        <option>sawtooth</option>
+        <option>square</option>
+        <option>triangle</option>
+        <option>sine</option>
+      </select>
+    </label>
+    <button id="toggleMetronome">🎚 Metronome</button>
+  </div>
+
+  <!-- Drum Grid -->
+  <div class="grid-wrapper">
+    <div class="grid-labels">
+      <div>Kick</div>
+      <div>Snare</div>
+      <div>Hat</div>
+    </div>
+    <div id="drumGrid"></div>
+  </div>
+
+  <!-- Synth Grid -->
+  <div class="grid-wrapper">
+    <div class="note-labels" id="noteLabels"></div>
+    <div id="synthGrid"></div>
+  </div>
+
+  <!-- Script -->
+  <script src="script.js"></script>
+</body>
+</html>
