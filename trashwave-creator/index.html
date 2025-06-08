@@ -12,7 +12,7 @@
 <h1>🎛️ Trashwave Creator</h1>
 
 <div class="controls">
-  <label>Synth Type: 
+  <label>Synth Type:
     <select id="synthType">
       <option>Sine</option>
       <option>Square</option>
@@ -30,33 +30,41 @@
 </div>
 
 <!-- DRUM SEQUENCER -->
-<div class="grid-wrapper">
-  <div class="grid-labels drum-labels">
-    <div>Kick</div>
-    <div>Snare</div>
-    <div>Hat</div>
+<section class="sequencer-section">
+  <h2>🥁 Drums</h2>
+  <div class="grid-wrapper">
+    <div class="grid-labels drum-labels">
+      <div>Kick</div>
+      <div>Snare</div>
+      <div>Hat</div>
+    </div>
+    <div class="bar-indicators"></div>
+    <div id="drumGrid" class="grid drum-grid"></div>
   </div>
-  <div id="drumGrid" class="grid"></div>
-</div>
+</section>
 
 <!-- SYNTH SEQUENCER -->
-<div class="grid-wrapper">
-  <div class="grid-labels synth-labels">
-    <div>C</div>
-    <div>B</div>
-    <div>A#</div>
-    <div>A</div>
-    <div>G#</div>
-    <div>G</div>
-    <div>F#</div>
-    <div>F</div>
-    <div>E</div>
-    <div>D#</div>
-    <div>D</div>
-    <div>C#</div>
+<section class="sequencer-section">
+  <h2>🎹 Synth</h2>
+  <div class="grid-wrapper">
+    <div class="grid-labels synth-labels">
+      <div>C</div>
+      <div>B</div>
+      <div>A#</div>
+      <div>A</div>
+      <div>G#</div>
+      <div>G</div>
+      <div>F#</div>
+      <div>F</div>
+      <div>E</div>
+      <div>D#</div>
+      <div>D</div>
+      <div>C#</div>
+    </div>
+    <div class="bar-indicators"></div>
+    <div id="synthGrid" class="grid synth-grid"></div>
   </div>
-  <div id="synthGrid" class="grid"></div>
-</div>
+</section>
 
 <script type="module" src="script.js"></script>
 </body>
