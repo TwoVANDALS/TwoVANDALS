@@ -1,157 +1,142 @@
 body {
   margin: 0;
-  padding: 0;
-  font-family: monospace;
-  background: black;
-  color: white;
+  font-family: 'VT323', monospace;
+  background: #000;
+  color: #fff;
+  font-size: 20px;
+}
+
+header {
   text-align: center;
+  padding: 20px 0;
+  border-bottom: 1px solid #444;
 }
 
 h1 {
-  font-family: 'VT323', monospace;
-  font-size: 1.5em;
-  margin: 20px 0;
-  text-shadow: 1px 1px #555;
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  color: white;
+  text-shadow: 1px 1px 0 #666;
 }
 
 .controls {
-  margin: 10px auto 20px;
   display: flex;
   flex-wrap: wrap;
+  gap: 15px;
   justify-content: center;
-  gap: 8px;
+  padding: 20px;
+  background: #111;
+  border-bottom: 1px solid #333;
 }
 
 .controls button,
-.controls select,
-.controls input {
-  font-family: monospace;
-  font-size: 1em;
-  padding: 4px 8px;
-  background: #111;
-  color: white;
-  border: 1px solid #444;
-  border-radius: 3px;
-  cursor: pointer;
+.controls input,
+.controls select {
+  font-family: inherit;
+  background: #000;
+  color: #fff;
+  border: 2px solid #555;
+  padding: 0.4em 0.8em;
+  font-size: 1rem;
+  transition: 0.2s ease;
 }
 
-button.active {
-  background: #0a0;
+.controls button:hover,
+.controls input:focus,
+.controls select:focus {
+  border-color: #fff;
+  background: #222;
+}
+
+.controls button#playBtn.active {
+  background: white;
   color: black;
+  border-color: white;
+  animation: pulse 0.6s infinite alternate;
 }
 
-.grid-wrapper {
+.controls button#stopBtn.active {
+  background: #fff;
+  color: #000;
+  border-color: #fff;
+  animation: blink 0.3s infinite alternate;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0px white; }
+  100% { box-shadow: 0 0 10px white; }
+}
+
+@keyframes blink {
+  from { opacity: 1; }
+  to { opacity: 0.4; }
+}
+
+.grid-section {
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 4px;
-  margin: 10px auto;
-  overflow-x: auto;
+  flex-direction: row;
+  margin: 20px auto;
+  max-width: 90%;
+  gap: 10px;
 }
 
-.note-labels,
-.grid-labels {
+.labels {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  font-size: 12px;
-  color: #ccc;
-  text-align: right;
-  margin-right: 4px;
-  min-width: 40px;
+  margin-right: 10px;
+  gap: 5px;
 }
 
-.note-labels div,
-.grid-labels div {
-  height: 24px;
-  line-height: 24px;
-  padding-right: 4px;
+.label-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1rem;
 }
 
-#synthGrid,
-#drumGrid {
+.grid {
   display: flex;
   flex-direction: column;
+  gap: 5px;
+  flex: 1;
 }
 
 .row {
   display: flex;
+  gap: 4px;
 }
 
 .cell {
-  width: 20px;
-  height: 24px;
+  width: 25px;
+  height: 25px;
   border: 1px solid #333;
-  background-color: #111;
-  box-sizing: border-box;
+  background: #111;
+  cursor: pointer;
+  transition: 0.1s ease;
+}
+
+.cell:hover {
+  background: #222;
 }
 
 .cell.active {
-  background-color: white;
+  background: #fff;
+  border-color: #fff;
 }
 
 .cell.playing {
-  outline: 1px solid #0f0;
+  outline: 2px solid #fff;
 }
 
 .bar-marker {
-  border-left: 2px solid #999;
+  border-left: 2px solid #888;
 }
 
-/* Responsive tweaks */
-@media (max-width: 600px) {
-  .controls {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .note-labels,
-  .grid-labels {
-    font-size: 10px;
-  }
-
-  .cell {
-    width: 16px;
-    height: 20px;
-  }
-
-  .note-labels div,
-  .grid-labels div {
-    height: 20px;
-    line-height: 20px;
-  }
-}
-
-button#playBtn,
-button#stopBtn {
-  transition: all 0.2s ease;
-  border: 2px solid #fff;
-  background: transparent;
+.sample-selector {
+  background: #000;
   color: #fff;
-  font-family: 'VT323', monospace;
-  font-size: 1.2rem;
-  padding: 0.6rem 1.2rem;
-  cursor: pointer;
-  box-shadow: none;
-}
-
-button#playBtn.active,
-button#stopBtn.active {
-  background: #fff;
-  color: #000;
-  box-shadow: 0 0 10px #fff;
-  animation: flicker 0.8s infinite alternate;
-}
-
-@keyframes flicker {
-  0% {
-    opacity: 1;
-    box-shadow: 0 0 5px #fff;
-    transform: scale(1);
-  }
-  100% {
-    opacity: 0.85;
-    box-shadow: 0 0 15px #aaa;
-    transform: scale(1.05);
-  }
+  border: 1px solid #555;
+  padding: 0.2rem 0.4rem;
+  font-size: 0.9rem;
 }
