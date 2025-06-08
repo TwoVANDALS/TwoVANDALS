@@ -506,3 +506,60 @@ section h2 {
   border-bottom: 2px solid #888;
   display: inline-block;
 }
+
+.grid-wrapper {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px;
+  margin-bottom: 30px;
+  align-items: start;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.grid-labels,
+.note-labels {
+  display: grid;
+  font-family: monospace;
+  font-size: 14px;
+  color: white;
+  text-align: right;
+  justify-content: end;
+}
+
+.grid-labels {
+  grid-template-rows: repeat(3, 32px); /* для kick/snare/hat */
+}
+
+.note-labels {
+  grid-template-rows: repeat(18, 32px); /* C5-G3 или сколько у тебя нот */
+}
+
+#drumGrid,
+#synthGrid {
+  display: grid;
+  gap: 2px;
+}
+
+#drumGrid .row,
+#synthGrid .row {
+  display: grid;
+  grid-template-columns: repeat(16, 32px); /* шаги */
+  gap: 2px;
+}
+
+.cell {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #666;
+  background-color: #111;
+  transition: background-color 0.2s ease;
+}
+
+.cell.active {
+  background-color: white;
+}
+
+.cell.playing {
+  box-shadow: 0 0 0 2px #0f0 inset;
+}
