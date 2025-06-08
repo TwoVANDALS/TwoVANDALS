@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TwoVANDALS</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=VT323&display=swap" rel="stylesheet" />
+</head>
+
+<body>
+<div id="loader-screen">
+  <span id="loader-text">T</span>
+</div>
+  <!-- Preloader -->
+  <div id="loader">
+    <div class="glitch-loader">TwoVANDALS</div>
+  </div>
+
+  <!-- Visual FX canvas -->
+  <canvas id="snow-canvas"></canvas>
+
+  <!-- Header -->
+  <header>
+    <div class="logo">TwoVANDALS</div>
+    <p class="motto">Trashwave is not a genre. It’s a wound.</p>
+    <nav>
+      <a href="#music" class="nav-btn">Music</a>
+      <a href="#manifest" class="nav-btn">Manifest</a>
+      <a href="#contacts" class="nav-btn">Contact</a>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="overlay"></div>
+    <div class="hero-content">
+      <h1>100+ tracks. No explanation.</h1>
+      <a href="https://soundcloud.com/vandalstwo" target="_blank" class="btn pixel-btn">LISTEN</a>
+    </div>
+  </section>
+
+  <!-- Popular Tracks Embed -->
+  <section id="music" class="music">
+    <h2>Our Popular Tracks</h2>
+    <iframe id="scPlayer" data-src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/vandalstwo/sets/popular&color=%23000000&auto_play=false&show_artwork=true&show_user=true" width="100%" height="450" scrolling="no" frameborder="no" allow="autoplay"></iframe>
+  </section>
+
+  <!-- Manifest -->
+  <section id="manifest" class="manifest">
+    <h2>Manifest</h2>
+    <p>We promote nothing.<br>We make noise.<br>We live raw.</p>
+  </section>
+
+  <!-- Contacts & Discord -->
+  <section id="contacts" class="contacts">
+    <h2>Contact</h2>
+    <div class="socials">
+      <a href="https://www.instagram.com/twovandals/" target="_blank">Instagram</a>
+      <a href="https://open.spotify.com/artist/3KwllIZI6D6aQrffiZUnrZ" target="_blank">Spotify</a>
+      <a href="https://soundcloud.com/vandalstwo" target="_blank">SoundCloud</a>
+    </div>
+    <p>Email: <a href="mailto:vandalstwo@gmail.com">vandalstwo@gmail.com</a></p>
+
+    <div class="discord-links">
+      <p><strong>Trashwave Community Discord:</strong> <a href="https://discord.gg/tf2X2ThCBM" target="_blank">Join here</a></p>
+      <p><strong>TwoVANDALS Private Server:</strong> <a href="https://discord.gg/CyzsWeQCZ8" target="_blank">Invite-only</a></p>
+    </div>
+  </section>
+
+  <!-- Trashwave Creator Section -->
+<section id="trashwave-creator" class="trashwave-creator">
+  <h2>Create your own noisy chaos in the browser</h2>
+  <iframe 
+    src="trashwave-creator/index.html" 
+    width="100%" 
+    height="800" 
+    style="border: none; background: #000;" 
+    allowfullscreen
+  ></iframe>
+</section>
+  
+  <!-- Footer -->
+  <footer>
+    <p>© TwoVANDALS / Noise never sleeps.</p>
+  </footer>
+
+  <!-- Audio Player -->
+  <div class="audio-player" id="audioPlayer">
+    <button id="togglePlayer" class="toggle-btn">▼</button>
+    <button id="prevTrackBtn">⏮</button>
+    <button id="playPauseBtn">▶ Listen to a curated Trashwave set</button>
+    <button id="nextTrackBtn">⏭</button>
+    <span id="trackTitle">Track 1</span>
+    <span id="currentTime">0:00</span>
+    <input type="range" id="seekBar" value="0" step="1" />
+    <span id="duration">0:00</span>
+    <input id="volumeSlider" type="range" min="0" max="1" step="0.01" value="0.5" />
+  </div>
+  <audio id="bgTrack" src="ybuocfiewu.mp3" preload="metadata"></audio>
+  <audio id="clickSound" src="click.mp3" preload="auto"></audio>
+
+  <!-- Hidden Easter Eggs -->
+  <a href="https://soundcloud.com/deadrazy" class="egg egg-blood" title="deadrazy"></a>
+  <a href="https://soundcloud.com/snybun" class="egg egg-water" title="snybun"></a>
+  <a href="https://soundcloud.com/princesssguilt" class="egg egg-electric" title="princesssguilt"></a>
+  <a href="https://soundcloud.com/3_66_7" class="egg egg-fire" title="3_66_7"></a>
+  <a href="https://soundcloud.com/vandal2012" class="egg egg-core" title="vandal2012"></a>
+
+  <!-- Upload Area -->
+<section id="upload-area" class="drop-zone">
+  <h2>Upload Your Trashwave</h2>
+  <input type="file" id="fileInput" accept="audio/*" />
+  <button id="uploadBtn">Upload</button>
+  <div id="uploadStatus"></div>
+</section>
+
+
+  <!-- Uploaded Track Feed -->
+  <section id="track-feed">
+    <h2>Uploaded Trashwave</h2>
+    <div id="trackList"></div>
+
+    <template id="audio-template">
+      <div class="track-player">
+        <h3 class="track-title"></h3>
+        <audio preload="metadata"></audio>
+        <canvas class="visualizer" width="600" height="60"></canvas>
+        <div class="controls">
+          <button class="play-btn">▶</button>
+          <input class="seek-bar" type="range" min="0" value="0" step="1" />
+          <span class="time current-time">0:00</span> /
+          <span class="time duration">0:00</span>
+          <input class="volume-bar" type="range" min="0" max="1" step="0.01" value="0.5" />
+        </div>
+        <button class="like-btn">❤️ <span class="like-count">0</span></button>
+      </div>
+    </template>
+  </section>
+
+  <!-- Main Script -->
+  <script src="script.js" defer></script>
+
+  <!-- Supabase Upload Logic -->
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js'
+
+    const supabase = createClient(
+      'https://qqffjsnlsbzhzhlvbexb.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFxZmZqc25sc2J6aHpobHZiZXhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkzMTM1MTksImV4cCI6MjA2NDg4OTUxOX0.LFrwLA5njJYak5RQ25Kd14TZE64HCV8WSsx31riL-0g'
+    );
+
+    async function listTracks() {
+      const { data: files, error } = await supabase.storage.from('tracks').list('', {
+        limit: 100
+      });
+
+      const listContainer = document.getElementById("trackList");
+      const template = document.getElementById("audio-template");
+      listContainer.innerHTML = "";
+
+      for (const file of files) {
+        if (!file.name.match(/\.(mp3|wav)$/i)) continue;
+
+        const { data } = supabase.storage.from('tracks').getPublicUrl(file.name);
+        const audioUrl = data.publicUrl;
+
+        const clone = template.content.cloneNode(true);
+        const audio = clone.querySelector("audio");
+        const title = clone.querySelector(".track-title");
+        const playBtn = clone.querySelector(".play-btn");
+        const seek = clone.querySelector(".seek-bar");
+        const volume = clone.querySelector(".volume-bar");
+        const currentTimeEl = clone.querySelector(".current-time");
+        const durationEl = clone.querySelector(".duration");
+
+        title.textContent = file.name.replace(/\.[^/.]+$/, "");
+        audio.src = audioUrl;
+
+        const formatTime = s => {
+          const m = Math.floor(s / 60);
+          const ss = Math.floor(s % 60).toString().padStart(2, "0");
+          return `${m}:${ss}`;
+        };
+
+        playBtn.addEventListener("click", () => {
+          document.querySelectorAll("audio").forEach(a => {
+            if (a !== audio) a.pause();
+          });
+          if (audio.paused) {
+            audio.play();
+          } else {
+            audio.pause();
+          }
+        });
+
+        audio.addEventListener("play", () => {
+          playBtn.textContent = "⏸";
+        });
+
+        audio.addEventListener("pause", () => {
+          playBtn.textContent = "▶";
+        });
+
+        audio.addEventListener("loadedmetadata", () => {
+          if (isFinite(audio.duration)) {
+            seek.max = Math.floor(audio.duration);
+            durationEl.textContent = formatTime(audio.duration);
+          } else {
+            audio.currentTime = 1e101;
+            audio.ontimeupdate = () => {
+              audio.ontimeupdate = null;
+              audio.currentTime = 0;
+              seek.max = Math.floor(audio.duration);
+              durationEl.textContent = formatTime(audio.duration);
+            };
+          }
+        });
+
+        audio.addEventListener("timeupdate", () => {
+          seek.value = audio.currentTime;
+          currentTimeEl.textContent = formatTime(audio.currentTime);
+        });
+
+        seek.addEventListener("input", () => {
+          audio.currentTime = seek.value;
+        });
+
+        volume.addEventListener("input", () => {
+          audio.volume = volume.value;
+        });
+
+        listContainer.appendChild(clone);
+      }
+    }
+
+    const uploadBtn = document.getElementById('uploadBtn');
+    const fileInput = document.getElementById('fileInput');
+    const uploadStatus = document.getElementById('uploadStatus');
+
+    uploadBtn.addEventListener('click', async () => {
+      const file = fileInput.files[0];
+      if (!file) return alert('Choose a file first!');
+      if (!file.name.match(/\.(mp3|wav)$/i)) return alert('Only .mp3 or .wav allowed!');
+
+      const { error } = await supabase.storage.from('tracks').upload(file.name, file, {
+        cacheControl: '3600',
+        upsert: false
+      });
+
+      if (error) {
+        uploadStatus.innerText = `Upload Error: ${error.message}`;
+      } else {
+        uploadStatus.innerText = `✅ Uploaded: ${file.name}`;
+        await listTracks();
+      }
+    });
+
+    const trackFeed = document.getElementById("track-feed");
+
+const trackObserver = new IntersectionObserver((entries, obs) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      listTracks();
+      obs.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.25 });
+
+if (trackFeed) trackObserver.observe(trackFeed);
+  </script>
+
+</body>
+</html>
+
