@@ -1,16 +1,32 @@
-#sequencer {
-  display: grid;
-  grid-template-columns: repeat(16, 40px);
-  gap: 4px;
+#studio-window {
+  background: #111;
+  padding: 20px;
+  border: 2px solid lime;
+  margin: 30px auto;
+  max-width: 800px;
+  color: #0f0;
+  font-family: 'VT323', monospace;
+}
+.track {
   margin-bottom: 20px;
 }
-.step {
-  width: 40px;
-  height: 40px;
+.grid {
+  display: grid;
+  grid-template-columns: repeat(16, 30px);
+  grid-auto-rows: 30px;
+  gap: 2px;
+}
+.grid .cell {
   background: #222;
-  border: 1px solid #444;
+  border: 1px solid #333;
   cursor: pointer;
 }
-.step.active {
+.grid .cell.active {
   background: #0f0;
+}
+select {
+  margin: 5px 0 15px 0;
+  background: #000;
+  color: #0f0;
+  border: 1px solid #0f0;
 }
