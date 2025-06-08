@@ -114,6 +114,48 @@ button:active {
   100% { outline-color: white; }
 }
 
+.grid-labels {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-right: 10px;
+  font-size: 14px;
+  color: #ffffff88;
+  font-family: 'VT323', monospace;
+  line-height: 32px;
+  user-select: none;
+}
+
+.grid-labels div {
+  height: 32px;
+  display: flex;
+  align-items: center;
+  padding-right: 4px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(16, 32px); /* можно изменить на 32 или 64 шагов */
+  grid-auto-rows: 32px;
+  gap: 2px;
+  margin: 10px auto;
+}
+
+.cell {
+  width: 32px;
+  height: 32px;
+  background: #111;
+  border: 1px solid #444;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.cell.active {
+  background: #fff;
+  border: 1px solid #fff;
+}
+
+
 /* Optional Scroll Fix for Small Screens */
 @media (max-width: 600px) {
   .grid {
