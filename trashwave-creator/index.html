@@ -9,10 +9,10 @@
 <body>
 
   <h1>Trashwave Sequencer</h1>
-  
+
   <div class="controls">
     <label>BPM: <input type="number" id="bpm" value="120" /></label>
-    <label>Synth: 
+    <label>Synth:
       <select id="synthType">
         <option value="sine">Sine</option>
         <option value="square">Square</option>
@@ -26,11 +26,13 @@
     <button id="exportBtn">📤 Export</button>
   </div>
 
+  <!-- Synth Grid -->
   <div class="grid-container">
     <div id="noteLabels" class="labels"></div>
     <div id="synthGrid" class="grid synth"></div>
   </div>
 
+  <!-- Drum Grid -->
   <div class="grid-container">
     <div id="drumLabels" class="labels"></div>
     <div id="drumGrid" class="grid drums"></div>
