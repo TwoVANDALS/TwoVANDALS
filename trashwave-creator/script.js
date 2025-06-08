@@ -19,14 +19,22 @@ let synthPattern = Array.from({ length: synthRows }, () => Array(steps).fill(fal
 let drumPattern = drumTracks.map(() => Array(steps).fill(false));
 
 // === AUDIO ===
-const synth = new Tone.PolySynth().toDestination();
+const synth = new Tone.PolySynth(Tone.Synth, {
+  oscillator: { type: synthType.value.toLowerCase() || "sawtooth" },
+  envelope: {
+    attack: 0.01,
+    decay: 0.1,
+    sustain: 0.6,
+    release: 0.3
+  },
+  portamento: 0.02
+}).toDestination();
 
 const samples = {
   kick: new Tone.Player("samples/kick.wav").toDestination(),
   snare: new Tone.Player("samples/snare.wav").toDestination(),
   hat: new Tone.Player("samples/hat.wav").toDestination(),
 };
-
 
 // === GRID ===
 function createGrid(grid, pattern) {
@@ -36,7 +44,6 @@ function createGrid(grid, pattern) {
       const cell = document.createElement("div");
       cell.classList.add("cell");
 
-      // 📏 Добавим визуальный бар каждый 4 шаг
       if (colIndex % 4 === 0) {
         cell.classList.add("bar-marker");
       }
@@ -60,6 +67,7 @@ Tone.Transport.scheduleRepeat(time => {
   bpmInput.value = Tone.Transport.bpm.value;
   document.querySelectorAll(".cell").forEach(cell => cell.classList.remove("playing"));
 
+  // 🎵 Ударные
   drumPattern.forEach((track, i) => {
     if (track[currentStep]) {
       samples[drumTracks[i]].start(time);
@@ -67,6 +75,7 @@ Tone.Transport.scheduleRepeat(time => {
     }
   });
 
+  // 🎹 Синт
   const notes = [];
   synthPattern.forEach((row, y) => {
     if (row[currentStep]) {
@@ -78,7 +87,10 @@ Tone.Transport.scheduleRepeat(time => {
 
   if (notes.length) {
     synth.set({ oscillator: { type: synthType.value.toLowerCase() } });
-    synth.triggerAttackRelease(notes, "8n", time);
+    notes.forEach(note => {
+      synth.triggerAttack(note, time);
+      synth.triggerRelease(note, time + Tone.Time("8n"));
+    });
   }
 
   currentStep = (currentStep + 1) % steps;
