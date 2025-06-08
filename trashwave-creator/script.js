@@ -1,8 +1,9 @@
 // === CONFIG ===
 const steps = 16;
 const synthRows = 12;
-const drumTracks = ["Kick", "Snare", "Hat"];
+const drumTracks = ["kick", "snare", "hat"];
 let currentStep = 0;
+
 Tone.Transport.bpm.value = 120;
 Tone.Transport.loop = true;
 Tone.Transport.loopEnd = "1m";
@@ -23,76 +24,62 @@ const synth = new Tone.PolySynth(Tone.Synth, {
 }).toDestination();
 
 const samples = {
-  Kick: new Tone.Player("samples/kick.wav").toDestination(),
-  Snare: new Tone.Player("samples/snare.wav").toDestination(),
-  Hat: new Tone.Player("samples/hat.wav").toDestination()
+  kick: new Tone.Player("samples/kick.wav").toDestination(),
+  snare: new Tone.Player("samples/snare.wav").toDestination(),
+  hat: new Tone.Player("samples/hat.wav").toDestination(),
 };
 
-// === UTILS ===
-function createLabelColumn(container, labels) {
-  container.innerHTML = "";
-  labels.forEach(label => {
-    const div = document.createElement("div");
-    div.textContent = label;
-    container.appendChild(div);
-  });
-}
-
-function createGrid(container, pattern, isSynth = false) {
-  container.innerHTML = "";
+// === GRID ===
+function createGrid(grid, pattern) {
+  grid.innerHTML = "";
   pattern.forEach((row, rowIndex) => {
     row.forEach((_, colIndex) => {
       const cell = document.createElement("div");
       cell.classList.add("cell");
+
+      // 📏 Добавим визуальный бар каждый 4 шаг
+      if (colIndex % 4 === 0) {
+        cell.classList.add("bar-marker");
+      }
+
       cell.dataset.row = rowIndex;
       cell.dataset.col = colIndex;
       cell.addEventListener("click", () => {
         pattern[rowIndex][colIndex] = !pattern[rowIndex][colIndex];
         cell.classList.toggle("active");
       });
-      container.appendChild(cell);
+      grid.appendChild(cell);
     });
   });
 }
 
-// === INIT ===
-const synthNotes = [...Array(synthRows)].map((_, i) =>
-  Tone.Frequency(60 + (synthRows - 1 - i), "midi").toNote()
-);
-
-createGrid(synthGrid, synthPattern, true);
 createGrid(drumGrid, drumPattern);
-createLabelColumn(document.getElementById("synthLabels"), synthNotes);
-createLabelColumn(document.getElementById("drumLabels"), drumTracks);
+createGrid(synthGrid, synthPattern);
 
-// === PLAYBACK LOGIC ===
+// === STEP LOGIC ===
 Tone.Transport.scheduleRepeat(time => {
   bpmInput.value = Tone.Transport.bpm.value;
   document.querySelectorAll(".cell").forEach(cell => cell.classList.remove("playing"));
 
-  // DRUMS
-  drumPattern.forEach((track, row) => {
+  drumPattern.forEach((track, i) => {
     if (track[currentStep]) {
-      samples[drumTracks[row]].start(time);
-      const index = row * steps + currentStep;
-      drumGrid.children[index].classList.add("playing");
+      samples[drumTracks[i]].start(time);
+      drumGrid.children[i * steps + currentStep].classList.add("playing");
     }
   });
 
-  // SYNTH
-  const notesToPlay = [];
+  const notes = [];
   synthPattern.forEach((row, y) => {
     if (row[currentStep]) {
-      const note = synthNotes[y];
-      notesToPlay.push(note);
-      const index = y * steps + currentStep;
-      synthGrid.children[index].classList.add("playing");
+      const note = Tone.Frequency(60 + (synthRows - 1 - y), "midi").toNote();
+      notes.push(note);
+      synthGrid.children[y * steps + currentStep].classList.add("playing");
     }
   });
 
-  if (notesToPlay.length > 0) {
+  if (notes.length) {
     synth.set({ oscillator: { type: synthType.value.toLowerCase() } });
-    synth.triggerAttackRelease(notesToPlay, "8n", time);
+    synth.triggerAttackRelease(notes, "8n", time);
   }
 
   currentStep = (currentStep + 1) % steps;
@@ -101,7 +88,7 @@ Tone.Transport.scheduleRepeat(time => {
 // === CONTROLS ===
 document.getElementById("playBtn").addEventListener("click", async () => {
   await Tone.start();
-  Tone.Transport.bpm.value = parseInt(bpmInput.value);
+  Tone.Transport.bpm.value = parseInt(bpmInput.value, 10);
   currentStep = 0;
   Tone.Transport.start();
 });
@@ -112,33 +99,5 @@ document.getElementById("stopBtn").addEventListener("click", () => {
 });
 
 bpmInput.addEventListener("input", e => {
-  Tone.Transport.bpm.value = parseInt(e.target.value);
-});
-
-// === EXPORT / SAVE ===
-document.getElementById("saveBtn").addEventListener("click", () => {
-  const data = { synthPattern, drumPattern };
-  const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "trashwave-pattern.json";
-  a.click();
-});
-
-document.getElementById("exportBtn").addEventListener("click", async () => {
-  const recorder = new Tone.Recorder();
-  synth.connect(recorder);
-  Object.values(samples).forEach(sample => sample.connect(recorder));
-  recorder.start();
-  Tone.Transport.stop();
-  Tone.Transport.start();
-  setTimeout(async () => {
-    Tone.Transport.stop();
-    const recording = await recorder.stop();
-    const blob = new Blob([recording], { type: "audio/wav" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "trashwave-export.wav";
-    a.click();
-  }, 4000);
+  Tone.Transport.bpm.value = parseInt(e.target.value, 10);
 });
