@@ -8,6 +8,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.39/Tone.min.js"></script>
 </head>
 <body>
+  <h1>Trashwave Creator</h1>
+
   <div class="controls">
     <button id="playBtn">▶ Play</button>
     <button id="stopBtn">■ Stop</button>
@@ -23,14 +25,16 @@
     <button id="exportBtn">⬇ Export WAV</button>
   </div>
 
-  <div class="grid-wrapper">
-    <div class="note-labels" id="noteLabels"></div>
-    <div class="synth-grid" id="synthGrid"></div>
+  <!-- SYNTH GRID -->
+  <div class="grid-container">
+    <div class="grid-labels" id="noteLabels"></div>
+    <div class="grid" id="synthGrid"></div>
   </div>
 
-  <div class="drum-wrapper">
-    <div class="drum-labels" id="drumLabels"></div>
-    <div class="drum-grid" id="drumGrid"></div>
+  <!-- DRUM GRID -->
+  <div class="grid-container">
+    <div class="grid-labels" id="drumLabels"></div>
+    <div class="grid" id="drumGrid"></div>
   </div>
 
   <script src="script.js"></script>
