@@ -3,21 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Trashwave Creator</title>
+  <title>Trash Creator</title>
   <link rel="stylesheet" href="style.css" />
   <script src="tone.min.js"></script>
 </head>
 <body>
-
   <h1>TrashMachine</h1>
-
-  <!-- Controls -->
   <div class="controls">
     <button id="playBtn">▶ Play</button>
     <button id="stopBtn">■ Stop</button>
-    <label>BPM: <input type="number" id="bpm" value="120" min="30" max="300"></label>
-    <label>
-      Synth: 
+    <label>BPM: <input type="number" id="bpm" min="30" max="300" value="120"></label>
+    <label>Synth:
       <select id="synthType">
         <option>sawtooth</option>
         <option>square</option>
@@ -29,22 +25,21 @@
   </div>
 
   <!-- Drum Grid -->
-  <div class="grid-wrapper">
-    <div class="grid-labels">
-      <div>Kick</div>
-      <div>Snare</div>
-      <div>Hat</div>
+  <div class="grid-container">
+    <div class="grid-labels" id="drumLabels">
+      <div>KICK <select data-track="kick" class="sample-select"></select></div>
+      <div>SNARE <select data-track="snare" class="sample-select"></select></div>
+      <div>HAT <select data-track="hat" class="sample-select"></select></div>
     </div>
     <div id="drumGrid"></div>
   </div>
 
   <!-- Synth Grid -->
-  <div class="grid-wrapper">
-    <div class="note-labels" id="noteLabels"></div>
+  <div class="grid-container">
+    <div class="grid-labels" id="noteLabels"></div>
     <div id="synthGrid"></div>
   </div>
 
-  <!-- Script -->
   <script src="script.js"></script>
 </body>
 </html>
