@@ -1,112 +1,109 @@
-// DRUMS
-const drumSounds = ["kick", "snare", "hat"];
-let drumPattern = Array(drumSounds.length).fill().map(() => Array(16).fill(false));
-const drumPlayers = new Tone.Players({
-  kick: "samples/kick.wav",
-  snare: "samples/snare.wav",
-  hat: "samples/hat.wav"
-}).toDestination();
+let bpmInput = document.getElementById('bpm');
+let playBtn = document.getElementById('playBtn');
+let stopBtn = document.getElementById('stopBtn');
+let saveBtn = document.getElementById('saveBtn');
+let exportBtn = document.getElementById('exportBtn');
+let waveformSelect = document.getElementById('waveform');
 
-// SYNTH
-const synthNotes = ["C5", "B4", "A4", "G4", "F4", "E4", "D4", "C4"];
-let synthPattern = Array(synthNotes.length).fill().map(() => Array(16).fill(false));
-let synth = new Tone.Synth().toDestination();
+Tone.Transport.bpm.value = 120;
+Tone.Transport.loop = true;
+Tone.Transport.loopEnd = "1m";
 
-// BUILD GRIDS
-function createGrid(containerId, pattern) {
-  const container = document.getElementById(containerId);
+const drumSamples = {
+  kick: new Tone.Player("samples/kick.wav").toDestination(),
+  snare: new Tone.Player("samples/snare.wav").toDestination(),
+  hat: new Tone.Player("samples/hat.wav").toDestination()
+};
+
+const synth = new Tone.Synth().toDestination();
+
+const drumGrid = document.getElementById("drum-grid");
+const synthGrid = document.getElementById("synth-grid");
+
+let drumSteps = { kick: [], snare: [], hat: [] };
+let synthSteps = [];
+
+function createGrid(container, rows = 3, cols = 16, target) {
   container.innerHTML = "";
-  const rows = pattern.length;
-  const cols = pattern[0].length;
-
-  for (let y = 0; y < rows; y++) {
-    for (let x = 0; x < cols; x++) {
-      const cell = document.createElement("div");
-      cell.className = "cell";
-      if (pattern[y][x]) cell.classList.add("active");
-      cell.addEventListener("click", () => {
-        pattern[y][x] = !pattern[y][x];
-        cell.classList.toggle("active");
+  for (let row = 0; row < rows; row++) {
+    for (let i = 0; i < cols; i++) {
+      let step = document.createElement("div");
+      step.className = "step";
+      step.dataset.row = row;
+      step.dataset.col = i;
+      step.addEventListener("click", () => {
+        step.classList.toggle("active");
+        target[row][i] = !target[row][i];
       });
-      container.appendChild(cell);
+      container.appendChild(step);
     }
   }
 }
 
-createGrid("drumGrid", drumPattern);
-createGrid("synthGrid", synthPattern);
+function initGrids() {
+  const steps = 16;
+  for (let k of ['kick', 'snare', 'hat']) {
+    drumSteps[k] = Array(steps).fill(false);
+  }
+  synthSteps = Array(3).fill().map(() => Array(steps).fill(false));
+  createGrid(drumGrid, 3, steps, [drumSteps.kick, drumSteps.snare, drumSteps.hat]);
+  createGrid(synthGrid, 3, steps, synthSteps);
+}
 
-// SYNTH SELECT
-document.getElementById("synthSelect").addEventListener("change", e => {
-  synth = new Tone.Synth({ oscillator: { type: e.target.value } }).toDestination();
-});
-
-// PLAYBACK
-let step = 0;
-Tone.Transport.scheduleRepeat(time => {
-  drumPattern.forEach((row, i) => {
-    if (row[step]) drumPlayers.player(drumSounds[i]).start(time);
+let index = 0;
+Tone.Transport.scheduleRepeat((time) => {
+  ['kick', 'snare', 'hat'].forEach((type, i) => {
+    if (drumSteps[type][index]) drumSamples[type].start(time);
   });
-
-  synthPattern.forEach((row, i) => {
-    if (row[step]) synth.triggerAttackRelease(synthNotes[i], "8n", time);
+  synthSteps.forEach((row, i) => {
+    if (row[index]) {
+      synth.oscillator.type = waveformSelect.value;
+      synth.triggerAttackRelease(["C4", "E4", "G4"][i], "8n", time);
+    }
   });
-
-  step = (step + 1) % 16;
+  index = (index + 1) % 16;
 }, "16n");
 
-document.getElementById("playStudioBtn").addEventListener("click", async () => {
+playBtn.onclick = async () => {
   await Tone.start();
-  Tone.Transport.stop();
-  step = 0;
-  Tone.Transport.start("+0.1");
-});
+  Tone.Transport.bpm.value = parseInt(bpmInput.value);
+  Tone.Transport.start();
+};
 
-// SAVE PATTERN
-document.getElementById("saveStudioBtn").addEventListener("click", () => {
-  const pattern = {
-    drums: drumPattern,
-    synth: synthPattern,
-    synthType: document.getElementById("synthSelect").value
-  };
-  const blob = new Blob([JSON.stringify(pattern, null, 2)], { type: "application/json" });
+stopBtn.onclick = () => {
+  Tone.Transport.stop();
+  index = 0;
+};
+
+saveBtn.onclick = () => {
+  const blob = new Blob([JSON.stringify({ drumSteps, synthSteps })], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "trashwave-pattern.json";
+  a.download = "pattern.json";
   a.click();
-  URL.revokeObjectURL(url);
-});
+};
 
-// EXPORT TO WAV
-let recorder, audioChunks = [];
+exportBtn.onclick = async () => {
+  const recorder = new Tone.Recorder();
+  synth.connect(recorder);
+  drumSamples.kick.connect(recorder);
+  drumSamples.snare.connect(recorder);
+  drumSamples.hat.connect(recorder);
 
-document.getElementById("exportAudioBtn").addEventListener("click", async () => {
+  Tone.Transport.start();
+  recorder.start();
   await Tone.start();
-  const dest = Tone.context.createMediaStreamDestination();
-  synth.connect(dest);
-  drumPlayers.connect(dest);
 
-  recorder = new MediaRecorder(dest.stream);
-  recorder.ondataavailable = e => audioChunks.push(e.data);
-  recorder.onstop = () => {
-    const blob = new Blob(audioChunks, { type: "audio/wav" });
-    const url = URL.createObjectURL(blob);
+  setTimeout(async () => {
+    Tone.Transport.stop();
+    const recording = await recorder.stop();
+    const url = URL.createObjectURL(recording);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "trashwave-export.wav";
+    a.download = "trashwave.wav";
     a.click();
-    URL.revokeObjectURL(url);
-  };
+  }, 4000);
+};
 
-  audioChunks = [];
-  recorder.start();
-  Tone.Transport.stop();
-  step = 0;
-  Tone.Transport.start("+0.1");
-
-  setTimeout(() => {
-    Tone.Transport.stop();
-    recorder.stop();
-  }, 8000); // 8 секунд
-});
+initGrids();
