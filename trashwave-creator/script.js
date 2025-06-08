@@ -19,15 +19,14 @@ let synthPattern = Array.from({ length: synthRows }, () => Array(steps).fill(fal
 let drumPattern = drumTracks.map(() => Array(steps).fill(false));
 
 // === AUDIO ===
-const synth = new Tone.PolySynth(Tone.Synth, {
-  oscillator: { type: synthType.value.toLowerCase() }
-}).toDestination();
+const synth = new Tone.PolySynth().toDestination();
 
 const samples = {
   kick: new Tone.Player("samples/kick.wav").toDestination(),
   snare: new Tone.Player("samples/snare.wav").toDestination(),
   hat: new Tone.Player("samples/hat.wav").toDestination(),
 };
+
 
 // === GRID ===
 function createGrid(grid, pattern) {
