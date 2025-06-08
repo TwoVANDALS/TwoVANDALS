@@ -2,32 +2,44 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>🎛 Trashwave Creator</title>
+  <title>🎛️ Trashwave Creator</title>
   <link rel="stylesheet" href="style.css" />
+  <script src="tone.min.js"></script>
 </head>
 <body>
-  <h1>🎛 TRASHWAVE CREATOR</h1>
-  <p>CREATE YOUR OWN NOISY CHAOS IN THE BROWSER.</p>
-
-  <div class="controls">
-    <select id="synthSelect">
-      <option value="sine">Sine</option>
-      <option value="triangle">Triangle</option>
-      <option value="square">Square</option>
-      <option value="sawtooth">Sawtooth</option>
-    </select>
-    <button id="playStudioBtn">▶️ PLAY</button>
-    <button id="saveStudioBtn">💾 Save Pattern</button>
-    <button id="exportAudioBtn">🎵 Export to WAV</button>
+  <div class="header">
+    <h1>🎛️ TRASHWAVE CREATOR</h1>
+    <p>Create your own noisy chaos.</p>
   </div>
 
-  <h2>🥁 Drums</h2>
-  <div id="drumGrid" class="grid"></div>
+  <div class="controls">
+    <label for="waveform">Synth Type:</label>
+    <select id="waveform">
+      <option value="sine">Sine</option>
+      <option value="square">Square</option>
+      <option value="sawtooth">Sawtooth</option>
+      <option value="triangle">Triangle</option>
+    </select>
 
-  <h2>🎹 Synth</h2>
-  <div id="synthGrid" class="grid"></div>
+    <label for="bpm">BPM:</label>
+    <input type="number" id="bpm" value="120" min="30" max="300" />
+    
+    <button id="playBtn">▶ PLAY</button>
+    <button id="stopBtn">■ STOP</button>
+    <button id="saveBtn">💾 Save Pattern</button>
+    <button id="exportBtn">🎵 Export WAV</button>
+  </div>
 
-  <script src="tone.min.js"></script>
+  <div class="grid-section">
+    <h2>🥁 Drums</h2>
+    <div id="drum-grid"></div>
+  </div>
+
+  <div class="grid-section">
+    <h2>🎹 Synth</h2>
+    <div id="synth-grid"></div>
+  </div>
+
   <script src="script.js"></script>
 </body>
 </html>
