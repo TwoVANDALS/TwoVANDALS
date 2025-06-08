@@ -1,27 +1,28 @@
-// === CONFIG ===
-const drumSounds = ["kick.wav", "snare.wav", "hat.wav"];
-const synthNotes = ["C5", "B4", "A4", "G4", "F4", "E4", "D4", "C4"];
-
-// === STATE ===
+// DRUMS
+const drumSounds = ["kick", "snare", "hat"];
 let drumPattern = Array(drumSounds.length).fill().map(() => Array(16).fill(false));
-let synthPattern = Array(synthNotes.length).fill().map(() => Array(16).fill(false));
-
-let drumPlayers = new Tone.Players({
+const drumPlayers = new Tone.Players({
   kick: "samples/kick.wav",
   snare: "samples/snare.wav",
   hat: "samples/hat.wav"
 }).toDestination();
 
+// SYNTH
+const synthNotes = ["C5", "B4", "A4", "G4", "F4", "E4", "D4", "C4"];
+let synthPattern = Array(synthNotes.length).fill().map(() => Array(16).fill(false));
 let synth = new Tone.Synth().toDestination();
 
-// === GRID GENERATION ===
-function createGrid(containerId, rows, cols, pattern) {
+// BUILD GRIDS
+function createGrid(containerId, pattern) {
   const container = document.getElementById(containerId);
-  container.innerHTML = '';
+  container.innerHTML = "";
+  const rows = pattern.length;
+  const cols = pattern[0].length;
+
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < cols; x++) {
       const cell = document.createElement("div");
-      cell.classList.add("cell");
+      cell.className = "cell";
       if (pattern[y][x]) cell.classList.add("active");
       cell.addEventListener("click", () => {
         pattern[y][x] = !pattern[y][x];
@@ -32,91 +33,80 @@ function createGrid(containerId, rows, cols, pattern) {
   }
 }
 
-createGrid("drumGrid", drumSounds.length, 16, drumPattern);
-createGrid("synthGrid", synthNotes.length, 16, synthPattern);
+createGrid("drumGrid", drumPattern);
+createGrid("synthGrid", synthPattern);
 
+// SYNTH SELECT
 document.getElementById("synthSelect").addEventListener("change", e => {
   synth = new Tone.Synth({ oscillator: { type: e.target.value } }).toDestination();
 });
 
-// === PLAYBACK ===
-let currentStep = 0;
+// PLAYBACK
+let step = 0;
 Tone.Transport.scheduleRepeat(time => {
-  // 🔁 Drums
   drumPattern.forEach((row, i) => {
-    if (row[currentStep]) {
-      drumPlayers.player(Object.keys(drumPlayers._players)[i]).start(time);
-    }
+    if (row[step]) drumPlayers.player(drumSounds[i]).start(time);
   });
 
-  // 🔁 Synth
   synthPattern.forEach((row, i) => {
-    if (row[currentStep]) {
-      synth.triggerAttackRelease(synthNotes[i], "8n", time);
-    }
+    if (row[step]) synth.triggerAttackRelease(synthNotes[i], "8n", time);
   });
 
-  currentStep = (currentStep + 1) % 16;
+  step = (step + 1) % 16;
 }, "16n");
 
 document.getElementById("playStudioBtn").addEventListener("click", async () => {
   await Tone.start();
   Tone.Transport.stop();
-  currentStep = 0;
-  Tone.Transport.start();
+  step = 0;
+  Tone.Transport.start("+0.1");
 });
 
+// SAVE PATTERN
 document.getElementById("saveStudioBtn").addEventListener("click", () => {
-  const patternData = {
+  const pattern = {
     drums: drumPattern,
     synth: synthPattern,
     synthType: document.getElementById("synthSelect").value
   };
-
-  const blob = new Blob([JSON.stringify(patternData, null, 2)], { type: "application/json" });
+  const blob = new Blob([JSON.stringify(pattern, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
-
   const a = document.createElement("a");
   a.href = url;
   a.download = "trashwave-pattern.json";
   a.click();
-
   URL.revokeObjectURL(url);
 });
 
-let recorder;
-let audioChunks = [];
+// EXPORT TO WAV
+let recorder, audioChunks = [];
 
-const exportBtn = document.getElementById("exportAudioBtn");
-
-exportBtn.addEventListener("click", async () => {
+document.getElementById("exportAudioBtn").addEventListener("click", async () => {
   await Tone.start();
-
   const dest = Tone.context.createMediaStreamDestination();
   synth.connect(dest);
-  drumSampler.connect(dest); // если есть ударные
+  drumPlayers.connect(dest);
 
   recorder = new MediaRecorder(dest.stream);
-  audioChunks = [];
-
   recorder.ondataavailable = e => audioChunks.push(e.data);
   recorder.onstop = () => {
     const blob = new Blob(audioChunks, { type: "audio/wav" });
     const url = URL.createObjectURL(blob);
-
     const a = document.createElement("a");
     a.href = url;
-    a.download = "trashwave-track.wav";
+    a.download = "trashwave-export.wav";
     a.click();
+    URL.revokeObjectURL(url);
   };
 
+  audioChunks = [];
   recorder.start();
   Tone.Transport.stop();
+  step = 0;
   Tone.Transport.start("+0.1");
 
-  // 🎯 Записываем ровно 8 тактов (регулируется)
   setTimeout(() => {
     Tone.Transport.stop();
     recorder.stop();
-  }, 8000); // 8 сек
+  }, 8000); // 8 секунд
 });
