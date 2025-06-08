@@ -1,163 +1,127 @@
-/* TRASHWAVE CREATOR — BLACK & WHITE STYLIZED UI */
-
-@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+:root {
+  --bg: #000;
+  --fg: #fff;
+  --accent: #888;
+  --highlight: #0f0;
+  --bar-marker: #444;
+  --cell-size: 28px;
+}
 
 body {
-  background-color: black;
-  color: white;
-  font-family: 'VT323', monospace;
-  text-align: center;
   margin: 0;
-  padding: 20px;
+  padding: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'VT323', monospace;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 50px;
 }
 
-h1 {
-  font-size: 36px;
-  margin-bottom: 0;
-  text-shadow: 0 0 4px white;
-  letter-spacing: 2px;
-}
-
-h2 {
-  font-size: 24px;
-  margin: 30px 0 10px;
-  letter-spacing: 1px;
-  color: white;
-  text-transform: uppercase;
-}
-
-p {
-  font-size: 16px;
-  color: #ccc;
-  margin-bottom: 30px;
+h1, h2 {
+  text-align: center;
+  margin-top: 1rem;
+  color: var(--fg);
 }
 
 .controls {
+  margin: 1rem 0;
   display: flex;
   flex-wrap: wrap;
+  gap: 1rem;
   justify-content: center;
-  gap: 10px;
-  margin-bottom: 30px;
 }
 
 .controls label {
-  font-size: 14px;
-  margin-right: 6px;
-  display: flex;
-  align-items: center;
+  font-size: 1.2rem;
 }
 
-.controls input[type="number"],
-.controls select {
-  font-family: 'VT323', monospace;
-  font-size: 16px;
-  background: black;
-  color: white;
-  border: 1px solid white;
-  padding: 5px 10px;
-  width: 70px;
+.controls input,
+.controls select,
+.controls button {
+  font-family: inherit;
+  background: #111;
+  color: var(--fg);
+  border: 1px solid var(--accent);
+  padding: 0.4rem 0.6rem;
+  border-radius: 4px;
+  outline: none;
+  transition: 0.2s ease-in-out;
 }
 
-button {
-  font-family: 'VT323', monospace;
-  font-size: 18px;
-  border: 2px solid white;
-  background: black;
-  color: white;
-  padding: 10px 20px;
-  margin: 4px;
+.controls input[type="number"] {
+  width: 60px;
+}
+
+.controls button:hover {
+  background: var(--fg);
+  color: var(--bg);
   cursor: pointer;
-  text-transform: uppercase;
-  letter-spacing: 2px;
 }
 
-button:hover {
-  background-color: white;
-  color: black;
-  box-shadow: 0 0 10px white;
-}
-
-button:active {
-  background-color: #444;
-  color: #ccc;
-  transform: scale(1);
-}
-
-.cell {
-  width: 32px;
-  height: 32px;
-  border: 1px solid white;
-  background-color: black;
-  transition: background-color 0.1s ease;
-}
-
-.cell.active {
-  background-color: white;
-}
-
-.cell.playing {
-  outline: 2px solid white;
-  animation: pulse 0.2s ease;
-}
-
-@keyframes pulse {
-  0%   { outline-color: white; }
-  50%  { outline-color: transparent; }
-  100% { outline-color: white; }
-}
-
-.grid-wrapper {
+.grid-container {
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  margin: 10px 0;
+  flex-direction: row;
+  margin-top: 1rem;
+  overflow-x: auto;
 }
 
 .grid-labels {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-  margin-right: 10px;
-  font-size: 14px;
-  color: #fff;
-  font-family: 'VT323', monospace;
-  line-height: 32px;
+  justify-content: center;
+  margin-right: 8px;
+  font-size: 1rem;
+  line-height: var(--cell-size);
+  color: var(--accent);
   user-select: none;
-}
-
-.grid-labels div {
-  height: 32px;
-  display: flex;
-  align-items: center;
-  padding-right: 4px;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(16, 32px); /* можно изменить на 32 или 64 шагов */
-  grid-auto-rows: 32px;
+  grid-template-columns: repeat(16, var(--cell-size));
   gap: 2px;
-  margin: 10px auto;
 }
 
 .cell {
-  width: 32px;
-  height: 32px;
-  background: #111;
-  border: 1px solid #444;
-  cursor: pointer;
-  transition: background 0.2s;
+  width: var(--cell-size);
+  height: var(--cell-size);
+  background-color: #111;
+  border: 1px solid var(--accent);
+  transition: background-color 0.2s ease;
 }
 
 .cell.active {
-  background: #fff;
-  border: 1px solid #fff;
+  background-color: var(--fg);
 }
 
+.cell.playing {
+  outline: 2px solid var(--highlight);
+  outline-offset: -2px;
+}
 
-/* Optional Scroll Fix for Small Screens */
-@media (max-width: 600px) {
+.cell.bar-start {
+  border-left: 2px solid var(--bar-marker);
+}
+
+/* Responsive layout */
+@media (max-width: 768px) {
+  .controls {
+    flex-direction: column;
+    align-items: center;
+  }
+
   .grid {
-    overflow-x: auto;
+    grid-template-columns: repeat(16, 24px);
+  }
+
+  .cell {
+    width: 24px;
+    height: 24px;
+  }
+
+  .grid-labels {
+    font-size: 0.85rem;
   }
 }
