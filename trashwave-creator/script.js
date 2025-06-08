@@ -15,6 +15,8 @@ const drumGrid = document.getElementById("drumGrid");
 const bpmInput = document.getElementById("bpm");
 const synthType = document.getElementById("synthType");
 const toggleMetronomeBtn = document.getElementById("toggleMetronome");
+const playBtn = document.getElementById("playBtn");
+const stopBtn = document.getElementById("stopBtn");
 
 // === STATE ===
 let synthPattern = Array.from({ length: synthRows }, () => Array(steps).fill(false));
@@ -60,7 +62,7 @@ createGrid(drumGrid, drumPattern);
 // === CREATE SYNTH GRID + NOTE LABELS ===
 const noteLabels = document.getElementById("noteLabels");
 noteLabels.innerHTML = "";
-const midiStart = 84; // C6 top
+const midiStart = 84;
 
 const noteNames = [];
 for (let i = 0; i < synthRows; i++) {
@@ -79,12 +81,10 @@ Tone.Transport.scheduleRepeat(time => {
   bpmInput.value = Tone.Transport.bpm.value;
   document.querySelectorAll(".cell").forEach(c => c.classList.remove("playing"));
 
-  // Metronome
   if (metronomeEnabled && currentStep % 4 === 0) {
     samples.metronome.start(time);
   }
 
-  // Drums
   drumPattern.forEach((track, i) => {
     if (track[currentStep]) {
       samples[drumTracks[i]].start(time);
@@ -93,7 +93,6 @@ Tone.Transport.scheduleRepeat(time => {
     }
   });
 
-  // Synth
   const notes = [];
   synthPattern.forEach((row, y) => {
     if (row[currentStep]) {
@@ -112,16 +111,22 @@ Tone.Transport.scheduleRepeat(time => {
 }, "16n");
 
 // === CONTROLS ===
-document.getElementById("playBtn").addEventListener("click", async () => {
+playBtn.addEventListener("click", async () => {
   await Tone.start();
   Tone.Transport.bpm.value = parseInt(bpmInput.value, 10);
   currentStep = 0;
   Tone.Transport.start();
+
+  playBtn.classList.add("active");
+  stopBtn.classList.remove("active");
 });
 
-document.getElementById("stopBtn").addEventListener("click", () => {
+stopBtn.addEventListener("click", () => {
   Tone.Transport.stop();
   currentStep = 0;
+
+  stopBtn.classList.add("active");
+  playBtn.classList.remove("active");
 });
 
 bpmInput.addEventListener("input", e => {
