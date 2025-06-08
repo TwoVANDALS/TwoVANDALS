@@ -2,22 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TrashMachine</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Trashwave Machine</title>
   <link rel="stylesheet" href="style.css" />
   <script src="tone.min.js"></script>
 </head>
 <body>
 
-  <h1>TrashMachine</h1>
+  <h1>Trashwave Machine</h1>
 
-  <!-- Controls -->
   <div class="controls">
-    <button id="playBtn">▶ Play</button>
-    <button id="stopBtn">■ Stop</button>
-    <label>BPM: <input type="number" id="bpm" value="120" min="30" max="300"></label>
-    <label>
-      Synth: 
+    <button id="playBtn" class="btn">▶</button>
+    <button id="stopBtn" class="btn">■</button>
+    <label>BPM: <input type="number" id="bpm" min="30" max="300" value="120" /></label>
+    <label>Synth:
       <select id="synthType">
         <option>sawtooth</option>
         <option>square</option>
@@ -25,25 +23,58 @@
         <option>sine</option>
       </select>
     </label>
-    <button id="toggleMetronome">🎚 Metronome</button>
+    <button id="toggleMetronome" class="btn">🎚 Metronome</button>
   </div>
 
-  <!-- Drum Grid -->
-  <div class="grid-wrapper">
-    <div class="grid-labels">
-      <div>Kick</div>
-      <div>Snare</div>
-      <div>Hat</div>
+  <div class="grid-section">
+    <div class="sound-row">
+      <label>Kick:
+        <select id="kickSelect" class="sound-select"></select>
+      </label>
     </div>
-    <div id="drumGrid"></div>
+    <div id="drumGridKick" class="grid"></div>
+
+    <div class="sound-row">
+      <label>Snare:
+        <select id="snareSelect" class="sound-select"></select>
+      </label>
+    </div>
+    <div id="drumGridSnare" class="grid"></div>
+
+    <div class="sound-row">
+      <label>Hat:
+        <select id="hatSelect" class="sound-select"></select>
+      </label>
+    </div>
+    <div id="drumGridHat" class="grid"></div>
+
+    <div class="sound-row">
+      <label>Bass:
+        <select id="bassSelect" class="sound-select"></select>
+      </label>
+    </div>
+    <div id="drumGridBass" class="grid"></div>
+
+    <div class="sound-row">
+      <label>FX:
+        <select id="fxSelect" class="sound-select"></select>
+      </label>
+    </div>
+    <div id="drumGridFx" class="grid"></div>
+
+    <div class="sound-row">
+      <label>Keys:
+        <select id="keysSelect" class="sound-select"></select>
+      </label>
+    </div>
+    <div id="drumGridKeys" class="grid"></div>
   </div>
 
-  <!-- Synth Grid -->
-  <div class="grid-wrapper">
-    <div class="note-labels" id="noteLabels"></div>
+  <div class="synth-section">
+    <div class="grid-labels" id="noteLabels"></div>
     <div id="synthGrid"></div>
   </div>
 
-  <script src="script.js"></script>
+  <script src="script.js" defer></script>
 </body>
 </html>
