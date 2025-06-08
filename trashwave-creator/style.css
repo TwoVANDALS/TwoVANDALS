@@ -1,32 +1,36 @@
-#studio-window {
-  background: #111;
-  padding: 20px;
-  border: 2px solid lime;
-  margin: 30px auto;
-  max-width: 800px;
-  color: #0f0;
-  font-family: 'VT323', monospace;
+body {
+  font-family: monospace;
+  background: #000;
+  color: #fff;
+  text-align: center;
+  padding: 30px;
 }
-.track {
-  margin-bottom: 20px;
+
+h1, h2 {
+  color: #0ff;
+  text-shadow: 0 0 5px #0ff;
 }
+
+.controls {
+  margin: 20px;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(16, 30px);
-  grid-auto-rows: 30px;
   gap: 2px;
+  justify-content: center;
+  margin: 20px 0;
 }
+
 .grid .cell {
+  width: 30px;
+  height: 30px;
   background: #222;
-  border: 1px solid #333;
+  border: 1px solid #444;
   cursor: pointer;
 }
+
 .grid .cell.active {
   background: #0f0;
-}
-select {
-  margin: 5px 0 15px 0;
-  background: #000;
-  color: #0f0;
-  border: 1px solid #0f0;
 }
