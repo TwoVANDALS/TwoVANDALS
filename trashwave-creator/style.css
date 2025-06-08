@@ -1,77 +1,94 @@
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
 body {
-  margin: 0;
-  padding: 0;
-  font-family: monospace;
-  background: black;
+  background-color: black;
   color: white;
+  font-family: 'VT323', monospace;
   text-align: center;
+  margin: 0;
+  padding: 20px;
 }
 
 h1 {
-  font-family: 'VT323', monospace;
-  font-size: 1.5em;
-  margin: 20px 0;
-  text-shadow: 1px 1px #555;
+  font-size: 36px;
+  margin-bottom: 0;
+  text-shadow: 0 0 4px white;
+  letter-spacing: 2px;
 }
 
 .controls {
-  margin: 10px auto 20px;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
+  margin-bottom: 30px;
 }
 
-.controls button,
-.controls select,
-.controls input {
-  font-family: monospace;
-  font-size: 1em;
-  padding: 4px 8px;
-  background: #111;
+.controls label {
+  font-size: 14px;
+  margin-right: 6px;
+  display: flex;
+  align-items: center;
+}
+
+.controls input[type="number"],
+.controls select {
+  font-family: 'VT323', monospace;
+  font-size: 16px;
+  background: black;
   color: white;
-  border: 1px solid #444;
-  border-radius: 3px;
-  cursor: pointer;
+  border: 1px solid white;
+  padding: 5px 10px;
+  width: 70px;
 }
 
-button.active {
-  background: #0a0;
+button {
+  font-family: 'VT323', monospace;
+  font-size: 16px;
+  background-color: black;
+  color: white;
+  border: 1px solid white;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+button:hover {
+  background-color: white;
   color: black;
+  box-shadow: 0 0 5px white;
+}
+
+button:active {
+  background-color: #444;
+  color: #ccc;
+  transform: scale(0.98);
 }
 
 .grid-wrapper {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  gap: 4px;
+  margin: 10px 0;
+}
+
+.grid-labels, .note-labels {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-right: 10px;
+  font-size: 14px;
+  color: #fff;
+  line-height: 32px;
+  user-select: none;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(16, 32px);
+  grid-auto-rows: 32px;
+  gap: 2px;
   margin: 10px auto;
-  overflow-x: auto;
-}
-
-.note-labels,
-.grid-labels {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  font-size: 12px;
-  color: #ccc;
-  text-align: right;
-  margin-right: 4px;
-  min-width: 40px;
-}
-
-.note-labels div,
-.grid-labels div {
-  height: 24px;
-  line-height: 24px;
-  padding-right: 4px;
-}
-
-#synthGrid,
-#drumGrid {
-  display: flex;
-  flex-direction: column;
 }
 
 .row {
@@ -79,11 +96,11 @@ button.active {
 }
 
 .cell {
-  width: 20px;
-  height: 24px;
-  border: 1px solid #333;
-  background-color: #111;
-  box-sizing: border-box;
+  width: 32px;
+  height: 32px;
+  border: 1px solid white;
+  background-color: black;
+  transition: background-color 0.1s ease;
 }
 
 .cell.active {
@@ -91,82 +108,18 @@ button.active {
 }
 
 .cell.playing {
-  outline: 1px solid #0f0;
+  outline: 2px solid white;
+  animation: pulse 0.2s ease;
 }
 
-.bar-marker {
-  border-left: 2px solid #999;
+@keyframes pulse {
+  0% { outline-color: white; }
+  50% { outline-color: transparent; }
+  100% { outline-color: white; }
 }
 
-/* Responsive tweaks */
 @media (max-width: 600px) {
-  .controls {
-    flex-direction: column;
-    align-items: center;
+  .grid {
+    overflow-x: auto;
   }
-
-  .note-labels,
-  .grid-labels {
-    font-size: 10px;
-  }
-
-  .cell {
-    width: 16px;
-    height: 20px;
-  }
-
-  .note-labels div,
-  .grid-labels div {
-    height: 20px;
-    line-height: 20px;
-  }
-}
-
-button#playBtn,
-button#stopBtn {
-  transition: all 0.2s ease;
-  border: 2px solid #fff;
-  background: transparent;
-  color: #fff;
-  font-family: 'VT323', monospace;
-  font-size: 1.2rem;
-  padding: 0.6rem 1.2rem;
-  cursor: pointer;
-  box-shadow: none;
-}
-
-button#playBtn.active,
-button#stopBtn.active {
-  background: #fff;
-  color: #000;
-  box-shadow: 0 0 10px #fff;
-  animation: flicker 0.8s infinite alternate;
-}
-
-@keyframes flicker {
-  0% {
-    opacity: 1;
-    box-shadow: 0 0 5px #fff;
-    transform: scale(1);
-  }
-  100% {
-    opacity: 0.85;
-    box-shadow: 0 0 15px #aaa;
-    transform: scale(1.05);
-  }
-}
-
-.sample-select {
-  background: black;
-  color: white;
-  font-family: 'VT323', monospace;
-  font-size: 16px;
-  margin-left: 0.5rem;
-  border: 1px solid #fff;
-  padding: 0.2rem 0.5rem;
-}
-
-.sample-select:focus {
-  outline: none;
-  border-color: #ccc;
 }
