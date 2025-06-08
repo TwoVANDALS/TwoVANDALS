@@ -33,7 +33,7 @@ const samples = {
 };
 
 // === GRID CREATION ===
-function createGrid(grid, pattern, isSynth = false) {
+function createGrid(grid, pattern) {
   grid.innerHTML = "";
   pattern.forEach((row, rowIndex) => {
     const rowEl = document.createElement("div");
@@ -57,10 +57,10 @@ function createGrid(grid, pattern, isSynth = false) {
 // === CREATE DRUM GRID ===
 createGrid(drumGrid, drumPattern);
 
-// === CREATE SYNTH GRID + NOTES LABELS ===
-const noteLabels = document.getElementById("synthLabels");
+// === CREATE SYNTH GRID + NOTE LABELS ===
+const noteLabels = document.getElementById("noteLabels");
 noteLabels.innerHTML = "";
-const midiStart = 72; // C5 top
+const midiStart = 84; // C6 top
 
 const noteNames = [];
 for (let i = 0; i < synthRows; i++) {
@@ -71,7 +71,8 @@ for (let i = 0; i < synthRows; i++) {
   label.textContent = note;
   noteLabels.appendChild(label);
 }
-createGrid(synthGrid, synthPattern, true);
+
+createGrid(synthGrid, synthPattern);
 
 // === STEP SEQUENCER ===
 Tone.Transport.scheduleRepeat(time => {
