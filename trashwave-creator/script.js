@@ -1,7 +1,7 @@
 // === CONFIG ===
 const steps = 16;
 const synthRows = 12;
-const drumTracks = ["kick", "snare", "hat"];
+const drumTracks = ["Kick", "Snare", "Hat"];
 let currentStep = 0;
 
 Tone.Transport.bpm.value = 120;
@@ -13,10 +13,14 @@ const synthGrid = document.getElementById("synthGrid");
 const drumGrid = document.getElementById("drumGrid");
 const bpmInput = document.getElementById("bpm");
 const synthType = document.getElementById("synthType");
+const noteLabels = document.getElementById("noteLabels");
+const drumLabels = document.getElementById("drumLabels");
 
 // === STATE ===
 let synthPattern = Array.from({ length: synthRows }, () => Array(steps).fill(false));
+let synthVelocity = Array.from({ length: synthRows }, () => Array(steps).fill(0.8));
 let drumPattern = drumTracks.map(() => Array(steps).fill(false));
+let drumVelocity = drumTracks.map(() => Array(steps).fill(0.8));
 
 // === AUDIO ===
 const synth = new Tone.PolySynth(Tone.Synth, {
@@ -24,64 +28,93 @@ const synth = new Tone.PolySynth(Tone.Synth, {
 }).toDestination();
 
 const samples = {
-  kick: new Tone.Player("samples/kick.wav").toDestination(),
-  snare: new Tone.Player("samples/snare.wav").toDestination(),
-  hat: new Tone.Player("samples/hat.wav").toDestination(),
+  Kick: new Tone.Player("samples/kick.wav").toDestination(),
+  Snare: new Tone.Player("samples/snare.wav").toDestination(),
+  Hat: new Tone.Player("samples/hat.wav").toDestination(),
 };
 
-// === GRID CREATION ===
-function createGrid(grid, pattern, isSynth = false) {
+// === GRID BUILD ===
+function createNoteLabels() {
+  noteLabels.innerHTML = "";
+  for (let i = 0; i < synthRows; i++) {
+    const note = Tone.Frequency(60 + (synthRows - 1 - i), "midi").toNote();
+    const label = document.createElement("div");
+    label.className = "note-label";
+    label.textContent = note;
+    noteLabels.appendChild(label);
+  }
+}
+
+function createDrumLabels() {
+  drumLabels.innerHTML = "";
+  drumTracks.forEach(name => {
+    const label = document.createElement("div");
+    label.className = "drum-label";
+    label.textContent = name;
+    drumLabels.appendChild(label);
+  });
+}
+
+function createGrid(grid, pattern, velocityPattern, isSynth = false) {
   grid.innerHTML = "";
   pattern.forEach((row, rowIndex) => {
     row.forEach((_, colIndex) => {
       const cell = document.createElement("div");
       cell.classList.add("cell");
-      if (colIndex % 4 === 0) cell.classList.add("bar-start");
+      if (colIndex % 4 === 0) cell.classList.add("bar");
       cell.dataset.row = rowIndex;
       cell.dataset.col = colIndex;
+
       cell.addEventListener("click", () => {
         pattern[rowIndex][colIndex] = !pattern[rowIndex][colIndex];
-        cell.classList.toggle("active");
+        if (pattern[rowIndex][colIndex]) {
+          velocityPattern[rowIndex][colIndex] = 0.8;
+          cell.classList.add("active");
+        } else {
+          velocityPattern[rowIndex][colIndex] = 0;
+          cell.classList.remove("active");
+        }
       });
+
       grid.appendChild(cell);
     });
   });
 }
 
-createGrid(drumGrid, drumPattern);
-createGrid(synthGrid, synthPattern, true);
+createNoteLabels();
+createDrumLabels();
+createGrid(drumGrid, drumPattern, drumVelocity);
+createGrid(synthGrid, synthPattern, synthVelocity, true);
 
 // === STEP LOGIC ===
 Tone.Transport.scheduleRepeat(time => {
   bpmInput.value = Tone.Transport.bpm.value;
+  document.querySelectorAll(".cell").forEach(c => c.classList.remove("playing"));
 
-  // 🔄 Clear previous highlights
-  document.querySelectorAll(".cell").forEach(cell => cell.classList.remove("playing"));
-
-  // 🥁 Drums
+  // play drums
   drumPattern.forEach((track, i) => {
     if (track[currentStep]) {
+      samples[drumTracks[i]].volume.value = Tone.gainToDb(drumVelocity[i][currentStep]);
       samples[drumTracks[i]].start(time);
-      const index = i * steps + currentStep;
-      drumGrid.children[index]?.classList.add("playing");
+      drumGrid.children[i * steps + currentStep].classList.add("playing");
     }
   });
 
-  // 🎹 Synth
+  // play synths
   const notes = [];
   synthPattern.forEach((row, y) => {
     if (row[currentStep]) {
-      const midi = 60 + (synthRows - 1 - y);
-      const note = Tone.Frequency(midi, "midi").toNote();
-      notes.push(note);
-      const index = y * steps + currentStep;
-      synthGrid.children[index]?.classList.add("playing");
+      const note = Tone.Frequency(60 + (synthRows - 1 - y), "midi").toNote();
+      notes.push({ note, vel: synthVelocity[y][currentStep] });
+      synthGrid.children[y * steps + currentStep].classList.add("playing");
     }
   });
 
   if (notes.length) {
     synth.set({ oscillator: { type: synthType.value.toLowerCase() } });
-    synth.triggerAttackRelease(notes, "8n", time);
+    notes.forEach(n => {
+      synth.triggerAttackRelease(n.note, "8n", time, n.vel);
+    });
   }
 
   currentStep = (currentStep + 1) % steps;
@@ -104,11 +137,7 @@ bpmInput.addEventListener("input", e => {
   Tone.Transport.bpm.value = parseInt(e.target.value, 10);
 });
 
-synthType.addEventListener("change", () => {
-  synth.set({ oscillator: { type: synthType.value.toLowerCase() } });
-});
-
-// === SAVE ===
+// === EXPORT & SAVE ===
 document.getElementById("saveBtn").addEventListener("click", () => {
   const blob = new Blob([JSON.stringify({ synthPattern, drumPattern })], {
     type: "application/json"
@@ -119,16 +148,13 @@ document.getElementById("saveBtn").addEventListener("click", () => {
   a.click();
 });
 
-// === EXPORT AUDIO ===
 document.getElementById("exportBtn").addEventListener("click", async () => {
   const recorder = new Tone.Recorder();
   synth.connect(recorder);
   Object.values(samples).forEach(s => s.connect(recorder));
-
   recorder.start();
   Tone.Transport.stop();
   Tone.Transport.start();
-
   setTimeout(async () => {
     Tone.Transport.stop();
     const recording = await recorder.stop();
