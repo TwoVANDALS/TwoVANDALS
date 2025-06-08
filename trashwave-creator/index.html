@@ -1,24 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
-  <div class="controls">
-    <label>Synth Type: 
-      <select id="synthType">
-        <option>Sine</option>
-        <option>Square</option>
-        <option>Sawtooth</option>
-        <option>Triangle</option>
-      </select>
-    </label>
-    <label>BPM:
-      <input type="number" id="bpm" value="120" />
-    </label>
-    <button id="playBtn">▶ PLAY</button>
-    <button id="stopBtn">■ STOP</button>
-    <button id="saveBtn">💾 Save Pattern</button>
-    <button id="exportBtn">🎶 Export WAV</button>
-  </div>
+<head>
+  <meta charset="UTF-8" />
+  <title>Trashwave Creator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="style.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.39/Tone.min.js"></script>
+</head>
+<body>
 
-<!-- DRUM SEQUENCER с подписями -->
+<h1>🎛️ Trashwave Creator</h1>
+
+<div class="controls">
+  <label>Synth Type: 
+    <select id="synthType">
+      <option>Sine</option>
+      <option>Square</option>
+      <option>Sawtooth</option>
+      <option>Triangle</option>
+    </select>
+  </label>
+  <label>BPM:
+    <input type="number" id="bpm" value="120" />
+  </label>
+  <button id="playBtn">▶ PLAY</button>
+  <button id="stopBtn">■ STOP</button>
+  <button id="saveBtn">💾 Save Pattern</button>
+  <button id="exportBtn">🎶 Export WAV</button>
+</div>
+
+<!-- DRUM SEQUENCER -->
 <div class="grid-wrapper">
   <div class="grid-labels drum-labels">
     <div>Kick</div>
@@ -28,7 +39,7 @@
   <div id="drumGrid" class="grid"></div>
 </div>
 
-<!-- SYNTH SEQUENCER с подписями -->
+<!-- SYNTH SEQUENCER -->
 <div class="grid-wrapper">
   <div class="grid-labels synth-labels">
     <div>C</div>
@@ -47,6 +58,6 @@
   <div id="synthGrid" class="grid"></div>
 </div>
 
-  <script type="module" src="script.js"></script>
+<script type="module" src="script.js"></script>
 </body>
 </html>
