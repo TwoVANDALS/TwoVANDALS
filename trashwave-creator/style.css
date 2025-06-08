@@ -127,3 +127,27 @@ button.active {
     padding: 6px 10px;
   }
 }
+
+.grid-zone {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.grid-labels {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-right: 8px;
+}
+
+.grid-labels div {
+  height: 26px;
+  line-height: 26px;
+  font-size: 0.85rem;
+  text-align: right;
+  white-space: nowrap;
+  padding-right: 6px;
+  color: #aaa;
+}
