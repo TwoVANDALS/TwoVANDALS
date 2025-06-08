@@ -121,3 +121,37 @@ button.active {
     line-height: 20px;
   }
 }
+
+button#playBtn,
+button#stopBtn {
+  transition: all 0.2s ease;
+  border: 2px solid #fff;
+  background: transparent;
+  color: #fff;
+  font-family: 'VT323', monospace;
+  font-size: 1.2rem;
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+  box-shadow: none;
+}
+
+button#playBtn.active,
+button#stopBtn.active {
+  background: #fff;
+  color: #000;
+  box-shadow: 0 0 10px #fff;
+  animation: flicker 0.8s infinite alternate;
+}
+
+@keyframes flicker {
+  0% {
+    opacity: 1;
+    box-shadow: 0 0 5px #fff;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0.85;
+    box-shadow: 0 0 15px #aaa;
+    transform: scale(1.05);
+  }
+}
