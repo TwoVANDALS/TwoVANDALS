@@ -1,127 +1,134 @@
-:root {
-  --bg: #000;
-  --fg: #fff;
-  --accent: #888;
-  --highlight: #0f0;
-  --bar-marker: #444;
-  --cell-size: 28px;
+/* === Base Reset === */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  margin: 0;
-  padding: 0;
-  background: var(--bg);
-  color: var(--fg);
-  font-family: 'VT323', monospace;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-bottom: 50px;
-}
-
-h1, h2 {
+  background: #111;
+  color: #fff;
+  font-family: 'Courier New', monospace;
+  padding: 1rem;
   text-align: center;
-  margin-top: 1rem;
-  color: var(--fg);
 }
 
+/* === Typography === */
+h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #fff;
+  text-shadow: 1px 1px 2px #000;
+}
+
+/* === Controls === */
 .controls {
-  margin: 1rem 0;
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
   justify-content: center;
-}
-
-.controls label {
-  font-size: 1.2rem;
+  align-items: center;
+  margin-bottom: 2rem;
 }
 
 .controls input,
 .controls select,
 .controls button {
-  font-family: inherit;
-  background: #111;
-  color: var(--fg);
-  border: 1px solid var(--accent);
-  padding: 0.4rem 0.6rem;
-  border-radius: 4px;
+  background: #000;
+  color: #fff;
+  border: 2px solid #fff;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
   outline: none;
-  transition: 0.2s ease-in-out;
-}
-
-.controls input[type="number"] {
-  width: 60px;
-}
-
-.controls button:hover {
-  background: var(--fg);
-  color: var(--bg);
   cursor: pointer;
 }
 
-.grid-container {
-  display: flex;
-  flex-direction: row;
-  margin-top: 1rem;
-  overflow-x: auto;
+.controls button:hover {
+  background: #fff;
+  color: #000;
+  transition: 0.2s;
 }
 
+/* === Grid Container === */
+.grid-container {
+  display: flex;
+  justify-content: center;
+  align-items: start;
+  margin-bottom: 2rem;
+}
+
+/* === Label Column === */
 .grid-labels {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  margin-right: 8px;
-  font-size: 1rem;
-  line-height: var(--cell-size);
-  color: var(--accent);
-  user-select: none;
+  justify-content: space-between;
+  margin-right: 0.5rem;
+  padding-top: 2px;
 }
 
+.grid-labels div {
+  height: 28px;
+  line-height: 28px;
+  padding: 0 4px;
+  font-size: 0.8rem;
+  text-align: right;
+  color: #aaa;
+}
+
+/* === Grid === */
 .grid {
   display: grid;
-  grid-template-columns: repeat(16, var(--cell-size));
+  grid-template-columns: repeat(16, 28px);
   gap: 2px;
 }
 
 .cell {
-  width: var(--cell-size);
-  height: var(--cell-size);
-  background-color: #111;
-  border: 1px solid var(--accent);
-  transition: background-color 0.2s ease;
+  width: 28px;
+  height: 28px;
+  background: #222;
+  border: 1px solid #444;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.cell:hover {
+  background: #333;
 }
 
 .cell.active {
-  background-color: var(--fg);
+  background: #fff;
 }
 
 .cell.playing {
-  outline: 2px solid var(--highlight);
-  outline-offset: -2px;
+  outline: 2px solid #0f0;
+  box-shadow: 0 0 6px #0f0;
 }
 
-.cell.bar-start {
-  border-left: 2px solid var(--bar-marker);
-}
-
-/* Responsive layout */
+/* === Responsive (Mobile) === */
 @media (max-width: 768px) {
-  .controls {
-    flex-direction: column;
-    align-items: center;
-  }
-
   .grid {
-    grid-template-columns: repeat(16, 24px);
+    grid-template-columns: repeat(16, 20px);
   }
 
   .cell {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
   }
 
-  .grid-labels {
-    font-size: 0.85rem;
+  .grid-labels div {
+    font-size: 0.7rem;
+    height: 20px;
+    line-height: 20px;
+  }
+
+  .controls {
+    flex-direction: column;
+  }
+
+  .controls input,
+  .controls select,
+  .controls button {
+    width: 100%;
+    max-width: 300px;
   }
 }
