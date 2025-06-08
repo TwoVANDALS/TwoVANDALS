@@ -9,8 +9,8 @@
 </head>
 <body>
   <header>
-    <h1>Trashwave Drum Synth</h1>
-    <p>Pure B/W destructive power</p>
+    <h1>Trashwave Machine</h1>
+    <p>CREATE YOUR OWN NOISY CHAOS IN THE BROWSER</p>
   </header>
 
   <div class="controls">
@@ -19,7 +19,7 @@
 
     <label>BPM: <input id="bpm" type="number" min="30" max="300" value="120" /></label>
 
-    <label>Synth Type:
+    <label>Synth:
       <select id="synthType">
         <option>sawtooth</option>
         <option>square</option>
@@ -31,42 +31,31 @@
     <button id="toggleMetronome">🎚 Metronome</button>
   </div>
 
-  <div class="grid-section">
-    <div class="labels" id="drumLabels">
-      <div class="label-row">Kick
-        <select class="sample-selector" data-type="kick"></select>
-      </div>
-      <div class="label-row">Snare
-        <select class="sample-selector" data-type="snare"></select>
-      </div>
-      <div class="label-row">Hat
-        <select class="sample-selector" data-type="hat"></select>
-      </div>
+  <!-- Grid -->
+  <div class="grid-wrapper">
+    <div class="grid-labels">
+      <div>Kick <select class="sample-selector" data-type="kick"></select></div>
+      <div>Snare <select class="sample-selector" data-type="snare"></select></div>
+      <div>Hat <select class="sample-selector" data-type="hat"></select></div>
     </div>
-    <div id="drumGrid" class="grid"></div>
+    <div id="drumGrid"></div>
   </div>
 
-  <div class="grid-section">
-    <div class="labels" id="noteLabels"></div>
-    <div id="synthGrid" class="grid"></div>
+  <div class="grid-wrapper">
+    <div class="note-labels" id="noteLabels"></div>
+    <div id="synthGrid"></div>
   </div>
 
-  <div class="grid-section">
-    <div class="labels" id="bassLabels">
-      <div class="label-row">Bass
-        <select class="sample-selector" data-type="bass"></select>
-      </div>
-      <div class="label-row">FX
-        <select class="sample-selector" data-type="fx"></select>
-      </div>
-      <div class="label-row">Keys
-        <select class="sample-selector" data-type="keys"></select>
-      </div>
+  <div class="grid-wrapper">
+    <div class="grid-labels">
+      <div>Bass <select class="sample-selector" data-type="bass"></select></div>
+      <div>FX <select class="sample-selector" data-type="fx"></select></div>
+      <div>Keys <select class="sample-selector" data-type="keys"></select></div>
     </div>
-    <div id="bassGrid" class="grid"></div>
+    <div id="bassGrid"></div>
   </div>
 
   <audio id="previewPlayer" controls style="display: none"></audio>
-  <script src="script.js"></script>
+  <script src="script.js" type="module"></script>
 </body>
 </html>
