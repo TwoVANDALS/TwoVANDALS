@@ -1,98 +1,102 @@
-/* === Base Reset === */
 * {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
 }
 
 body {
-  background: #111;
+  font-family: "VT323", monospace;
+  margin: 0;
+  background: #000;
   color: #fff;
-  font-family: 'Courier New', monospace;
-  padding: 1rem;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
 }
 
-/* === Typography === */
 h1 {
   font-size: 2rem;
-  margin-bottom: 1rem;
-  color: #fff;
-  text-shadow: 1px 1px 2px #000;
+  margin-bottom: 10px;
 }
 
-/* === Controls === */
 .controls {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
-  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
   align-items: center;
-  margin-bottom: 2rem;
+  justify-content: center;
 }
 
-.controls input,
-.controls select,
-.controls button {
-  background: #000;
+button,
+input,
+select {
+  font-family: inherit;
+  background: #111;
+  border: 1px solid #fff;
   color: #fff;
-  border: 2px solid #fff;
-  padding: 0.5rem 1rem;
+  padding: 8px 12px;
   font-size: 1rem;
-  outline: none;
   cursor: pointer;
 }
 
-.controls button:hover {
-  background: #fff;
-  color: #000;
-  transition: 0.2s;
+button:hover,
+input:focus,
+select:focus {
+  background: #222;
+  outline: none;
 }
 
-/* === Grid Container === */
-.grid-container {
+button.active {
+  background: #444;
+}
+
+.grid-wrapper {
   display: flex;
+  gap: 10px;
+  align-items: flex-start;
   justify-content: center;
-  align-items: start;
-  margin-bottom: 2rem;
+  flex-wrap: wrap;
 }
 
-/* === Label Column === */
 .grid-labels {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  margin-right: 0.5rem;
-  padding-top: 2px;
+  justify-content: start;
+  gap: 2px;
+  font-size: 0.9rem;
+  margin-top: 2px;
 }
 
 .grid-labels div {
-  height: 28px;
-  line-height: 28px;
-  padding: 0 4px;
-  font-size: 0.8rem;
-  text-align: right;
-  color: #aaa;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 4px;
 }
 
-/* === Grid === */
 .grid {
-  display: grid;
-  grid-template-columns: repeat(16, 32px); /* увеличение ячеек */
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.row {
+  display: flex;
   gap: 2px;
 }
 
 .cell {
-  width: 32px;
-  height: 28px;
-  background: #222;
-  border: 1px solid #444;
+  width: 26px;
+  height: 26px;
+  background: #111;
+  border: 1px solid #333;
   cursor: pointer;
   transition: background 0.2s;
 }
 
 .cell:hover {
-  background: #333;
+  background: #222;
 }
 
 .cell.active {
@@ -100,39 +104,26 @@ h1 {
 }
 
 .cell.playing {
-  outline: 2px solid #0f0;
-  box-shadow: 0 0 6px #0f0;
+  outline: 2px solid #999;
 }
 
-.cell.bar-marker {
-  border-left: 3px solid #555;
+.bar-marker {
+  border-left: 2px solid #fff !important;
 }
 
-/* === Responsive (Mobile) === */
 @media (max-width: 768px) {
-  .grid {
-    grid-template-columns: repeat(16, 20px);
-  }
-
   .cell {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
   }
 
   .grid-labels div {
-    font-size: 0.7rem;
-    height: 20px;
-    line-height: 20px;
+    height: 22px;
+    font-size: 0.8rem;
   }
 
-  .controls {
-    flex-direction: column;
-  }
-
-  .controls input,
-  .controls select,
-  .controls button {
-    width: 100%;
-    max-width: 300px;
+  button, input, select {
+    font-size: 0.9rem;
+    padding: 6px 10px;
   }
 }
