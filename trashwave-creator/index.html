@@ -1,16 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Trashwave Creator</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <h1>Trashwave Sequencer</h1>
-  <div id="sequencer"></div>
-  <button id="startBtn">▶ Play</button>
-
-  <script src="tone.min.js"></script>
-  <script src="script.js"></script>
-</body>
-</html>
+<section id="tw-studio">
+  <h2>🎛 Trashwave Studio</h2>
+  <div id="studio-window">
+    <div class="track" id="drum-track">
+      <h3>🥁 Drums</h3>
+      <div class="grid" id="drumGrid"></div>
+    </div>
+    <div class="track" id="synth-track">
+      <h3>🎹 Synth</h3>
+      <select id="synthSelect">
+        <option value="sine">Sine</option>
+        <option value="triangle">Triangle</option>
+        <option value="square">Square</option>
+        <option value="sawtooth">Sawtooth</option>
+      </select>
+      <div class="grid" id="synthGrid"></div>
+    </div>
+    <button id="playStudioBtn">▶️ PLAY</button>
+  </div>
+</section>
