@@ -1,1653 +1,323 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TwoVANDALS — Trashwave Signal</title>
-  <meta
-    name="description"
-    content="TwoVANDALS — trashwave / cyber-industrial signal archive, interactive manifesto, sequencer, soundlab, hidden artifacts."
-  />
-
+  <title>ASH//NULL — ritual signal archive</title>
+  <meta name="description" content="Мрачный психоделический ritual/trashwave сайт с архивом, манифестом и галереей." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Orbitron:wght@500;700;800&family=VT323&display=swap"
-    rel="stylesheet"
-  />
-
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&family=UnifrakturCook:wght@700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
-  <!-- Loader -->
-  <div id="loader-screen" aria-hidden="true">
-    <div id="loader-text">T</div>
+  <div id="loader" aria-hidden="true">
+    <div class="loader__inner">
+      <div class="loader__mark">ASH//NULL</div>
+      <div class="loader__text">signal opens in static</div>
+    </div>
   </div>
 
-  <!-- FX -->
-  <canvas id="snow-canvas" aria-hidden="true"></canvas>
+  <div class="noise"></div>
+  <div class="scanlines"></div>
+  <div class="vignette"></div>
+  <div class="cursor-light" id="cursorLight"></div>
 
-  <!-- Optional UI sounds -->
-  <audio id="clickSound" preload="auto">
-    <source src="./click.mp3" type="audio/mpeg" />
-  </audio>
+  <canvas id="ashCanvas" aria-hidden="true"></canvas>
 
-  <header>
-    <nav aria-label="Main navigation">
-      <a href="#home" class="logo">TwoVANDALS</a>
+  <header class="site-header">
+    <div class="nav-shell">
+      <a href="#home" class="brand">
+        <span class="brand__sigil">✢</span>
+        <span class="brand__text">ASH//NULL</span>
+      </a>
 
-      <div class="nav-links">
-        <a href="#manifest">Manifest</a>
-        <a href="#music">Music</a>
-        <a href="#lab">Lab</a>
-        <a href="#soundlab">Noise</a>
-        <a href="#tracks">Tracks</a>
-        <a href="#vault">Vault</a>
-        <a href="#contact">Contact</a>
-      </div>
-    </nav>
+      <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="siteNav">
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav class="site-nav" id="siteNav">
+        <a href="#home">Вход</a>
+        <a href="#manifest">Манифест</a>
+        <a href="#archive">Архив</a>
+        <a href="#visions">Образы</a>
+        <a href="#ritual">Ритуал</a>
+        <a href="#contact">Связь</a>
+      </nav>
+    </div>
   </header>
 
   <main>
-    <!-- HERO -->
-    <section id="home" class="hero">
-      <div class="hero-panel hero-content">
-        <span class="hero-kicker">signal // trashwave archive</span>
+    <section class="hero section" id="home">
+      <div class="hero__grid">
+        <div class="hero__copy panel panel--hero reveal">
+          <p class="eyebrow">signal / memory / abrasion</p>
+          <h1 class="hero__title glitch-title" data-text="WE SPEAK IN STATIC">
+            WE SPEAK IN STATIC
+          </h1>
+          <p class="hero__lead">
+            Это не уютное место. Это мокрый свет в пустом дворе, шорох в кабеле, белое лицо без черт,
+            тень, которая стоит слишком долго и не уходит, даже когда уже рассвело.
+          </p>
+          <p class="hero__lead hero__lead--muted">
+            Текст здесь должен царапать, а не успокаивать. Он должен тянуть вглубь, как шум вентиляции в
+            закрытом подъезде, где кто-то ещё дышит, но ты не видишь его.
+          </p>
 
-        <h1 class="hero-title">
-          Frostbitten club debris for the end of the feed.
-        </h1>
-
-        <p class="hero-subtitle">
-          TwoVANDALS is a collision of broken playback systems, black-ice rhythm,
-          scavenged melody, industrial drift, low-lit ritual and hostile beauty.
-          This is not clean nostalgia. This is transmission damage with intent.
-        </p>
-
-        <div class="hero-actions">
-          <a class="btn btn-primary" href="#music">Enter the signal</a>
-          <a class="btn btn--outline" href="#lab">Build a pattern</a>
-          <a class="btn btn--outline egg" href="#vault">Artifact 01</a>
-        </div>
-      </div>
-    </section>
-
-    <!-- MANIFEST -->
-    <section id="manifest">
-      <div class="manifest scanlines">
-        <span class="kicker">manifest // machine text</span>
-        <h2 class="section-title">The code under the noise</h2>
-
-        <p data-glitch>
-          We sample collapse, repetition, rust, pressure, dead bandwidth and
-          unfinished futures.
-        </p>
-        <p data-glitch>
-          Trashwave is not retro comfort. It is damaged memory rendered as rhythm.
-        </p>
-        <p data-glitch>
-          Every loop is a corridor. Every pulse is an alarm pretending to dance.
-        </p>
-        <p data-glitch>
-          We archive impact, cold light, failed utopias, broken nightlife and
-          machine ghosts.
-        </p>
-        <p data-glitch>
-          Beauty survives best inside interference.
-        </p>
-      </div>
-    </section>
-
-    <!-- MUSIC -->
-    <section id="music">
-      <div class="section-shell">
-        <span class="kicker">music // curated signal</span>
-        <h2 class="section-title">Playback bunker</h2>
-
-        <div id="audioPlayer" class="audio-player">
-          <div class="player-top">
-            <div>
-              <div id="trackTitle">Track 1</div>
-              <div class="meta">trashwave set / internal rotation</div>
-            </div>
-
-            <button id="togglePlayer" type="button" aria-label="Toggle player">
-              ▼
-            </button>
+          <div class="hero__actions">
+            <a class="btn btn--primary" href="#manifest">Открыть манифест</a>
+            <a class="btn" href="#visions">Смотреть образы</a>
           </div>
 
-          <div class="player-body">
-            <div class="player-controls">
-              <button id="playPauseBtn" type="button" class="btn btn-primary">
-                ▶ Listen to a curated Trashwave set
-              </button>
-              <button id="prevTrackBtn" type="button">Prev</button>
-              <button id="nextTrackBtn" type="button">Next</button>
+          <div class="hero__stats">
+            <div class="stat">
+              <span class="stat__num">08</span>
+              <span class="stat__label">свидетельств</span>
             </div>
-
-            <div class="player-meta">
-              <span id="currentTime">0:00</span>
-              <input id="seekBar" type="range" value="0" min="0" max="100" />
-              <span id="duration">0:00</span>
+            <div class="stat">
+              <span class="stat__num">01</span>
+              <span class="stat__label">ритуал передачи</span>
             </div>
-
-            <div class="player-meta">
-              <label class="mono" for="volumeSlider">Volume</label>
-              <input id="volumeSlider" type="range" min="0" max="1" step="0.01" value="0.7" />
+            <div class="stat">
+              <span class="stat__num">∞</span>
+              <span class="stat__label">остаточный шум</span>
             </div>
-
-            <audio id="bgTrack" preload="metadata"></audio>
           </div>
         </div>
 
-        <div style="margin-top: 1.25rem;">
-          <iframe
-            id="scPlayer"
-            title="SoundCloud player"
-            height="166"
-            loading="lazy"
-            data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/293&color=%2389f7ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"
-          ></iframe>
+        <div class="hero__visual reveal reveal--delay">
+          <div class="hero-card hero-card--main tilt-card">
+            <img src="./image.jpg" alt="Силуэт в белой ткани и зернистом свете." />
+            <div class="hero-card__caption">“Лицо, стёртое вспышкой, запоминается сильнее, чем обычное лицо.”</div>
+          </div>
+          <div class="hero-card hero-card--sub tilt-card">
+            <img src="./image-5.jpg" alt="Светящийся силуэт на чёрном фоне." />
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- PATTERN LAB -->
-    <section id="lab">
-      <div class="section-shell">
-        <span class="kicker">lab // step sequencer</span>
-        <h2 class="section-title">Pattern lab</h2>
+    <section class="section manifesto" id="manifest">
+      <div class="section-head reveal">
+        <p class="eyebrow">text / fracture / invocation</p>
+        <h2>Манифест беспокойного сигнала</h2>
+      </div>
 
-        <div class="grid-wrapper">
-          <div class="grid-labels"></div>
-          <div id="drumGrid"></div>
-        </div>
+      <div class="manifest-grid">
+        <article class="panel manifesto-block reveal">
+          <p data-glitch>
+            Мы не ищем чистый звук. Нас интересует звук, который будто найден на грязной плёнке,
+            пережил воду, пепел и чью-то руку.
+          </p>
+          <p data-glitch>
+            Нас интересует белый свет, который не освещает, а стирает. Он убирает лицо, пол, время,
+            имена и оставляет только тревожную форму присутствия.
+          </p>
+        </article>
 
-        <div class="grid-wrapper">
-          <div class="note-labels"></div>
-          <div id="synthGrid"></div>
-        </div>
+        <article class="panel manifesto-block reveal reveal--delay">
+          <p data-glitch>
+            Наш язык — это рваные молитвы, холодные коридоры, нервные повторы, треск старого стекла и
+            шипение дешёвых колонок на пределе.
+          </p>
+          <p data-glitch>
+            Если здесь красиво, то только так, как красиво бывает в вещах, которые немного опасны и
+            слишком близко подходят к нервной системе.
+          </p>
+        </article>
 
-        <div class="sequencer-actions">
-          <button id="seqPlayBtn" type="button">Play pattern</button>
-          <button id="seqStopBtn" type="button" class="btn btn--outline">Stop</button>
-          <button id="seqRandomBtn" type="button" class="btn btn--outline">Random</button>
-          <button id="seqClearBtn" type="button" class="btn btn--outline">Clear</button>
-          <button id="seqShareBtn" type="button" class="btn btn--outline egg">Copy link</button>
-        </div>
-
-        <div class="lab-meta">
-          <label for="seqBpm">BPM</label>
-          <input id="seqBpm" type="range" min="70" max="170" value="118" />
-          <span id="seqBpmValue">118</span>
-        </div>
+        <aside class="panel quote-block reveal reveal--delay-2">
+          <div class="quote-mark">⸸</div>
+          <blockquote>
+            “Чем сильнее вспышка, тем темнее то, что остаётся после неё.”
+          </blockquote>
+          <span>— архив без адреса</span>
+        </aside>
       </div>
     </section>
 
-    <!-- SOUNDLAB -->
-    <section id="soundlab">
-      <div class="section-shell">
-        <span class="kicker">noise // atmosphere engine</span>
-        <h2 class="section-title">Soundlab</h2>
-
-        <p class="text-muted">
-          Build an ambient undercurrent: drone mass, high-band hiss and pulse pressure.
+    <section class="section archive" id="archive">
+      <div class="section-head reveal">
+        <p class="eyebrow">archive / loops / residue</p>
+        <h2>Архив следов</h2>
+        <p class="section-text">
+          Не треки, а состояния. Не релизы, а утечки. Не композиции, а обломки дыхания, собранные в
+          форму, которая держится только за счёт повторения.
         </p>
+      </div>
 
-        <div class="sequencer-actions">
-          <button id="soundLabInit" type="button">Activate Soundlab</button>
-          <a href="#tracks" class="btn btn--outline egg">Artifact 02</a>
+      <div class="archive-grid">
+        <article class="track panel reveal tilt-card">
+          <div class="track__meta">
+            <span>001</span>
+            <span>04:21</span>
+          </div>
+          <h3>cold hallway psalm</h3>
+          <p>
+            Монотонный импульс, глубокий воздух, шаги, которые то ли приближаются, то ли ходят вокруг
+            тебя по кругу.
+          </p>
+          <div class="track__tags">
+            <span>ritual noise</span>
+            <span>empty stairwell</span>
+            <span>white burn</span>
+          </div>
+        </article>
+
+        <article class="track panel reveal reveal--delay tilt-card">
+          <div class="track__meta">
+            <span>002</span>
+            <span>05:08</span>
+          </div>
+          <h3>face erased by flash</h3>
+          <p>
+            Этот фрагмент звучит так, будто плёнка вспомнила человека, но забыла его черты, и теперь
+            держит только жар светового удара.
+          </p>
+          <div class="track__tags">
+            <span>flashcore</span>
+            <span>burnt skin</span>
+            <span>vigil static</span>
+          </div>
+        </article>
+
+        <article class="track panel reveal reveal--delay-2 tilt-card">
+          <div class="track__meta">
+            <span>003</span>
+            <span>06:11</span>
+          </div>
+          <h3>no god in the courtyard</h3>
+          <p>
+            Очень низкий тон, редкие удары, слепая пауза между ними, и чувство, что двор смотрит на тебя
+            через окна, но никто не моргает.
+          </p>
+          <div class="track__tags">
+            <span>yard drone</span>
+            <span>anxious pulse</span>
+            <span>grave signal</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section visions" id="visions">
+      <div class="section-head reveal">
+        <p class="eyebrow">visions / witness / overexposure</p>
+        <h2>Наблюдения после вспышки</h2>
+      </div>
+
+      <div class="gallery-grid">
+        <figure class="gallery-card reveal tilt-card tall">
+          <img src="./image-2.jpg" alt="Чёрно-белый коллаж с силуэтами и фигурой в белом." />
+          <figcaption>Сборка из силуэтов, дыры в памяти, белая фигура как след от молнии.</figcaption>
+        </figure>
+
+        <figure class="gallery-card reveal reveal--delay tilt-card">
+          <img src="./image-3.jpg" alt="Размытая чёрная фигура на белом фоне." />
+          <figcaption>Существо, которое невозможно поймать фокусом.</figcaption>
+        </figure>
+
+        <figure class="gallery-card reveal reveal--delay-2 tilt-card">
+          <img src="./image-4.jpg" alt="Пересвеченное лицо с дымом на фоне окон ночью." />
+          <figcaption>Человек превращается в световой дефект.</figcaption>
+        </figure>
+
+        <figure class="gallery-card reveal tilt-card">
+          <img src="./image-6.jpg" alt="Белый силуэт на тёмной живописной поверхности." />
+          <figcaption>Стоящий посреди тёмной массы — как ошибка в самом чёрном.</figcaption>
+        </figure>
+
+        <figure class="gallery-card reveal reveal--delay tilt-card">
+          <img src="./image-7.jpg" alt="Чёрно-белый образ лица с терновым венцом и закрытой нижней частью." />
+          <figcaption>Икона, испорченная шумом и злым воздухом.</figcaption>
+        </figure>
+
+        <figure class="gallery-card reveal reveal--delay-2 tilt-card">
+          <img src="./image-8.jpg" alt="Черепообразный образ в зернистом чёрно-белом стиле." />
+          <figcaption>Не смерть, а пустая оболочка от слишком долгого напряжения.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section ritual" id="ritual">
+      <div class="ritual-grid">
+        <div class="panel ritual-copy reveal">
+          <p class="eyebrow">ritual / body / transmission</p>
+          <h2>Ритуал входа</h2>
+          <p>
+            Подойди ближе к экрану. Задержись на секунду там, где хочется быстро пролистать. Это и есть
+            точка входа: не комфорт, а задержка; не уверенность, а медленное осознание, что тебе уже
+            интересно то, что должно было бы оттолкнуть.
+          </p>
+          <p>
+            Самые цепляющие вещи всегда немного тревожат. Они как дверь в длинный подъездный коридор:
+            никто не заставляет тебя идти туда, но ты уже сделал шаг и слышишь, как за спиной закрывается
+            воздух.
+          </p>
         </div>
 
-        <div class="lab-meta">
-          <label for="ambienceDrone">Drone</label>
-          <input id="ambienceDrone" type="range" min="0" max="100" value="0" />
-        </div>
-
-        <div class="lab-meta">
-          <label for="ambienceNoise">Noise</label>
-          <input id="ambienceNoise" type="range" min="0" max="100" value="0" />
-        </div>
-
-        <div class="lab-meta">
-          <label for="ambiencePulse">Pulse</label>
-          <input id="ambiencePulse" type="range" min="0" max="100" value="0" />
+        <div class="panel ritual-list reveal reveal--delay">
+          <ol>
+            <li><span>01</span> Не пытайся всё понять сразу.</li>
+            <li><span>02</span> Читай как будто кто-то шепчет это слишком близко.</li>
+            <li><span>03</span> Смотри на белое как на форму насилия, а не света.</li>
+            <li><span>04</span> Помни: здесь важнее след, чем объяснение.</li>
+          </ol>
         </div>
       </div>
     </section>
 
-    <!-- TRACK ANATOMY -->
-    <section id="tracks">
-      <div class="section-shell">
-        <span class="kicker">analysis // destructive listening</span>
-        <h2 class="section-title">Track anatomy</h2>
-
-        <p class="text-muted">
-          Cut the signal, sweep the filter, distort the body, jump between structural zones.
-        </p>
-
-        <audio id="anatomyTrack" src="./track2.mp3" preload="metadata" controls></audio>
-
-        <div class="sequencer-actions" style="margin-top: 1rem;">
-          <button id="anatomyPlay" type="button">Play track</button>
-          <button type="button" class="btn btn--outline" data-seek-anatomy="0">Intro</button>
-          <button type="button" class="btn btn--outline" data-seek-anatomy="35">Drop</button>
-          <button type="button" class="btn btn--outline" data-seek-anatomy="70">Break</button>
+    <section class="section contact" id="contact">
+      <div class="contact-shell panel reveal">
+        <div class="section-head">
+          <p class="eyebrow">contact / leak / invocation</p>
+          <h2>Передача сигнала</h2>
         </div>
 
-        <div class="lab-meta">
-          <label for="anatomyLowpass">Lowpass</label>
-          <input id="anatomyLowpass" type="range" min="200" max="12000" value="12000" />
-        </div>
-
-        <div class="lab-meta">
-          <label for="anatomyDrive">Drive</label>
-          <input id="anatomyDrive" type="range" min="0" max="100" value="0" />
-        </div>
-
-        <div class="lab-meta">
-          <span>Now</span>
-          <span id="anatomyNow">0:00</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- TRACK VAULT -->
-    <section id="vault">
-      <div class="section-shell">
-        <span class="kicker">vault // user uploads and archive</span>
-        <h2 class="section-title">Track vault</h2>
-
-        <div id="upload-area" class="upload-box">
+        <div class="contact-grid">
           <div>
-            <h3>Drop a file into the bunker</h3>
-            <p class="text-muted">
-              Accepts .mp3 / .wav — drag & drop or use the button below.
+            <p>
+              Если этот язык тебе подходит, значит ты уже понял главное: страшное не обязано быть
+              дешёвым, а мрачное может быть гипнотическим, плотным и очень красивым.
             </p>
-
-            <input id="fileInput" type="file" accept=".mp3,.wav" />
-            <div class="hero-actions" style="margin-top: 1rem; justify-content: center;">
-              <button id="uploadBtn" type="button">Upload track</button>
-              <a href="#contact" class="btn btn--outline egg">Artifact 03</a>
-            </div>
-
-            <div id="uploadStatus" class="meta"></div>
+            <p class="contact-note">
+              Здесь может быть booking, арт-манифест, форма, Bandcamp, Telegram, SoundCloud или архив
+              будущих релизов.
+            </p>
           </div>
-        </div>
 
-        <template id="audio-template">
-          <article class="track-item">
-            <div class="track-head">
-              <h3 class="track-title">Unknown Track</h3>
-              <div class="track-actions">
-                <button type="button" class="play-btn">▶</button>
-                <button type="button" class="like-btn">Like</button>
-                <span class="like-count">0</span>
-                <button type="button" class="delete-btn">Delete</button>
-              </div>
-            </div>
+          <form class="contact-form" id="contactForm">
+            <label>
+              Имя сигнала
+              <input type="text" name="name" placeholder="кто передаёт" />
+            </label>
 
-            <canvas class="visualizer" width="640" height="140"></canvas>
-            <audio preload="metadata"></audio>
+            <label>
+              Канал
+              <input type="email" name="email" placeholder="куда отвечать" />
+            </label>
 
-            <div class="player-meta">
-              <span class="current-time">0:00</span>
-              <input class="seek-bar" type="range" value="0" min="0" max="100" />
-              <span class="duration">0:00</span>
-            </div>
+            <label>
+              Сообщение
+              <textarea name="message" rows="5" placeholder="оставь фразу, от которой не по себе"></textarea>
+            </label>
 
-            <div class="player-meta">
-              <label class="mono">Volume</label>
-              <input class="volume-bar" type="range" min="0" max="1" step="0.01" value="0.7" />
-            </div>
-          </article>
-        </template>
-
-        <div id="trackList"></div>
-      </div>
-    </section>
-
-    <!-- CONTACT -->
-    <section id="contact">
-      <div class="section-shell">
-        <span class="kicker">contact // booking / transmission</span>
-        <h2 class="section-title">Transmit back</h2>
-
-        <div class="cards">
-          <article class="card">
-            <h3>Booking</h3>
-            <p class="text-muted">
-              Live sets, hybrid audiovisual ritual, broken club architecture, cold-room transmission.
-            </p>
-            <a class="btn btn-primary" href="mailto:twovandals@signal.invalid">Book the signal</a>
-          </article>
-
-          <article class="card">
-            <h3>Links</h3>
-            <p class="text-muted">
-              Archive mirrors, stream fragments, network exits and platform debris.
-            </p>
-            <div class="hero-actions">
-              <a class="btn btn--outline" href="https://soundcloud.com/" target="_blank" rel="noopener noreferrer">SoundCloud</a>
-              <a class="btn btn--outline" href="https://instagram.com/" target="_blank" rel="noopener noreferrer">Instagram</a>
-              <a class="btn btn--outline" href="https://youtube.com/" target="_blank" rel="noopener noreferrer">YouTube</a>
-            </div>
-          </article>
-
-          <article class="card">
-            <h3>Terminal note</h3>
-            <p class="text-muted">
-              If you reached this far, you are already inside the archive.
-            </p>
-            <a class="btn btn--outline egg" href="#home">Return to source</a>
-          </article>
+            <button type="submit" class="btn btn--primary">Отправить в шум</button>
+            <p class="form-status" id="formStatus"></p>
+          </form>
         </div>
       </div>
     </section>
   </main>
 
-  <footer>
-    <p class="mono">TwoVANDALS // signal persists // 2026</p>
+  <footer class="site-footer">
+    <div class="footer-shell">
+      <p>ASH//NULL — ritual signal archive / white burn / black residue / memory of pressure</p>
+      <a href="#home">Наверх</a>
+    </div>
   </footer>
 
-  <script type="module">
-    // =========================================
-    // BASIC SUPABASE PLACEHOLDER
-    // Replace with your real values if needed.
-    // =========================================
-    import { createClient } from "https://esm.sh/@supabase/supabase-js";
-
-    const SUPABASE_URL = "https://qqffjsnlsbzhzhlvbexb.supabase.co";
-    const SUPABASE_ANON_KEY = "YOUR_ANON_KEY";
-
-    window.supabase = SUPABASE_ANON_KEY && SUPABASE_ANON_KEY !== "YOUR_ANON_KEY"
-      ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-      : null;
-
-    // =========================================
-    // CORE SCRIPT
-    // =========================================
-
-    const $ = (selector, root = document) => root.querySelector(selector);
-    const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
-
-    function formatTime(sec) {
-      if (!Number.isFinite(sec) || sec < 0) return "0:00";
-      const minutes = Math.floor(sec / 60);
-      const seconds = Math.floor(sec % 60).toString().padStart(2, "0");
-      return `${minutes}:${seconds}`;
-    }
-
-    async function safePlay(audio) {
-      try {
-        await audio.play();
-        return true;
-      } catch {
-        return false;
-      }
-    }
-
-    function prefersReducedMotion() {
-      return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    }
-
-    // -------------------------
-    // LOADER
-    // -------------------------
-    window.addEventListener("DOMContentLoaded", () => {
-      const loader = document.getElementById("loader-screen");
-      const text = document.getElementById("loader-text");
-      if (!loader || !text) return;
-
-      const final = "TwoVANDALS";
-      text.textContent = final[0] || "";
-
-      let index = 1;
-      const interval = setInterval(() => {
-        if (index < final.length) {
-          text.textContent += final[index];
-          index++;
-        } else {
-          clearInterval(interval);
-          setTimeout(() => loader.classList.add("hidden"), 450);
-        }
-      }, 110);
-    });
-
-    // -------------------------
-    // SNOW
-    // -------------------------
-    function initSnow() {
-      const snowCanvas = document.getElementById("snow-canvas");
-      if (!snowCanvas || prefersReducedMotion()) return;
-
-      const snowCtx = snowCanvas.getContext("2d");
-      if (!snowCtx) return;
-
-      let snowflakes = [];
-      let animationId = null;
-
-      function resizeCanvas() {
-        snowCanvas.width = window.innerWidth;
-        snowCanvas.height = window.innerHeight;
-      }
-
-      function createSnowflake() {
-        return {
-          x: Math.random() * snowCanvas.width,
-          y: Math.random() * -snowCanvas.height,
-          radius: Math.random() * 2 + 0.8,
-          speed: Math.random() * 1.3 + 0.35,
-          alpha: Math.random() * 0.45 + 0.25,
-          drift: Math.random() * 0.6 - 0.3
-        };
-      }
-
-      function updateSnow() {
-        snowCtx.clearRect(0, 0, snowCanvas.width, snowCanvas.height);
-
-        snowflakes.forEach((flake, i) => {
-          flake.y += flake.speed;
-          flake.x += flake.drift;
-
-          if (flake.y > snowCanvas.height || flake.x < -20 || flake.x > snowCanvas.width + 20) {
-            snowflakes[i] = createSnowflake();
-          }
-
-          snowCtx.beginPath();
-          snowCtx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
-          snowCtx.fillStyle = `rgba(255,255,255,${flake.alpha})`;
-          snowCtx.fill();
-        });
-
-        animationId = requestAnimationFrame(updateSnow);
-      }
-
-      resizeCanvas();
-      snowflakes = Array.from({ length: 110 }, createSnowflake);
-      updateSnow();
-
-      window.addEventListener("resize", resizeCanvas);
-
-      document.addEventListener("visibilitychange", () => {
-        if (document.hidden) {
-          cancelAnimationFrame(animationId);
-        } else {
-          updateSnow();
-        }
-      });
-    }
-
-    // -------------------------
-    // EASTER EGGS
-    // -------------------------
-    function initEasterEggs() {
-      const eggs = $$(".egg");
-      if (!eggs.length) return;
-
-      eggs.forEach(egg => {
-        egg.addEventListener("click", e => {
-          if (!egg.classList.contains("found")) {
-            egg.classList.add("found");
-          }
-
-          const foundCount = document.querySelectorAll(".egg.found").length;
-          const totalCount = eggs.length;
-
-          if (foundCount === totalCount && !document.getElementById("secret-section")) {
-            const section = document.createElement("section");
-            section.id = "secret-section";
-            section.innerHTML = `
-              <h2>You unlocked the core.</h2>
-              <p>This is only the beginning.</p>
-            `;
-            document.body.appendChild(section);
-          }
-
-          if (egg.tagName === "A" && egg.getAttribute("href")?.startsWith("http")) {
-            e.preventDefault();
-            window.open(egg.href, "_blank", "noopener,noreferrer");
-          }
-        });
-      });
-    }
-
-    // -------------------------
-    // CLICK SOUND
-    // -------------------------
-    function initClickSound() {
-      const clickAudio = document.getElementById("clickSound");
-      if (!clickAudio) return;
-
-      document.addEventListener("click", e => {
-        const isButton = e.target.closest("button, .pixel-btn, .egg, a");
-        if (!isButton) return;
-        clickAudio.currentTime = 0;
-        clickAudio.play().catch(() => {});
-      });
-    }
-
-    // -------------------------
-    // MAIN PLAYER
-    // -------------------------
-    function initMainPlayer() {
-      const audio = document.getElementById("bgTrack");
-      const playPauseBtn = document.getElementById("playPauseBtn");
-      const volumeSlider = document.getElementById("volumeSlider");
-      const seekBar = document.getElementById("seekBar");
-      const currentTimeEl = document.getElementById("currentTime");
-      const durationEl = document.getElementById("duration");
-      const toggleBtn = document.getElementById("togglePlayer");
-      const audioPlayer = document.getElementById("audioPlayer");
-      const prevBtn = document.getElementById("prevTrackBtn");
-      const nextBtn = document.getElementById("nextTrackBtn");
-      const trackTitle = document.getElementById("trackTitle");
-
-      if (!audio || !playPauseBtn || !volumeSlider || !seekBar || !currentTimeEl || !durationEl) return;
-
-      const playlist = [
-        "./ybuocfiewu.mp3",
-        "./track2.mp3",
-        "./track3.mp3"
-      ];
-
-      let currentIndex = 0;
-
-      async function loadTrack(index, autoplay = false) {
-        if (!playlist.length) return;
-
-        if (index < 0) index = playlist.length - 1;
-        if (index >= playlist.length) index = 0;
-
-        currentIndex = index;
-        audio.src = playlist[currentIndex];
-        trackTitle.textContent = `Track ${currentIndex + 1}`;
-        audio.load();
-
-        if (autoplay) {
-          const started = await safePlay(audio);
-          playPauseBtn.textContent = started
-            ? "⏸ Playing Trashwave Set"
-            : "▶ Listen to a curated Trashwave set";
-        } else {
-          playPauseBtn.textContent = "▶ Listen to a curated Trashwave set";
-        }
-      }
-
-      playPauseBtn.addEventListener("click", async () => {
-        if (audio.paused) {
-          const started = await safePlay(audio);
-          playPauseBtn.textContent = started
-            ? "⏸ Playing Trashwave Set"
-            : "▶ Listen to a curated Trashwave set";
-        } else {
-          audio.pause();
-          playPauseBtn.textContent = "▶ Listen to a curated Trashwave set";
-        }
-      });
-
-      volumeSlider.addEventListener("input", () => {
-        audio.volume = Number(volumeSlider.value);
-      });
-
-      audio.addEventListener("loadedmetadata", () => {
-        seekBar.max = Math.floor(audio.duration || 0);
-        durationEl.textContent = formatTime(audio.duration);
-      });
-
-      audio.addEventListener("timeupdate", () => {
-        seekBar.value = String(audio.currentTime || 0);
-        currentTimeEl.textContent = formatTime(audio.currentTime);
-      });
-
-      seekBar.addEventListener("input", () => {
-        audio.currentTime = Number(seekBar.value);
-      });
-
-      toggleBtn?.addEventListener("click", () => {
-        const isCollapsed = audioPlayer.classList.toggle("collapsed");
-        toggleBtn.textContent = isCollapsed ? "▲" : "▼";
-      });
-
-      prevBtn?.addEventListener("click", () => loadTrack(currentIndex - 1, true));
-      nextBtn?.addEventListener("click", () => loadTrack(currentIndex + 1, true));
-      audio.addEventListener("ended", () => loadTrack(currentIndex + 1, true));
-
-      loadTrack(currentIndex, false);
-    }
-
-    // -------------------------
-    // SCROLLSPY
-    // -------------------------
-    function initScrollSpy() {
-      const sections = document.querySelectorAll("section[id]");
-      const navLinks = document.querySelectorAll("nav a");
-
-      if (!sections.length || !navLinks.length) return;
-
-      const observer = new IntersectionObserver(
-        entries => {
-          entries.forEach(entry => {
-            const id = entry.target.getAttribute("id");
-            const link = document.querySelector(`nav a[href="#${id}"]`);
-            if (entry.isIntersecting) {
-              navLinks.forEach(a => a.classList.remove("active"));
-              if (link) link.classList.add("active");
-            }
-          });
-        },
-        {
-          rootMargin: "-30% 0px -55% 0px",
-          threshold: 0.08
-        }
-      );
-
-      sections.forEach(section => observer.observe(section));
-    }
-
-    // -------------------------
-    // SOUNDCLOUD LAZY LOAD
-    // -------------------------
-    function initSoundCloud() {
-      const scSection = document.getElementById("music");
-      const scIframe = document.getElementById("scPlayer");
-      if (!scSection || !scIframe) return;
-
-      const observer = new IntersectionObserver((entries, obs) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting && scIframe.dataset.src) {
-            scIframe.src = scIframe.dataset.src;
-            obs.unobserve(entry.target);
-          }
-        });
-      }, { threshold: 0.25 });
-
-      observer.observe(scSection);
-    }
-
-    // -------------------------
-    // TRACK LIST / SUPABASE
-    // -------------------------
-    async function listTracks() {
-      const listContainer = document.getElementById("trackList");
-      const template = document.getElementById("audio-template");
-      if (!listContainer || !template) return;
-
-      listContainer.innerHTML = "";
-
-      if (!window.supabase) {
-        listContainer.innerHTML = `
-          <article class="track-item">
-            <h3 class="track-title">Supabase disabled</h3>
-            <p class="text-muted">
-              Add your real anon key to enable upload / vault / likes / delete.
-            </p>
-          </article>
-        `;
-        return;
-      }
-
-      const { data, error } = await window.supabase.storage.from("tracks").list("", {
-        limit: 100,
-        offset: 0,
-        sortBy: { column: "name", order: "asc" }
-      });
-
-      if (error) {
-        listContainer.innerHTML = `
-          <article class="track-item">
-            <h3 class="track-title">Storage error</h3>
-            <p class="text-muted">${error.message}</p>
-          </article>
-        `;
-        return;
-      }
-
-      const publicFiles = data
-        .filter(file => /\.(mp3|wav)$/i.test(file.name))
-        .map(file => {
-          const { data: publicData } = window.supabase.storage.from("tracks").getPublicUrl(file.name);
-          return {
-            name: file.name,
-            publicUrl: publicData.publicUrl
-          };
-        });
-
-      await loadTracks(publicFiles);
-    }
-
-    async function loadTracks(fileList) {
-      const listContainer = document.getElementById("trackList");
-      const template = document.getElementById("audio-template");
-      if (!listContainer || !template) return;
-
-      listContainer.innerHTML = "";
-
-      for (const file of fileList) {
-        const name = file.name || "Unknown";
-        if (!name.match(/\.(mp3|wav)$/i)) continue;
-
-        const clone = template.content.cloneNode(true);
-        const audio = clone.querySelector("audio");
-        const canvas = clone.querySelector(".visualizer");
-        const vizCtx = canvas?.getContext("2d");
-
-        const title = clone.querySelector(".track-title");
-        const playBtn = clone.querySelector(".play-btn");
-        const seek = clone.querySelector(".seek-bar");
-        const volume = clone.querySelector(".volume-bar");
-        const currentTimeEl = clone.querySelector(".current-time");
-        const durationEl = clone.querySelector(".duration");
-        const deleteBtn = clone.querySelector(".delete-btn");
-        const likeBtn = clone.querySelector(".like-btn");
-        const likeCount = clone.querySelector(".like-count");
-
-        title.textContent = name.replace(/\.[^/.]+$/, "");
-        audio.src = file.publicUrl || file.url || "";
-
-        let audioCtx = null;
-        let analyser = null;
-        let source = null;
-        let animationId = null;
-
-        function drawBars() {
-          if (!analyser || !vizCtx || !canvas) return;
-
-          const bufferLength = analyser.frequencyBinCount;
-          const dataArray = new Uint8Array(bufferLength);
-          analyser.getByteFrequencyData(dataArray);
-
-          vizCtx.clearRect(0, 0, canvas.width, canvas.height);
-
-          const barWidth = (canvas.width / bufferLength) * 2.2;
-          let x = 0;
-
-          for (let i = 0; i < bufferLength; i++) {
-            const barHeight = dataArray[i] / 1.8;
-            vizCtx.fillStyle = `rgba(${80 + barHeight}, 240, 255, 0.8)`;
-            vizCtx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
-            x += barWidth + 1;
-          }
-
-          animationId = requestAnimationFrame(drawBars);
-        }
-
-        audio.addEventListener("play", async () => {
-          if (!audioCtx) {
-            const AudioCtx = window.AudioContext || window.webkitAudioContext;
-            if (!AudioCtx) return;
-            audioCtx = new AudioCtx();
-            analyser = audioCtx.createAnalyser();
-            source = audioCtx.createMediaElementSource(audio);
-            source.connect(analyser);
-            analyser.connect(audioCtx.destination);
-            analyser.fftSize = 256;
-          }
-
-          if (audioCtx.state === "suspended") {
-            await audioCtx.resume();
-          }
-
-          drawBars();
-          playBtn.textContent = "⏸";
-        });
-
-        audio.addEventListener("pause", () => {
-          cancelAnimationFrame(animationId);
-          if (vizCtx && canvas) vizCtx.clearRect(0, 0, canvas.width, canvas.height);
-          playBtn.textContent = "▶";
-        });
-
-        audio.addEventListener("ended", () => {
-          cancelAnimationFrame(animationId);
-          if (vizCtx && canvas) vizCtx.clearRect(0, 0, canvas.width, canvas.height);
-          playBtn.textContent = "▶";
-        });
-
-        playBtn.addEventListener("click", async () => {
-          if (audio.paused) {
-            document.querySelectorAll("#trackList audio").forEach(a => {
-              if (a !== audio) a.pause();
-            });
-            await safePlay(audio);
-          } else {
-            audio.pause();
-          }
-        });
-
-        audio.addEventListener("loadedmetadata", () => {
-          if (isFinite(audio.duration)) {
-            seek.max = Math.floor(audio.duration);
-            durationEl.textContent = formatTime(audio.duration);
-          }
-        });
-
-        audio.addEventListener("timeupdate", () => {
-          seek.value = String(audio.currentTime || 0);
-          currentTimeEl.textContent = formatTime(audio.currentTime);
-        });
-
-        seek.addEventListener("input", () => {
-          audio.currentTime = Number(seek.value);
-        });
-
-        volume.addEventListener("input", () => {
-          audio.volume = Number(volume.value);
-        });
-
-        if (window.supabase && likeBtn && likeCount) {
-          const likeKey = `liked_${file.name}`;
-          if (localStorage.getItem(likeKey)) {
-            likeBtn.classList.add("liked");
-          }
-
-          window.supabase
-            .from("likes")
-            .select("likes")
-            .eq("filename", file.name)
-            .single()
-            .then(({ data }) => {
-              likeCount.textContent = data?.likes || 0;
-            });
-
-          likeBtn.addEventListener("click", async () => {
-            if (localStorage.getItem(likeKey)) return;
-
-            const { data, error } = await window.supabase.rpc("increment_like", {
-              filename_input: file.name
-            });
-
-            if (!error) {
-              likeCount.textContent = data?.likes ?? Number(likeCount.textContent || 0) + 1;
-              localStorage.setItem(likeKey, "1");
-              likeBtn.classList.add("liked");
-            }
-          });
-        }
-
-        deleteBtn?.addEventListener("click", async () => {
-          if (!window.supabase) return;
-          const confirmDelete = confirm(`Delete track "${file.name}"?`);
-          if (!confirmDelete) return;
-
-          const { error } = await window.supabase.storage.from("tracks").remove([file.name]);
-          if (error) {
-            alert("❌ Error deleting track: " + error.message);
-          } else {
-            alert(`🗑️ Deleted: ${file.name}`);
-            await listTracks();
-          }
-        });
-
-        listContainer.appendChild(clone);
-      }
-    }
-
-    // -------------------------
-    // UPLOAD
-    // -------------------------
-    function initUpload() {
-      const dropZone = document.getElementById("upload-area");
-      const fileInput = document.getElementById("fileInput");
-      const uploadStatus = document.getElementById("uploadStatus");
-      const uploadBtn = document.getElementById("uploadBtn");
-
-      if (!dropZone || !fileInput || !uploadStatus || !uploadBtn) return;
-
-      async function handleFile(file) {
-        if (!file.name.match(/\.(mp3|wav)$/i)) {
-          uploadStatus.textContent = "❌ Only .mp3 or .wav allowed.";
-          return;
-        }
-
-        if (!window.supabase) {
-          uploadStatus.textContent = "❗ Supabase anon key is not configured.";
-          return;
-        }
-
-        const { error } = await window.supabase.storage.from("tracks").upload(file.name, file, {
-          cacheControl: "3600",
-          upsert: false
-        });
-
-        if (error) {
-          uploadStatus.textContent = `❌ Error: ${error.message}`;
-        } else {
-          uploadStatus.textContent = `✅ Uploaded: ${file.name}`;
-          await listTracks();
-        }
-      }
-
-      dropZone.addEventListener("dragover", e => {
-        e.preventDefault();
-        dropZone.classList.add("dragging");
-      });
-
-      dropZone.addEventListener("dragleave", () => {
-        dropZone.classList.remove("dragging");
-      });
-
-      dropZone.addEventListener("drop", e => {
-        e.preventDefault();
-        dropZone.classList.remove("dragging");
-        const file = e.dataTransfer.files[0];
-        if (file) handleFile(file);
-      });
-
-      uploadBtn.addEventListener("click", () => {
-        const file = fileInput.files[0];
-        if (file) handleFile(file);
-        else uploadStatus.textContent = "❗ Choose a file first.";
-      });
-    }
-
-    // -------------------------
-    // EXTRA INTERACTIVE PACK
-    // -------------------------
-    (() => {
-      const $ = (selector, root = document) => root.querySelector(selector);
-      const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
-
-      async function safeCopy(text) {
-        try {
-          if (navigator.clipboard?.writeText) {
-            await navigator.clipboard.writeText(text);
-            return true;
-          }
-        } catch {}
-        return false;
-      }
-
-      function flashMessage(message, type = "info") {
-        let box = document.getElementById("tv-status-toast");
-        if (!box) {
-          box = document.createElement("div");
-          box.id = "tv-status-toast";
-          box.style.cssText = `
-            position:fixed;right:16px;bottom:90px;z-index:99999;
-            padding:10px 14px;color:#fff;font-family:VT323,monospace;
-            font-size:20px;letter-spacing:.06em;opacity:0;transform:translateY(8px);
-            transition:opacity .2s ease, transform .2s ease;
-          `;
-          document.body.appendChild(box);
-        }
-        box.textContent = message;
-        box.style.opacity = "1";
-        box.style.transform = "translateY(0)";
-        clearTimeout(box._timer);
-        box._timer = setTimeout(() => {
-          box.style.opacity = "0";
-          box.style.transform = "translateY(8px)";
-        }, 1800);
-      }
-
-      function clamp(n, min, max) {
-        return Math.min(Math.max(n, min), max);
-      }
-
-      function debounce(fn, delay = 120) {
-        let t;
-        return (...args) => {
-          clearTimeout(t);
-          t = setTimeout(() => fn(...args), delay);
-        };
-      }
-
-      function initInteractiveManifest() {
-        const lines = $$(".manifest [data-glitch], .manifest p");
-        if (!lines.length) return;
-
-        const glitchChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<>/=+*-_";
-        let audioCtx = null;
-
-        function blip(freq = 220, duration = 0.06, type = "square", gainValue = 0.015) {
-          try {
-            const AudioCtx = window.AudioContext || window.webkitAudioContext;
-            if (!AudioCtx) return;
-            if (!audioCtx) audioCtx = new AudioCtx();
-            if (audioCtx.state === "suspended") audioCtx.resume();
-
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-
-            osc.type = type;
-            osc.frequency.value = freq;
-            gain.gain.value = gainValue;
-
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-
-            const now = audioCtx.currentTime;
-            gain.gain.setValueAtTime(gainValue, now);
-            gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-
-            osc.start(now);
-            osc.stop(now + duration);
-          } catch {}
-        }
-
-        function scrambleText(el) {
-          if (el.dataset.animating === "1") return;
-          el.dataset.animating = "1";
-
-          const original = el.dataset.originalText || el.textContent.trim();
-          el.dataset.originalText = original;
-
-          let frame = 0;
-          const totalFrames = 12;
-
-          const tick = () => {
-            const progress = frame / totalFrames;
-            const revealCount = Math.floor(original.length * progress);
-
-            el.textContent = original
-              .split("")
-              .map((ch, i) => {
-                if (ch === " ") return " ";
-                if (i < revealCount) return original[i];
-                return glitchChars[Math.floor(Math.random() * glitchChars.length)];
-              })
-              .join("");
-
-            frame++;
-            if (frame <= totalFrames) requestAnimationFrame(tick);
-            else {
-              el.textContent = original;
-              el.dataset.animating = "0";
-            }
-          };
-
-          tick();
-        }
-
-        lines.forEach((line, i) => {
-          line.dataset.originalText = line.textContent.trim();
-          line.addEventListener("mouseenter", () => {
-            scrambleText(line);
-            blip(160 + i * 35, 0.05, i % 2 ? "triangle" : "square", 0.01);
-          });
-          line.addEventListener("click", () => {
-            scrambleText(line);
-            blip(110 + i * 55, 0.09, "sawtooth", 0.018);
-          });
-        });
-      }
-
-      function initSequencer() {
-        const drumGridEl = document.getElementById("drumGrid");
-        const synthGridEl = document.getElementById("synthGrid");
-        if (!drumGridEl || !synthGridEl) return;
-
-        const drumLabelsEl = $(".grid-labels");
-        const noteLabelsEl = $(".note-labels");
-        const playBtn = document.getElementById("seqPlayBtn");
-        const stopBtn = document.getElementById("seqStopBtn");
-        const randomBtn = document.getElementById("seqRandomBtn");
-        const clearBtn = document.getElementById("seqClearBtn");
-        const shareBtn = document.getElementById("seqShareBtn");
-        const bpmSlider = document.getElementById("seqBpm");
-        const bpmValue = document.getElementById("seqBpmValue");
-
-        const steps = 16;
-        const drumRows = ["kick", "snare", "hat"];
-        const noteRows = ["C5", "B4", "A4", "G4", "F4", "E4", "D4", "C4"];
-        const noteFreq = {
-          C5: 523.25, B4: 493.88, A4: 440.0, G4: 392.0,
-          F4: 349.23, E4: 329.63, D4: 293.66, C4: 261.63
-        };
-
-        let audioCtx = null;
-        let masterGain = null;
-        let stepIndex = 0;
-        let playing = false;
-        let timer = null;
-        let bpm = Number(bpmSlider?.value || 118);
-
-        const drumState = drumRows.map(() => Array(steps).fill(false));
-        const noteState = noteRows.map(() => Array(steps).fill(false));
-
-        function ensureAudio() {
-          const AudioCtx = window.AudioContext || window.webkitAudioContext;
-          if (!AudioCtx) return false;
-          if (!audioCtx) {
-            audioCtx = new AudioCtx();
-            masterGain = audioCtx.createGain();
-            masterGain.gain.value = 0.32;
-            masterGain.connect(audioCtx.destination);
-          }
-          if (audioCtx.state === "suspended") audioCtx.resume();
-          return true;
-        }
-
-        function playKick(time) {
-          const osc = audioCtx.createOscillator();
-          const gain = audioCtx.createGain();
-          osc.type = "sine";
-          osc.frequency.setValueAtTime(140, time);
-          osc.frequency.exponentialRampToValueAtTime(42, time + 0.12);
-          gain.gain.setValueAtTime(0.28, time);
-          gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.14);
-          osc.connect(gain).connect(masterGain);
-          osc.start(time);
-          osc.stop(time + 0.15);
-        }
-
-        function playSnare(time) {
-          const bufferSize = audioCtx.sampleRate * 0.12;
-          const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-          const output = buffer.getChannelData(0);
-          for (let i = 0; i < bufferSize; i++) output[i] = Math.random() * 2 - 1;
-
-          const noise = audioCtx.createBufferSource();
-          const filter = audioCtx.createBiquadFilter();
-          const gain = audioCtx.createGain();
-
-          noise.buffer = buffer;
-          filter.type = "highpass";
-          filter.frequency.value = 1200;
-          gain.gain.setValueAtTime(0.16, time);
-          gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.12);
-
-          noise.connect(filter).connect(gain).connect(masterGain);
-          noise.start(time);
-          noise.stop(time + 0.12);
-        }
-
-        function playHat(time) {
-          const bufferSize = audioCtx.sampleRate * 0.04;
-          const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-          const output = buffer.getChannelData(0);
-          for (let i = 0; i < bufferSize; i++) output[i] = Math.random() * 2 - 1;
-
-          const noise = audioCtx.createBufferSource();
-          const filter = audioCtx.createBiquadFilter();
-          const gain = audioCtx.createGain();
-
-          noise.buffer = buffer;
-          filter.type = "highpass";
-          filter.frequency.value = 5000;
-          gain.gain.setValueAtTime(0.08, time);
-          gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.035);
-
-          noise.connect(filter).connect(gain).connect(masterGain);
-          noise.start(time);
-          noise.stop(time + 0.04);
-        }
-
-        function playSynth(freq, time, duration = 0.22) {
-          const osc = audioCtx.createOscillator();
-          const sub = audioCtx.createOscillator();
-          const gain = audioCtx.createGain();
-          const filter = audioCtx.createBiquadFilter();
-
-          osc.type = "sawtooth";
-          sub.type = "triangle";
-          osc.frequency.value = freq;
-          sub.frequency.value = freq / 2;
-
-          filter.type = "lowpass";
-          filter.frequency.value = 1400;
-          filter.Q.value = 2.2;
-
-          gain.gain.setValueAtTime(0.0001, time);
-          gain.gain.linearRampToValueAtTime(0.08, time + 0.012);
-          gain.gain.exponentialRampToValueAtTime(0.0001, time + duration);
-
-          osc.connect(filter);
-          sub.connect(filter);
-          filter.connect(gain);
-          gain.connect(masterGain);
-
-          osc.start(time);
-          sub.start(time);
-          osc.stop(time + duration);
-          sub.stop(time + duration);
-        }
-
-        function buildLabels() {
-          if (drumLabelsEl) drumLabelsEl.innerHTML = drumRows.map(r => `<div>${r}</div>`).join("");
-          if (noteLabelsEl) noteLabelsEl.innerHTML = noteRows.map(r => `<div>${r}</div>`).join("");
-        }
-
-        function buildGrid(container, rows, state, groupName) {
-          container.innerHTML = "";
-          rows.forEach((rowName, rowIndex) => {
-            const row = document.createElement("div");
-            row.className = "row";
-
-            for (let step = 0; step < steps; step++) {
-              const cell = document.createElement("button");
-              cell.type = "button";
-              cell.className = "cell";
-              cell.dataset.group = groupName;
-              cell.dataset.row = String(rowIndex);
-              cell.dataset.step = String(step);
-              cell.setAttribute("aria-label", `${groupName} ${rowName} step ${step + 1}`);
-
-              if (state[rowIndex][step]) cell.classList.add("active");
-
-              cell.addEventListener("click", () => {
-                state[rowIndex][step] = !state[rowIndex][step];
-                cell.classList.toggle("active", state[rowIndex][step]);
-              });
-
-              row.appendChild(cell);
-            }
-
-            container.appendChild(row);
-          });
-        }
-
-        function clearPlayingMarks() {
-          $$(".cell.playing").forEach(c => c.classList.remove("playing"));
-        }
-
-        function markStep(step) {
-          clearPlayingMarks();
-          $$(`.cell[data-step="${step}"]`).forEach(c => c.classList.add("playing"));
-        }
-
-        function encodePattern() {
-          const drum = drumState.flat().map(v => (v ? "1" : "0")).join("");
-          const synth = noteState.flat().map(v => (v ? "1" : "0")).join("");
-          return `${drum}.${synth}.${bpm}`;
-        }
-
-        function decodePattern(serialized) {
-          if (!serialized) return;
-          const [drumBits, synthBits, bpmBits] = serialized.split(".");
-          if (bpmBits) {
-            bpm = clamp(Number(bpmBits) || 118, 70, 170);
-            if (bpmSlider) bpmSlider.value = String(bpm);
-            if (bpmValue) bpmValue.textContent = String(bpm);
-          }
-
-          if (drumBits && drumBits.length === drumRows.length * steps) {
-            let i = 0;
-            for (let r = 0; r < drumRows.length; r++) {
-              for (let s = 0; s < steps; s++) drumState[r][s] = drumBits[i++] === "1";
-            }
-          }
-
-          if (synthBits && synthBits.length === noteRows.length * steps) {
-            let i = 0;
-            for (let r = 0; r < noteRows.length; r++) {
-              for (let s = 0; s < steps; s++) noteState[r][s] = synthBits[i++] === "1";
-            }
-          }
-        }
-
-        function syncUrl() {
-          const url = new URL(window.location.href);
-          url.searchParams.set("pattern", encodePattern());
-          history.replaceState({}, "", url);
-        }
-
-        function triggerStep(step, time) {
-          markStep(step);
-
-          if (drumState[0][step]) playKick(time);
-          if (drumState[1][step]) playSnare(time);
-          if (drumState[2][step]) playHat(time);
-
-          noteRows.forEach((note, rowIndex) => {
-            if (noteState[rowIndex][step]) playSynth(noteFreq[note], time, 0.24);
-          });
-        }
-
-        function tick() {
-          if (!audioCtx) return;
-          triggerStep(stepIndex, audioCtx.currentTime + 0.01);
-          stepIndex = (stepIndex + 1) % steps;
-        }
-
-        function startSequencer() {
-          if (playing) return;
-          if (!ensureAudio()) return;
-
-          const intervalMs = (60 / bpm / 4) * 1000;
-          playing = true;
-          tick();
-          timer = setInterval(tick, intervalMs);
-          flashMessage("SEQUENCER ON");
-        }
-
-        function stopSequencer() {
-          playing = false;
-          clearInterval(timer);
-          timer = null;
-          stepIndex = 0;
-          clearPlayingMarks();
-          flashMessage("SEQUENCER STOPPED");
-        }
-
-        function randomizePattern() {
-          drumState.forEach((row, r) => {
-            row.forEach((_, s) => {
-              const chance = r === 2 ? 0.38 : 0.24;
-              drumState[r][s] = Math.random() < chance;
-            });
-          });
-
-          noteState.forEach((row, r) => {
-            row.forEach((_, s) => {
-              const chance = r < 2 ? 0.08 : 0.14;
-              noteState[r][s] = Math.random() < chance;
-            });
-          });
-
-          renderGridState();
-          syncUrl();
-          flashMessage("RANDOM PATTERN");
-        }
-
-        function clearPattern() {
-          drumState.forEach(row => row.fill(false));
-          noteState.forEach(row => row.fill(false));
-          renderGridState();
-          syncUrl();
-          flashMessage("PATTERN CLEARED");
-        }
-
-        function renderGridState() {
-          $$(".cell[data-group='drum']").forEach(cell => {
-            const r = Number(cell.dataset.row);
-            const s = Number(cell.dataset.step);
-            cell.classList.toggle("active", drumState[r][s]);
-          });
-
-          $$(".cell[data-group='synth']").forEach(cell => {
-            const r = Number(cell.dataset.row);
-            const s = Number(cell.dataset.step);
-            cell.classList.toggle("active", noteState[r][s]);
-          });
-        }
-
-        const params = new URLSearchParams(window.location.search);
-        const pattern = params.get("pattern");
-        if (pattern) decodePattern(pattern);
-
-        buildLabels();
-        buildGrid(drumGridEl, drumRows, drumState, "drum");
-        buildGrid(synthGridEl, noteRows, noteState, "synth");
-        renderGridState();
-
-        if (bpmValue) bpmValue.textContent = String(bpm);
-
-        bpmSlider?.addEventListener("input", () => {
-          bpm = Number(bpmSlider.value);
-          if (bpmValue) bpmValue.textContent = String(bpm);
-          syncUrl();
-          if (playing) {
-            stopSequencer();
-            startSequencer();
-          }
-        });
-
-        playBtn?.addEventListener("click", startSequencer);
-        stopBtn?.addEventListener("click", stopSequencer);
-        randomBtn?.addEventListener("click", randomizePattern);
-        clearBtn?.addEventListener("click", clearPattern);
-
-        shareBtn?.addEventListener("click", async () => {
-          syncUrl();
-          const ok = await safeCopy(window.location.href);
-          flashMessage(ok ? "LINK COPIED" : "COPY FAILED");
-        });
-
-        drumGridEl.addEventListener("click", debounce(syncUrl, 120));
-        synthGridEl.addEventListener("click", debounce(syncUrl, 120));
-      }
-
-      function initSoundLab() {
-        const initBtn = document.getElementById("soundLabInit");
-        const droneSlider = document.getElementById("ambienceDrone");
-        const noiseSlider = document.getElementById("ambienceNoise");
-        const pulseSlider = document.getElementById("ambiencePulse");
-
-        if (!initBtn || !droneSlider || !noiseSlider || !pulseSlider) return;
-
-        let audioCtx = null;
-        let droneOsc = null;
-        let droneSub = null;
-        let droneGain = null;
-        let noiseSource = null;
-        let noiseGain = null;
-        let pulseOsc = null;
-        let pulseGain = null;
-        let lfo = null;
-        let lfoGain = null;
-        let ready = false;
-
-        function createNoiseBuffer(ctx, seconds = 2) {
-          const buffer = ctx.createBuffer(1, ctx.sampleRate * seconds, ctx.sampleRate);
-          const data = buffer.getChannelData(0);
-          for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
-          return buffer;
-        }
-
-        function boot() {
-          if (ready) return true;
-          const AudioCtx = window.AudioContext || window.webkitAudioContext;
-          if (!AudioCtx) return false;
-
-          audioCtx = new AudioCtx();
-
-          droneOsc = audioCtx.createOscillator();
-          droneSub = audioCtx.createOscillator();
-          droneGain = audioCtx.createGain();
-          const droneFilter = audioCtx.createBiquadFilter();
-
-          droneOsc.type = "sawtooth";
-          droneSub.type = "triangle";
-          droneOsc.frequency.value = 55;
-          droneSub.frequency.value = 27.5;
-          droneFilter.type = "lowpass";
-          droneFilter.frequency.value = 320;
-          droneGain.gain.value = 0;
-
-          droneOsc.connect(droneFilter);
-          droneSub.connect(droneFilter);
-          droneFilter.connect(droneGain).connect(audioCtx.destination);
-
-          noiseSource = audioCtx.createBufferSource();
-          noiseSource.buffer = createNoiseBuffer(audioCtx, 3);
-          noiseSource.loop = true;
-          noiseGain = audioCtx.createGain();
-          const noiseFilter = audioCtx.createBiquadFilter();
-          noiseFilter.type = "highpass";
-          noiseFilter.frequency.value = 2800;
-          noiseGain.gain.value = 0;
-          noiseSource.connect(noiseFilter).connect(noiseGain).connect(audioCtx.destination);
-
-          pulseOsc = audioCtx.createOscillator();
-          pulseGain = audioCtx.createGain();
-          pulseOsc.type = "square";
-          pulseOsc.frequency.value = 110;
-          pulseGain.gain.value = 0;
-
-          lfo = audioCtx.createOscillator();
-          lfoGain = audioCtx.createGain();
-          lfo.type = "sine";
-          lfo.frequency.value = 2.2;
-          lfoGain.gain.value = 0.018;
-          lfo.connect(lfoGain).connect(pulseGain.gain);
-
-          pulseOsc.connect(pulseGain).connect(audioCtx.destination);
-
-          droneOsc.start();
-          droneSub.start();
-          noiseSource.start();
-          pulseOsc.start();
-          lfo.start();
-
-          ready = true;
-          return true;
-        }
-
-        function applyValues() {
-          if (!ready) return;
-          droneGain.gain.setTargetAtTime(Number(droneSlider.value) / 500, audioCtx.currentTime, 0.08);
-          noiseGain.gain.setTargetAtTime(Number(noiseSlider.value) / 900, audioCtx.currentTime, 0.08);
-          pulseGain.gain.setTargetAtTime(Number(pulseSlider.value) / 800, audioCtx.currentTime, 0.08);
-        }
-
-        initBtn.addEventListener("click", async () => {
-          const ok = boot();
-          if (!ok) return;
-          if (audioCtx.state === "suspended") await audioCtx.resume();
-          applyValues();
-          flashMessage("SOUNDLAB ACTIVE");
-        });
-
-        [droneSlider, noiseSlider, pulseSlider].forEach(slider => {
-          slider.addEventListener("input", applyValues);
-        });
-      }
-
-      function initTrackAnatomy() {
-        const audio = document.getElementById("anatomyTrack");
-        const playBtn = document.getElementById("anatomyPlay");
-        const lowpass = document.getElementById("anatomyLowpass");
-        const drive = document.getElementById("anatomyDrive");
-        const now = document.getElementById("anatomyNow");
-        const seekMarkers = $$("[data-seek-anatomy]");
-
-        if (!audio || !playBtn || !lowpass || !drive) return;
-
-        let audioCtx = null;
-        let source = null;
-        let filter = null;
-        let distortion = null;
-        let outputGain = null;
-        let graphReady = false;
-
-        function makeDistortionCurve(amount = 20) {
-          const k = typeof amount === "number" ? amount : 0;
-          const n = 44100;
-          const curve = new Float32Array(n);
-          const deg = Math.PI / 180;
-
-          for (let i = 0; i < n; i++) {
-            const x = (i * 2) / n - 1;
-            curve[i] = ((3 + k) * x * 20 * deg) / (Math.PI + k * Math.abs(x));
-          }
-          return curve;
-        }
-
-        async function ensureGraph() {
-          if (graphReady) {
-            if (audioCtx.state === "suspended") await audioCtx.resume();
-            return true;
-          }
-
-          const AudioCtx = window.AudioContext || window.webkitAudioContext;
-          if (!AudioCtx) return false;
-
-          audioCtx = new AudioCtx();
-          source = audioCtx.createMediaElementSource(audio);
-          filter = audioCtx.createBiquadFilter();
-          distortion = audioCtx.createWaveShaper();
-          outputGain = audioCtx.createGain();
-
-          filter.type = "lowpass";
-          filter.frequency.value = Number(lowpass.value || 12000);
-          distortion.curve = makeDistortionCurve(Number(drive.value || 0));
-          distortion.oversample = "4x";
-          outputGain.gain.value = 0.95;
-
-          source.connect(filter);
-          filter.connect(distortion);
-          distortion.connect(outputGain);
-          outputGain.connect(audioCtx.destination);
-
-          if (audioCtx.state === "suspended") await audioCtx.resume();
-          graphReady = true;
-          return true;
-        }
-
-        playBtn.addEventListener("click", async () => {
-          const ok = await ensureGraph();
-          if (!ok) return;
-
-          if (audio.paused) await safePlay(audio);
-          else audio.pause();
-        });
-
-        lowpass.addEventListener("input", () => {
-          if (filter) filter.frequency.value = Number(lowpass.value);
-        });
-
-        drive.addEventListener("input", () => {
-          if (distortion) distortion.curve = makeDistortionCurve(Number(drive.value));
-        });
-
-        seekMarkers.forEach(btn => {
-          btn.addEventListener("click", () => {
-            audio.currentTime = Number(btn.dataset.seekAnatomy || 0);
-          });
-        });
-
-        audio.addEventListener("timeupdate", () => {
-          if (now) now.textContent = formatTime(audio.currentTime);
-        });
-
-        audio.addEventListener("play", () => {
-          playBtn.textContent = "Pause track";
-        });
-
-        audio.addEventListener("pause", () => {
-          playBtn.textContent = "Play track";
-        });
-      }
-
-      function initEasterProgress() {
-        const eggs = $$(".egg");
-        if (!eggs.length) return;
-
-        let badge = document.getElementById("egg-progress");
-        if (!badge) {
-          badge = document.createElement("div");
-          badge.id = "egg-progress";
-          badge.style.cssText = `
-            position:fixed;left:14px;bottom:86px;z-index:9998;
-            padding:6px 10px;font-family:VT323,monospace;font-size:18px;
-            letter-spacing:.08em;
-          `;
-          document.body.appendChild(badge);
-        }
-
-        const update = () => {
-          const found = $$(".egg.found").length;
-          badge.textContent = `ARTIFACTS ${found}/${eggs.length}`;
-        };
-
-        update();
-        eggs.forEach(egg => egg.addEventListener("click", () => setTimeout(update, 0)));
-      }
-
-      document.addEventListener("DOMContentLoaded", () => {
-        initInteractiveManifest();
-        initSequencer();
-        initSoundLab();
-        initTrackAnatomy();
-        initEasterProgress();
-      });
-    })();
-
-    // -------------------------
-    // BOOT
-    // -------------------------
-    document.addEventListener("DOMContentLoaded", async () => {
-      initSnow();
-      initEasterEggs();
-      initClickSound();
-      initMainPlayer();
-      initScrollSpy();
-      initSoundCloud();
-      initUpload();
-      await listTracks();
-    });
-  </script>
+  <script src="./script.js"></script>
 </body>
 </html>
