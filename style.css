@@ -1373,3 +1373,16 @@ footer {
     transform: translateY(0);
   }
 }
+
+
+/* Polishing fixes */
+html, body { max-width: 100%; }
+body { padding-bottom: 84px; }
+iframe { max-width: 100%; }
+#spectrum3d-canvas { contain: layout paint size; }
+#tv-status-toast { will-change: transform, opacity; }
+.audio-player { will-change: transform, opacity; }
+.audio-player.collapsed { pointer-events: auto; }
+#loader-screen.hidden { visibility: hidden; }
+.drop-zone input[type="file"] { display: block; margin: 1rem auto; }
+@media (max-width: 768px) { body { padding-bottom: 112px; } }
