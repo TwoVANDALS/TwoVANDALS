@@ -1158,3 +1158,218 @@ footer {
     height: 380px;
   }
 }
+/* =========================================================
+   TWOVANDALS SECRET BANNER
+   ========================================================= */
+
+#tv-easter-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 99999;
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+  padding-top: 1.2rem;
+  opacity: 0;
+  transform: translateY(-120%);
+  transition: opacity 0.45s ease, transform 0.55s cubic-bezier(.2,.8,.2,1);
+}
+
+#tv-easter-banner.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.tv-easter-banner__inner {
+  position: relative;
+  padding: 0.2rem 1rem 1.1rem;
+  filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.65));
+}
+
+.tv-easter-title {
+  position: relative;
+  margin: 0;
+  font-size: clamp(2.4rem, 8vw, 7rem);
+  line-height: 0.95;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #f7d7d7;
+  text-shadow:
+    0 0 2px rgba(255,255,255,0.25),
+    0 0 12px rgba(140, 0, 0, 0.35),
+    0 0 28px rgba(255, 0, 0, 0.18);
+  transform-origin: top center;
+  user-select: none;
+  will-change: transform, filter, opacity;
+}
+
+.tv-easter-title::before,
+.tv-easter-title::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.tv-easter-title::before {
+  color: rgba(255, 0, 0, 0.82);
+  transform: translate(3px, 0);
+  text-shadow: -2px 0 10px rgba(255, 0, 0, 0.45);
+  clip-path: polygon(0 3%, 100% 0, 100% 30%, 0 42%);
+  opacity: 0.85;
+}
+
+.tv-easter-title::after {
+  color: rgba(140, 255, 255, 0.85);
+  transform: translate(-3px, 0);
+  text-shadow: 2px 0 10px rgba(0, 255, 255, 0.35);
+  clip-path: polygon(0 45%, 100% 35%, 100% 100%, 0 92%);
+  opacity: 0.65;
+}
+
+#tv-easter-banner.active .tv-easter-title {
+  animation:
+    tvRevealDrop 850ms cubic-bezier(.18,.89,.26,1.18),
+    tvGlitchJitter 180ms steps(2, end) 12,
+    tvBleedPulse 2.8s ease-in-out infinite;
+}
+
+#tv-easter-banner.active .tv-easter-title::before {
+  animation: tvSliceA 130ms steps(2, end) 14;
+}
+
+#tv-easter-banner.active .tv-easter-title::after {
+  animation: tvSliceB 170ms steps(2, end) 12;
+}
+
+.tv-blood-drips {
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  top: 92%;
+  height: 54px;
+  pointer-events: none;
+}
+
+.tv-blood-drips span {
+  position: absolute;
+  top: -6px;
+  width: 12px;
+  border-radius: 0 0 999px 999px;
+  background: linear-gradient(to bottom, #7a0000 0%, #b30000 45%, #2b0000 100%);
+  box-shadow:
+    0 0 12px rgba(110, 0, 0, 0.45),
+    inset 0 -4px 6px rgba(0, 0, 0, 0.28);
+  transform-origin: top center;
+  opacity: 0;
+}
+
+.tv-blood-drips span:nth-child(1) { left: 8%; height: 30px; animation-delay: .08s; }
+.tv-blood-drips span:nth-child(2) { left: 28%; height: 48px; animation-delay: .22s; }
+.tv-blood-drips span:nth-child(3) { left: 49%; height: 38px; animation-delay: .14s; }
+.tv-blood-drips span:nth-child(4) { left: 67%; height: 52px; animation-delay: .3s; }
+.tv-blood-drips span:nth-child(5) { left: 84%; height: 34px; animation-delay: .18s; }
+
+#tv-easter-banner.active .tv-blood-drips span {
+  opacity: 1;
+  animation:
+    tvDripFall 1.45s ease-out forwards,
+    tvDripShake 2.6s ease-in-out infinite;
+}
+
+#tv-easter-banner.flash {
+  filter: contrast(1.35) saturate(1.25);
+}
+
+@keyframes tvRevealDrop {
+  0% {
+    opacity: 0;
+    transform: translateY(-90px) scaleY(0.2) scaleX(1.1) skewX(-18deg);
+    filter: blur(12px);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(12px) scaleY(1.25) scaleX(0.92) skewX(8deg);
+    filter: blur(1px);
+  }
+  55% {
+    transform: translateY(-4px) scaleY(0.92) scaleX(1.04) skewX(-4deg);
+  }
+  100% {
+    transform: translateY(0) scale(1) skewX(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes tvGlitchJitter {
+  0% { transform: translate(0, 0) skewX(0); }
+  20% { transform: translate(-2px, 1px) skewX(-6deg); }
+  40% { transform: translate(3px, -1px) skewX(5deg); }
+  60% { transform: translate(-1px, 2px) skewX(-3deg); }
+  80% { transform: translate(2px, 0) skewX(4deg); }
+  100% { transform: translate(0, 0) skewX(0); }
+}
+
+@keyframes tvBleedPulse {
+  0%, 100% {
+    text-shadow:
+      0 0 2px rgba(255,255,255,0.25),
+      0 0 12px rgba(140, 0, 0, 0.35),
+      0 0 28px rgba(255, 0, 0, 0.18);
+  }
+  50% {
+    text-shadow:
+      0 0 2px rgba(255,255,255,0.25),
+      0 0 18px rgba(180, 0, 0, 0.55),
+      0 0 44px rgba(255, 0, 0, 0.28);
+  }
+}
+
+@keyframes tvSliceA {
+  0% { transform: translate(2px, 0); clip-path: polygon(0 3%, 100% 0, 100% 30%, 0 42%); }
+  25% { transform: translate(8px, -2px); clip-path: polygon(0 8%, 100% 2%, 100% 24%, 0 37%); }
+  50% { transform: translate(-6px, 1px); clip-path: polygon(0 12%, 100% 5%, 100% 29%, 0 45%); }
+  100% { transform: translate(3px, 0); clip-path: polygon(0 3%, 100% 0, 100% 30%, 0 42%); }
+}
+
+@keyframes tvSliceB {
+  0% { transform: translate(-2px, 0); clip-path: polygon(0 45%, 100% 35%, 100% 100%, 0 92%); }
+  25% { transform: translate(-8px, 2px); clip-path: polygon(0 52%, 100% 42%, 100% 100%, 0 96%); }
+  50% { transform: translate(5px, -1px); clip-path: polygon(0 40%, 100% 32%, 100% 100%, 0 88%); }
+  100% { transform: translate(-3px, 0); clip-path: polygon(0 45%, 100% 35%, 100% 100%, 0 92%); }
+}
+
+@keyframes tvDripFall {
+  0% {
+    transform: scaleY(0.1) translateY(-10px);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: scaleY(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes tvDripShake {
+  0%, 100% { margin-top: 0; }
+  50% { margin-top: 2px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #tv-easter-banner,
+  #tv-easter-banner * {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  #tv-easter-banner.active {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
