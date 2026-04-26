@@ -1,360 +1,587 @@
-/* ========== GLOBAL ========== */
+/* ========== RESET & BASE ========== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  font-family: 'VT323', monospace;
   margin: 0;
   padding: 0;
-  font-family: 'VT323', monospace;
+  font-family: "VT323", monospace;
   font-size: 20px;
-  background: #000;
-  color: #fff;
+  background: radial-gradient(circle at top, #050505 0, #000 55%, #020308 100%);
+  color: #f5f5f5;
   overflow-x: hidden;
 }
 
-h2, h3, p, a, .btn, .motto, .track-title {
-  font-family: inherit;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+/* глобальный сеточный фон под всё */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(0, 255, 128, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mix-blend-mode: screen;
 }
 
-/* ========== HEADER ========== */
+/* лёгкий сканлайн-эффект */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background-image: linear-gradient(
+    rgba(255, 255, 255, 0.03) 1px,
+    transparent 1px
+  );
+  background-size: 100% 3px;
+  opacity: 0.4;
+}
+
+h1, h2, h3, p, a, .btn, .motto, .track-title {
+  font-family: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+a {
+  color: inherit;
+}
+
+/* общие отступы секций */
+section {
+  padding: 5rem 1.5rem;
+  margin: 0 auto;
+  max-width: 1100px;
+  scroll-margin-top: 90px;
+  border-top: 1px dashed #333;
+}
+
+section:first-of-type {
+  border-top: none;
+}
+
+section h2 {
+  display: inline-block;
+  margin-bottom: 1.8rem;
+  font-size: 2.3rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 2px solid #999;
+}
+
+/* =========================
+   HEADER
+   ========================= */
 header {
   position: sticky;
   top: 0;
-  z-index: 999;
-  background: #000;
-  padding: 1.5rem 1rem 0.5rem;
-  text-align: center;
-  border-bottom: 1px solid #333;
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.94);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid #222;
+  box-shadow: 0 0 0 1px rgba(0, 255, 128, 0.08);
+  padding: 0.8rem 1.5rem 0.6rem;
+}
+
+.header-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  align-items: center;
 }
 
 .logo {
-  font-family: 'Archivo Black', sans-serif;
-  font-size: 3.5rem;
-  letter-spacing: 2px;
+  font-family: "Archivo Black", system-ui, sans-serif;
+  font-size: clamp(2.2rem, 4vw, 3.4rem);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-align: center;
+  text-shadow:
+    0 0 8px rgba(0, 255, 128, 0.7),
+    0 0 24px rgba(0, 255, 128, 0.4);
 }
 
 .motto {
-  font-size: 1.2rem;
-  opacity: 0.6;
+  font-size: 0.95rem;
+  opacity: 0.75;
+  text-align: center;
 }
 
 nav {
-  margin-top: 1rem;
+  margin-top: 0.4rem;
 }
 
 nav a {
-  color: #fff;
   text-decoration: none;
-  margin: 0 1rem;
-  font-size: 1.3rem;
-  transition: color 0.2s ease;
+  margin: 0 0.7rem;
+  font-size: 0.95rem;
+  color: #ccc;
+  position: relative;
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+nav a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -0.25rem;
+  width: 0;
+  height: 1px;
+  background: #0f0;
+  box-shadow: 0 0 6px rgba(0, 255, 128, 0.9);
+  transition: width 0.22s ease;
 }
 
 nav a:hover {
   color: #0f0;
+  opacity: 1;
 }
 
-/* ========== HERO BLOCK ========== */
+nav a:hover::after {
+  width: 100%;
+}
+
+nav a.active {
+  color: #0f0;
+  font-weight: 700;
+}
+
+nav a.active::after {
+  width: 100%;
+}
+
+/* =========================
+   HERO
+   ========================= */
 .hero {
   position: relative;
-  height: 90vh;
-  background: #000;
+  min-height: 88vh;
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
 }
 
-.hero .overlay {
-  display: none;
+.hero::before {
+  /* лёгкий radial glow за контентом */
+  content: "";
+  position: absolute;
+  width: 520px;
+  height: 520px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 255, 128, 0.18), transparent 60%);
+  filter: blur(4px);
+  z-index: 0;
 }
 
 .hero-content {
+  position: relative;
+  z-index: 1;
   text-align: center;
-  z-index: 2;
+  padding: 0 1.5rem;
 }
 
 .hero h1 {
-  font-size: 2.2rem;
+  font-size: clamp(2.1rem, 4.2vw, 3rem);
   margin-bottom: 1rem;
-  font-family: 'VT323', monospace;
-  letter-spacing: 1px;
 }
 
+.hero-sub {
+  font-size: 1.1rem;
+  opacity: 0.8;
+  margin-bottom: 2rem;
+}
 
+/* =========================
+   BUTTONS
+   ========================= */
 .btn {
-  padding: 1rem 2rem;
-  border: 2px solid white;
-  color: white;
-  background: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.9rem 2.4rem;
+  border-radius: 0;
+  border: 1px solid #0f0;
+  color: #0f0;
+  background: transparent;
   text-decoration: none;
-  font-size: 1.2rem;
-  transition: all 0.2s ease;
+  font-size: 1rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition:
+    color 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease;
+}
+
+.btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    rgba(0, 255, 128, 0.12),
+    rgba(0, 255, 255, 0.16)
+  );
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+
+.btn:hover::before {
+  opacity: 1;
 }
 
 .btn:hover {
-  background: white;
-  color: black;
+  color: #000;
+  background: #0f0;
+  border-color: #0f0;
+  box-shadow:
+    0 0 16px rgba(0, 255, 128, 0.7),
+    0 0 40px rgba(0, 255, 128, 0.4);
 }
 
-/* ========== SECTION ========== */
-section {
-  padding: 4rem 2rem;
-  text-align: center;
-  scroll-margin-top: 80px;
+/* вторичная кнопка */
+.btn--outline {
+  border-color: #fff;
+  color: #fff;
 }
 
-.music iframe {
-  margin-top: 2rem;
-  border: none;
+.btn--outline:hover {
+  background: #fff;
+  color: #000;
+  box-shadow:
+    0 0 16px rgba(255, 255, 255, 0.5),
+    0 0 36px rgba(255, 255, 255, 0.3);
 }
 
-/* ========== MANIFEST ========== */
+/* =========================
+   MANIFEST
+   ========================= */
 .manifest h2 {
-  font-size: 3rem;
-  margin-bottom: 1rem;
+  font-size: 2.5rem;
 }
 
 .manifest p {
-  font-size: 2rem;
-  font-family: 'Archivo Black', sans-serif;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  line-height: 2.8rem;
-  margin-top: 1rem;
+  font-family: "Archivo Black", system-ui, sans-serif;
+  font-size: 1.6rem;
+  line-height: 2.6rem;
+  letter-spacing: 0.12em;
+  margin-top: 1.2rem;
 }
 
-/* ========== CONTACTS ========== */
+/* =========================
+   CONTACTS
+   ========================= */
 .contacts .socials a {
   display: inline-block;
-  margin: 0.5rem 1rem;
-  font-size: 1.2rem;
+  margin: 0.4rem 0.8rem;
+  font-size: 1rem;
   text-decoration: none;
-  color: #fff;
+  color: #e5e5e5;
+  opacity: 0.85;
+  transition: color 0.18s ease, opacity 0.18s ease, transform 0.18s ease;
+}
+
+.contacts .socials a:hover {
+  color: #0ff;
+  opacity: 1;
+  transform: translateY(-1px);
 }
 
 .discord-links a {
   display: inline-block;
-  padding: 0.6rem 1.2rem;
-  margin: 0.5rem;
-  font-size: 1.1rem;
-  font-family: 'VT323', monospace;
+  padding: 0.5rem 1.3rem;
+  margin: 0.4rem;
+  font-size: 1rem;
+  font-family: "VT323", monospace;
   background: transparent;
-  border: 2px solid #fff;
+  border: 1px solid #fff;
   color: #fff;
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
 }
 
 .discord-links a:hover {
   background: #fff;
   color: #000;
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.36);
 }
 
-/* ========== AUDIO PLAYER ========== */
+/* =========================
+   AUDIO PLAYER (GLOBAL)
+   ========================= */
 .audio-player {
   position: fixed;
   bottom: 0;
+  left: 0;
   width: 100%;
-  background: #000;
-  color: #fff;
-  border-top: 2px solid #444;
+  background: rgba(0, 0, 0, 0.96);
+  backdrop-filter: blur(10px);
+  color: #f5f5f5;
+  border-top: 1px solid #222;
+  box-shadow:
+    0 -1px 0 rgba(0, 255, 128, 0.4),
+    0 -14px 40px rgba(0, 0, 0, 0.8);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.6rem 1rem;
-  gap: 1rem;
-  font-family: 'VT323', monospace;
-  font-size: 1.2rem;
-  z-index: 9999;
-  transition: transform 0.3s ease;
+  gap: 0.7rem;
+  padding: 0.4rem 1rem;
+  font-size: 0.95rem;
+  z-index: 99;
+  transition: transform 0.28s ease, opacity 0.28s ease;
 }
 
 .audio-player.collapsed {
-  opacity: 0.3;
-  pointer-events: auto;
-  height: 40px;
-  overflow: hidden;
+  opacity: 0.25;
+  transform: translateY(60%);
 }
 
 .audio-player button,
 .audio-player input[type="range"] {
-  background: none;
-  border: 2px solid #fff;
-  color: #fff;
   font-family: inherit;
-  font-size: 1.2rem;
-  padding: 0.2rem 0.8rem;
+  font-size: 0.95rem;
+}
+
+/* controls */
+.audio-player button {
+  background: transparent;
+  border: 1px solid #444;
+  color: #eee;
+  padding: 0.3rem 0.7rem;
   cursor: pointer;
+  transition: background 0.16s ease, color 0.16s ease, border-color 0.16s ease;
 }
 
 .audio-player button:hover {
-  background: #fff;
+  background: #0f0;
   color: #000;
+  border-color: #0f0;
 }
 
 .audio-player input[type="range"] {
-  width: 100px;
+  width: 90px;
   height: 4px;
   appearance: none;
-  background: #555;
+  background: #333;
+  border-radius: 999px;
+  cursor: pointer;
 }
 
 .audio-player input[type="range"]::-webkit-slider-thumb {
   appearance: none;
-  width: 14px;
-  height: 14px;
-  background: #fff;
+  width: 13px;
+  height: 13px;
+  background: #0f0;
   border-radius: 50%;
+  box-shadow: 0 0 8px rgba(0, 255, 128, 0.9);
 }
 
-/* TOGGLE BUTTON */
+.audio-player input[type="range"]::-moz-range-thumb {
+  width: 13px;
+  height: 13px;
+  background: #0f0;
+  border-radius: 50%;
+  border: none;
+}
+
+/* toggle handle */
 .toggle-btn {
-  font-size: 1rem;
   background: none;
   border: none;
-  color: #888;
+  color: #777;
   cursor: pointer;
-  transition: color 0.2s ease;
+  font-size: 0.9rem;
+  padding: 0.2rem 0.5rem;
+  transition: color 0.18s ease, transform 0.18s ease;
 }
 
 .toggle-btn:hover {
   color: #fff;
+  transform: translateY(-1px);
 }
 
-/* ========== TRACK PLAYER ========== */
+/* =========================
+   TRACK PLAYER (LIST)
+   ========================= */
 .track-player {
-  background: #000;
-  color: #fff;
-  border: 1px solid #444;
+  background: rgba(0, 0, 0, 0.92);
+  color: #f8f8f8;
+  border: 1px solid #333;
+  border-radius: 6px;
   margin: 1rem auto;
-  padding: 1rem;
-  width: 90%;
-  max-width: 600px;
-  font-family: 'VT323', monospace;
+  padding: 0.9rem 1rem 0.8rem;
+  width: 100%;
+  max-width: 640px;
+  box-shadow: 0 0 0 1px rgba(0, 255, 128, 0.02);
 }
 
 .track-player h3 {
-  font-family: 'Archivo Black', sans-serif;
-  font-size: 1.6rem;
-  margin-bottom: 0.5rem;
+  font-family: "Archivo Black", system-ui, sans-serif;
+  font-size: 1.3rem;
+  margin-bottom: 0.4rem;
 }
 
 .track-player .controls {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.45rem;
   flex-wrap: wrap;
-  font-size: 1rem;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
 }
 
 .track-player .controls button {
-  font-size: 1.2rem;
-  padding: 0.2rem 0.6rem;
-  border: 2px solid #fff;
-  background: none;
-  color: #fff;
+  font-size: 1rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 3px;
+  border: 1px solid #555;
+  background: #050505;
+  color: #eee;
   cursor: pointer;
+  transition: background 0.16s ease, color 0.16s ease, border-color 0.16s ease;
 }
 
 .track-player .controls button:hover {
-  background: #fff;
+  background: #0ff;
   color: #000;
+  border-color: #0ff;
 }
 
 .track-player .controls input[type="range"] {
   flex: 1;
   height: 4px;
-  background: #555;
+  background: #2a2a2a;
   appearance: none;
+  border-radius: 999px;
 }
 
 .track-player .controls input[type="range"]::-webkit-slider-thumb {
   appearance: none;
-  width: 12px;
-  height: 12px;
-  background: #fff;
+  width: 11px;
+  height: 11px;
+  background: #0ff;
   border-radius: 50%;
 }
 
 .track-player .time {
-  min-width: 40px;
+  min-width: 44px;
   text-align: center;
 }
 
-/* ========== FOOTER ========== */
-footer {
-  padding: 2rem;
-  text-align: center;
-  background: #111;
-  font-size: 0.9rem;
-  color: #777;
+.visualizer {
+  display: block;
+  width: 100%;
+  height: 60px;
+  background: radial-gradient(circle at top, #111 0, #050505 55%, #000 100%);
+  border-top: 1px solid #333;
+  border-bottom: 1px solid #333;
 }
 
-/* ========== EASTER EGGS ========== */
+/* =========================
+   LIKE / DROPZONE
+   ========================= */
+.like-btn {
+  border: 1px solid #666;
+  background: transparent;
+  color: #f8f8f8;
+  font-size: 1rem;
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.like-btn.liked {
+  color: #ff3366;
+  border-color: #ff3366;
+  text-shadow: 0 0 5px rgba(255, 51, 102, 0.8);
+}
+
+.drop-zone {
+  border: 1px dashed #666;
+  padding: 1.8rem;
+  transition: background 0.26s ease, border-color 0.26s ease, box-shadow 0.26s ease;
+  max-width: 640px;
+  margin: 1rem auto;
+}
+
+.drop-zone.dragging {
+  background: rgba(0, 255, 128, 0.06);
+  border-color: #0f0;
+  box-shadow: 0 0 18px rgba(0, 255, 128, 0.45);
+}
+
+/* =========================
+   EASTER EGGS
+   ========================= */
 .egg {
   position: absolute;
   width: 26px;
   height: 26px;
   background-size: cover;
-  opacity: 0.4;
+  opacity: 0.5;
   z-index: 10;
-  transition: 0.3s ease;
-  filter: grayscale(1);
+  transition: 0.25s ease;
+  filter: grayscale(1) contrast(1.2);
 }
 
 .egg:hover {
   opacity: 1;
-  transform: scale(1.2) rotate(5deg);
+  transform: scale(1.15) rotate(4deg);
   filter: none;
+  box-shadow: 0 0 12px rgba(0, 255, 128, 0.8);
 }
 
-.egg-blood { top: 10%; left: 5%; background-image: url('icons/blood.png'); }
-.egg-water { bottom: 15%; right: 5%; background-image: url('icons/water.png'); }
-.egg-electric { top: 30%; right: 3%; background-image: url('icons/electric.png'); }
-.egg-fire { bottom: 20%; left: 8%; background-image: url('icons/fire.png'); }
-.egg-core { bottom: 5%; right: 5%; background-image: url('icons/core.png'); }
+.egg-blood { top: 10%; left: 5%; background-image: url("icons/blood.png"); }
+.egg-water { bottom: 15%; right: 5%; background-image: url("icons/water.png"); }
+.egg-electric { top: 30%; right: 3%; background-image: url("icons/electric.png"); }
+.egg-fire { bottom: 20%; left: 8%; background-image: url("icons/fire.png"); }
+.egg-core { bottom: 5%; right: 5%; background-image: url("icons/core.png"); }
 
-/* ========== MOBILE ========== */
-@media (max-width: 768px) {
-  .audio-player {
-    flex-wrap: wrap;
-    font-size: 1rem;
-    gap: 0.5rem;
-  }
-
-  .track-player .controls {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  nav a {
-    display: block;
-    margin: 0.5rem 0;
-  }
-}
-
-
+/* =========================
+   CANVAS SNOW
+   ========================= */
 canvas#snow-canvas {
   position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 0;
+  inset: 0;
+  z-index: -3;
   pointer-events: none;
 }
 
-
+/* =========================
+   LOADER
+   ========================= */
 #loader-screen {
   position: fixed;
   inset: 0;
-  background: black;
-  color: white;
+  background: #000;
+  color: #0f0;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 99999;
-  font-family: 'VT323', monospace;
+  z-index: 9999;
+  font-family: "VT323", monospace;
   font-size: 3rem;
-  letter-spacing: 3px;
+  letter-spacing: 0.3em;
+  text-shadow:
+    0 0 8px rgba(0, 255, 128, 0.8),
+    0 0 32px rgba(0, 255, 128, 0.4);
   transition: opacity 0.4s ease;
 }
 
@@ -363,176 +590,34 @@ canvas#snow-canvas {
   pointer-events: none;
 }
 
-@media (max-width: 768px) {
-  html {
-    font-size: 18px;
-    overflow-x: hidden;
-  }
-
-  body {
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden;
-  }
-
-  .logo {
-    font-size: 2.5rem;
-    line-height: 1.2;
-  }
-
-  .motto {
-    font-size: 1rem;
-    padding: 0 1rem;
-  }
-
-  nav {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  nav a {
-    font-size: 1.2rem;
-    margin: 0.3rem 0;
-  }
-
-  .hero h1 {
-    font-size: 1.6rem;
-    padding: 0 1rem;
-  }
-
-  .btn {
-    font-size: 1rem;
-    padding: 0.6rem 1.2rem;
-  }
-
-  section {
-    padding: 2rem 1rem;
-  }
-
-  .manifest p {
-    font-size: 1.2rem;
-    line-height: 2rem;
-    padding: 0 1rem;
-  }
-
-  .discord-links a {
-    display: block;
-    margin: 0.6rem auto;
-    width: 90%;
-    text-align: center;
-  }
-
-  .audio-player {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .track-player {
-    width: 95%;
-    margin: 1rem auto;
-    padding: 1rem;
-  }
-
-  .track-player h3 {
-    font-size: 1.2rem;
-  }
-
-  .track-player .controls {
-    flex-direction: column;
-    gap: 0.4rem;
-  }
-
-  .track-player input[type="range"] {
-    width: 100%;
-  }
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
-nav a.active {
-  color: #0f0;
-  font-weight: bold;
-}
-
-.drop-zone {
-  border: 2px dashed #888;
-  padding: 2rem;
-  transition: background 0.3s ease, border-color 0.3s ease;
-}
-
-.drop-zone.dragging {
-  background: #111;
-  border-color: #0f0;
-}
-
-.like-btn {
-  border: 1px solid #fff;
-  background: transparent;
-  color: #fff;
-  font-size: 1.2rem;
-  padding: 0.4rem 0.8rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.like-btn.liked {
-  color: #f00;
-  font-weight: bold;
-  border-color: #f00;
-}
-
-.visualizer {
-  display: block;
-  width: 100%;
-  height: 60px;
-  background: #111;
-  border-top: 1px solid #333;
-  border-bottom: 1px solid #333;
-}
-
-section {
-  padding: 100px 20px;
-  border-top: 2px dashed #444;
-  margin-top: 40px;
-}
-
-section h2 {
-  margin-bottom: 20px;
-  font-size: 2em;
-  color: #f0f0f0;
-  border-bottom: 2px solid #888;
-  display: inline-block;
-}
-
+/* =========================
+   GRID SEQUENCER
+   ========================= */
 .grid-wrapper {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 8px;
-  margin-bottom: 30px;
-  align-items: start;
-  justify-content: center;
-  padding: 1rem;
+  gap: 0.5rem;
+  align-items: flex-start;
+  margin-bottom: 2.2rem;
+  padding: 0.8rem;
 }
 
 .grid-labels,
 .note-labels {
   display: grid;
   font-family: monospace;
-  font-size: 14px;
-  color: white;
+  font-size: 0.8rem;
+  color: #f5f5f5;
   text-align: right;
-  justify-content: end;
+  justify-content: flex-end;
 }
 
 .grid-labels {
-  grid-template-rows: repeat(3, 32px); /* для kick/snare/hat */
+  grid-template-rows: repeat(3, 28px);
 }
 
 .note-labels {
-  grid-template-rows: repeat(18, 32px); /* C5-G3 или сколько у тебя нот */
+  grid-template-rows: repeat(18, 28px);
 }
 
 #drumGrid,
@@ -544,22 +629,125 @@ section h2 {
 #drumGrid .row,
 #synthGrid .row {
   display: grid;
-  grid-template-columns: repeat(16, 32px); /* шаги */
+  grid-template-columns: repeat(16, 28px);
   gap: 2px;
 }
 
 .cell {
-  width: 32px;
-  height: 32px;
-  border: 1px solid #666;
-  background-color: #111;
-  transition: background-color 0.2s ease;
+  width: 28px;
+  height: 28px;
+  border: 1px solid #444;
+  background-color: #050505;
+  transition: background-color 0.16s ease, box-shadow 0.16s ease, transform 0.12s ease;
 }
 
 .cell.active {
-  background-color: white;
+  background-color: #0f0;
+  box-shadow:
+    0 0 6px rgba(0, 255, 128, 0.7),
+    0 0 18px rgba(0, 255, 128, 0.5);
 }
 
 .cell.playing {
-  box-shadow: 0 0 0 2px #0f0 inset;
+  box-shadow: 0 0 0 2px #0ff inset;
+}
+
+/* =========================
+   FOOTER
+   ========================= */
+footer {
+  padding: 2rem 1.5rem 4.5rem;
+  text-align: center;
+  background: #050505;
+  font-size: 0.85rem;
+  color: #777;
+  border-top: 1px solid #202020;
+}
+
+/* =========================
+   MOBILE
+   ========================= */
+@media (max-width: 768px) {
+  html {
+    font-size: 18px;
+  }
+
+  header {
+    padding: 0.6rem 1rem 0.4rem;
+  }
+
+  .header-inner {
+    align-items: flex-start;
+  }
+
+  nav {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    row-gap: 0.2rem;
+  }
+
+  nav a {
+    font-size: 0.9rem;
+    margin: 0.2rem 0.5rem;
+  }
+
+  .hero {
+    min-height: 80vh;
+  }
+
+  .hero h1 {
+    font-size: 1.7rem;
+  }
+
+  section {
+    padding: 3rem 1rem;
+  }
+
+  .manifest p {
+    font-size: 1.2rem;
+    line-height: 2.1rem;
+  }
+
+  .discord-links a {
+    display: block;
+    margin: 0.45rem auto;
+    width: 90%;
+    text-align: center;
+  }
+
+  .audio-player {
+    flex-wrap: wrap;
+    row-gap: 0.3rem;
+    justify-content: space-between;
+  }
+
+  .audio-player input[type="range"] {
+    width: 100px;
+  }
+
+  .track-player {
+    width: 100%;
+    margin: 0.8rem auto;
+  }
+
+  .track-player h3 {
+    font-size: 1.1rem;
+  }
+
+  .track-player .controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  #drumGrid .row,
+  #synthGrid .row {
+    grid-template-columns: repeat(16, 22px);
+  }
+
+  .cell {
+    width: 22px;
+    height: 22px;
+  }
 }
