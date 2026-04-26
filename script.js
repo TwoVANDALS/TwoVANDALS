@@ -1,56 +1,119 @@
-/* =========================================================
-   TwoVANDALS — MAIN SCRIPT
-   ========================================================= */
-
-(function () {
+(() => {
   "use strict";
 
-  const $ = (sel, root = document) => root.querySelector(sel);
-  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+  // =========================================================
+  // UTILITIES
+  // =========================================================
+  const $ = (selector, root = document) => root.querySelector(selector);
+  const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
 
-  /* ==============================
-     0. GLOBAL HELPERS
-     ============================== */
+  const state = {
+    theme: null,
+    revealObserver: null,
+    navObserver: null,
+    loaderDone: false,
+    pointer: {
+      x: window.innerWidth / 2,
+      y: window.innerHeight / 2
+    }
+  };
 
-  function formatTime(sec) {
+  function clamp(n, min, max) {
+    return Math.min(Math.max(n, min), max);
+  }
+
+  function debounce(fn, delay = 120) {
+    let timer;
+    return (...args) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => fn(...args), delay);
+    };
+  }
+
+  function safeFormatTime(sec) {
     if (!Number.isFinite(sec) || sec < 0) return "0:00";
     const m = Math.floor(sec / 60);
-    const s = Math.floor(sec % 60)
-      .toString()
-      .padStart(2, "0");
+    const s = Math.floor(sec % 60).toString().padStart(2, "0");
     return `${m}:${s}`;
+  }
+
+  async function safeCopy(text) {
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    } catch {}
+    try {
+      const el = document.createElement("textarea");
+      el.value = text;
+      el.setAttribute("readonly", "");
+      el.style.position = "absolute";
+      el.style.left = "-9999px";
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand("copy");
+      el.remove();
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   function prefersReducedMotion() {
     return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   }
 
+  function hasTouch() {
+    return window.matchMedia("(hover: none)").matches;
+  }
+
+  function setTheme(theme) {
+    state.theme = theme;
+    document.documentElement.setAttribute("data-theme", theme);
+
+    if (theme === "light") {
+      document.body.style.background =
+        "radial-gradient(circle at 20% 20%, rgba(116,246,255,.07), transparent 28%), radial-gradient(circle at 80% 15%, rgba(214,110,255,.08), transparent 25%), radial-gradient(circle at 50% 80%, rgba(215,179,116,.07), transparent 35%), linear-gradient(180deg, #f7f3ed 0%, #efebe2 16%, #ece7dd 45%, #e7e3db 100%)";
+      document.body.style.color = "#191714";
+    } else {
+      document.body.style.background =
+        "radial-gradient(circle at 20% 20%, rgba(116,246,255,.07), transparent 28%), radial-gradient(circle at 80% 15%, rgba(214,110,255,.08), transparent 25%), radial-gradient(circle at 50% 80%, rgba(215,179,116,.07), transparent 35%), linear-gradient(180deg, #050608 0%, #06080c 16%, #090c11 45%, #040507 100%)";
+      document.body.style.color = "";
+    }
+  }
+
+  function initTheme() {
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    setTheme(prefersDark ? "dark" : "light");
+
+    const themeToggle = $("#themeToggle");
+    if (!themeToggle) return;
+
+    themeToggle.addEventListener("click", () => {
+      setTheme(state.theme === "dark" ? "light" : "dark");
+      flashMessage(state.theme === "dark" ? "DARK MODE" : "LIGHT MODE", "accent");
+    });
+  }
+
   function flashMessage(message, type = "info") {
-    let box = document.getElementById("tv-status-toast");
+    let box = $("#tv-status-toast");
     if (!box) {
       box = document.createElement("div");
       box.id = "tv-status-toast";
-      box.style.cssText = `
-        position:fixed;right:16px;bottom:90px;z-index:99999;
-        padding:10px 14px;background:#000;border:1px solid #444;color:#fff;
-        font-family:VT323,monospace;font-size:20px;letter-spacing:.06em;
-        box-shadow:0 0 18px rgba(0,0,0,.5);
-        opacity:0;transform:translateY(8px);
-        transition:opacity .2s ease, transform .2s ease;
-      `;
       document.body.appendChild(box);
     }
+
     box.textContent = message;
     box.style.borderColor =
-      type === "success"
-        ? "#0f0"
-        : type === "error"
-        ? "#f44"
-        : type === "accent"
-        ? "#0ff"
-        : "#666";
+      type === "success" ? "rgba(116,246,255,.35)" :
+      type === "error" ? "rgba(255,80,100,.35)" :
+      type === "accent" ? "rgba(215,179,116,.35)" :
+      "rgba(255,255,255,.12)";
+
     box.style.opacity = "1";
     box.style.transform = "translateY(0)";
+
     clearTimeout(box._timer);
     box._timer = setTimeout(() => {
       box.style.opacity = "0";
@@ -58,55 +121,142 @@
     }, 1800);
   }
 
-  function debounce(fn, delay = 120) {
-    let t;
-    return (...args) => {
-      clearTimeout(t);
-      t = setTimeout(() => fn(...args), delay);
-    };
+  function softScrollTo(target) {
+    const el = typeof target === "string" ? $(target) : target;
+    if (!el) return;
+    el.scrollIntoView({ behavior: prefersReducedMotion() ? "auto" : "smooth", block: "start" });
   }
 
-  /* ==============================
-     1. LOADER (TEXT "TwoVANDALS")
-     ============================== */
-
+  // =========================================================
+  // LOADER
+  // =========================================================
   function initLoader() {
-    const loader = document.getElementById("loader-screen");
-    const text = document.getElementById("loader-text");
+    const loader = $("#loader-screen");
+    const text = $("#loader-text");
     if (!loader || !text) return;
 
     const final = "TwoVANDALS";
     let index = 1;
+    text.textContent = final[0];
 
-    const timer = setInterval(() => {
+    const interval = setInterval(() => {
       if (index < final.length) {
         text.textContent += final[index];
         index++;
       } else {
-        clearInterval(timer);
+        clearInterval(interval);
         setTimeout(() => {
           loader.classList.add("hidden");
-        }, 500);
+          state.loaderDone = true;
+        }, 700);
       }
-    }, 150);
+    }, 140);
+
+    window.addEventListener("load", () => {
+      if (!state.loaderDone) {
+        setTimeout(() => {
+          loader.classList.add("hidden");
+          state.loaderDone = true;
+        }, 1200);
+      }
+    }, { once: true });
   }
 
-  /* ==============================
-     2. CANVAS SNOW
-     ============================== */
+  // =========================================================
+  // REVEAL / SCROLLSPY
+  // =========================================================
+  function initReveal() {
+    const items = $$(".reveal");
+    if (!items.length) return;
 
+    if (prefersReducedMotion()) {
+      items.forEach(item => item.classList.add("is-visible"));
+      return;
+    }
+
+    state.revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          requestAnimationFrame(() => entry.target.classList.add("is-visible"));
+          state.revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    items.forEach(item => state.revealObserver.observe(item));
+  }
+
+  function initScrollSpy() {
+    const sections = $$("main section[id]");
+    const navLinks = $$(".nav a");
+    if (!sections.length || !navLinks.length) return;
+
+    state.navObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const id = entry.target.getAttribute("id");
+        const link = $(`.nav a[href="#${id}"]`);
+        if (entry.isIntersecting) {
+          navLinks.forEach(a => a.classList.remove("active"));
+          link?.classList.add("active");
+        }
+      });
+    }, {
+      rootMargin: "-28% 0px -54% 0px",
+      threshold: 0.08
+    });
+
+    sections.forEach(section => state.navObserver.observe(section));
+
+    navLinks.forEach(link => {
+      link.addEventListener("click", (e) => {
+        const href = link.getAttribute("href");
+        if (!href?.startsWith("#")) return;
+        const target = $(href);
+        if (!target) return;
+        e.preventDefault();
+        softScrollTo(target);
+      });
+    });
+  }
+
+  // =========================================================
+  // CURSOR GLOW
+  // =========================================================
+  function initCursorGlow() {
+    const glow = $("#cursorGlow");
+    if (!glow || hasTouch() || prefersReducedMotion()) {
+      if (glow) glow.style.display = "none";
+      return;
+    }
+
+    window.addEventListener("pointermove", (e) => {
+      state.pointer.x = e.clientX;
+      state.pointer.y = e.clientY;
+      glow.style.left = `${e.clientX}px`;
+      glow.style.top = `${e.clientY}px`;
+    });
+
+    const interactiveSelectors = "a, button, .manifest-lines p, .seq-cell, .marker-btn, .ghost-btn, .btn";
+    document.addEventListener("mouseover", (e) => {
+      if (e.target.closest(interactiveSelectors)) glow.classList.add("active");
+      else glow.classList.remove("active");
+    });
+  }
+
+  // =========================================================
+  // SNOW EFFECT
+  // =========================================================
   function initSnow() {
-    const canvas = document.getElementById("snow-canvas");
+    const canvas = $("#snow-canvas");
     if (!canvas) return;
-    if (prefersReducedMotion()) return;
-
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+    if (prefersReducedMotion()) return;
 
-    let snowflakes = [];
+    let flakes = [];
     let animationId = null;
 
-    function resize() {
+    function resizeCanvas() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
     }
@@ -115,313 +265,89 @@
       return {
         x: Math.random() * canvas.width,
         y: Math.random() * -canvas.height,
-        radius: Math.random() * 2 + 1,
-        speed: Math.random() * 1 + 0.5,
-        alpha: Math.random() * 0.5 + 0.3
+        radius: Math.random() * 2.4 + 0.7,
+        speedY: Math.random() * 0.95 + 0.35,
+        speedX: (Math.random() - 0.5) * 0.35,
+        alpha: Math.random() * 0.45 + 0.18
       };
     }
 
-    function update() {
+    function resetFlakes() {
+      flakes = Array.from({ length: 120 }, createSnowflake);
+    }
+
+    function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      snowflakes.forEach((flake, i) => {
-        flake.y += flake.speed;
-        if (flake.y > canvas.height) {
-          snowflakes[i] = createSnowflake();
+
+      flakes.forEach((flake, i) => {
+        flake.y += flake.speedY;
+        flake.x += flake.speedX + Math.sin(flake.y * 0.012) * 0.18;
+
+        if (
+          flake.y > canvas.height + 20 ||
+          flake.x < -20 ||
+          flake.x > canvas.width + 20
+        ) {
+          flakes[i] = createSnowflake();
+          flakes[i].y = -20;
         }
+
         ctx.beginPath();
         ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(255,255,255,${flake.alpha})`;
         ctx.fill();
       });
-      animationId = requestAnimationFrame(update);
+
+      animationId = requestAnimationFrame(draw);
     }
 
-    function start() {
-      if (animationId == null) {
-        update();
-      }
-    }
+    resizeCanvas();
+    resetFlakes();
+    draw();
 
-    function stop() {
-      if (animationId != null) {
-        cancelAnimationFrame(animationId);
-        animationId = null;
-      }
-    }
-
-    resize();
-    snowflakes = Array.from({ length: 100 }, createSnowflake);
-    start();
-
-    window.addEventListener("resize", () => {
-      resize();
-      snowflakes = Array.from({ length: 100 }, createSnowflake);
-    });
+    window.addEventListener("resize", resizeCanvas);
 
     document.addEventListener("visibilitychange", () => {
-      if (document.hidden) stop();
-      else start();
-    });
-  }
-
-  /* ==============================
-     3. NAV ACTIVE (SCROLL SPY)
-     ============================== */
-
-  function initScrollSpy() {
-    const sections = $$("section[id]");
-    const navLinks = $$("nav a");
-    if (!sections.length || !navLinks.length) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          const id = entry.target.getAttribute("id");
-          const link = document.querySelector(`nav a[href="#${id}"]`);
-          if (entry.isIntersecting) {
-            navLinks.forEach((a) => a.classList.remove("active"));
-            if (link) link.classList.add("active");
-          }
-        });
-      },
-      {
-        rootMargin: "-30% 0px -60% 0px",
-        threshold: 0.1
+      if (document.hidden) {
+        if (animationId) cancelAnimationFrame(animationId);
+      } else {
+        draw();
       }
-    );
-
-    sections.forEach((section) => observer.observe(section));
-
-    const firstVisible = sections.find(
-      (sec) => sec.getBoundingClientRect().top >= 0
-    );
-    if (firstVisible) {
-      const id = firstVisible.getAttribute("id");
-      const link = document.querySelector(`nav a[href="#${id}"]`);
-      navLinks.forEach((a) => a.classList.remove("active"));
-      if (link) link.classList.add("active");
-    }
-  }
-
-  /* ==============================
-     4. EASTER EGGS + PROGRESS
-     ============================== */
-
-  function initEasterEggs() {
-    const eggs = $$(".egg");
-    if (!eggs.length) return;
-
-    eggs.forEach((egg) => {
-      egg.addEventListener("click", (e) => {
-        e.preventDefault();
-        if (!egg.classList.contains("found")) {
-          egg.classList.add("found");
-
-          // Secret section once all found
-          const foundCount = $$(".egg.found").length;
-          if (foundCount === eggs.length && !document.getElementById("secret-section")) {
-            const section = document.createElement("section");
-            section.id = "secret-section";
-            section.innerHTML = `
-              <h2>Core unlocked</h2>
-              <p>Trashwave is a glitch in the archive. Welcome inside.</p>
-            `;
-            document.body.insertBefore(
-              section,
-              document.querySelector("footer")
-            );
-            flashMessage("CORE UNLOCKED", "accent");
-          }
-        }
-        if (egg.href) {
-          window.open(egg.href, "_blank", "noopener,noreferrer");
-        }
-      });
     });
-
-    // Progress badge
-    let badge = document.getElementById("egg-progress");
-    if (!badge) {
-      badge = document.createElement("div");
-      badge.id = "egg-progress";
-      badge.style.cssText = `
-        position:fixed;left:14px;bottom:86px;z-index:9998;
-        padding:6px 10px;background:rgba(0,0,0,.85);color:#fff;
-        border:1px solid #333;font-family:VT323,monospace;font-size:18px;
-        letter-spacing:.08em;
-      `;
-      document.body.appendChild(badge);
-    }
-
-    const update = () => {
-      const found = $$(".egg.found").length;
-      badge.textContent = `ARTIFACTS ${found}/${eggs.length}`;
-      badge.style.borderColor = found === eggs.length ? "#0f0" : "#333";
-      badge.style.color = found === eggs.length ? "#0f0" : "#fff";
-    };
-
-    update();
-    eggs.forEach((egg) =>
-      egg.addEventListener("click", () => setTimeout(update, 0))
-    );
   }
 
-  /* ==============================
-     5. CLICK SOUND
-     ============================== */
-
+  // =========================================================
+  // CLICK SOUND
+  // =========================================================
   function initClickSound() {
-    const clickAudio = document.getElementById("clickSound");
+    const clickAudio = $("#clickSound");
     if (!clickAudio) return;
 
     document.addEventListener("click", (e) => {
-      const isButton = e.target.closest(
-        "button, .pixel-btn, .egg, a, .like-btn"
-      );
-      if (isButton) {
+      const target = e.target.closest("button, a, .egg");
+      if (!target) return;
+      try {
         clickAudio.currentTime = 0;
         clickAudio.play().catch(() => {});
-      }
+      } catch {}
     });
   }
 
-  /* ==============================
-     6. MAIN AUDIO PLAYER (PLAYLIST)
-     ============================== */
-
-  function initGlobalPlayer() {
-    const audio = document.getElementById("bgTrack");
-    const playPauseBtn = document.getElementById("playPauseBtn");
-    const volumeSlider = document.getElementById("volumeSlider");
-    const seekBar = document.getElementById("seekBar");
-    const currentTimeEl = document.getElementById("currentTime");
-    const durationEl = document.getElementById("duration");
-    const toggleBtn = document.getElementById("togglePlayer");
-    const audioPlayer = document.getElementById("audioPlayer");
-    const prevBtn = document.getElementById("prevTrackBtn");
-    const nextBtn = document.getElementById("nextTrackBtn");
-    const trackTitle = document.getElementById("trackTitle");
-
-    if (
-      !audio ||
-      !playPauseBtn ||
-      !volumeSlider ||
-      !seekBar ||
-      !currentTimeEl ||
-      !durationEl ||
-      !toggleBtn ||
-      !audioPlayer ||
-      !prevBtn ||
-      !nextBtn ||
-      !trackTitle
-    ) {
-      return;
-    }
-
-    const playlist = [
-      "ybuocfiewu.mp3",
-      "track2.mp3",
-      "track3.mp3"
-    ];
-    let currentIndex = 0;
-
-    function loadTrack(index) {
-      if (index < 0) index = playlist.length - 1;
-      if (index >= playlist.length) index = 0;
-      currentIndex = index;
-      audio.src = playlist[currentIndex];
-      trackTitle.textContent = `Track ${currentIndex + 1}`;
-      audio.load();
-      audio
-        .play()
-        .then(() => {
-          playPauseBtn.textContent = "⏸ Playing Trashwave Set";
-        })
-        .catch(() => {
-          // autoplay blocked, leave in paused state
-          playPauseBtn.textContent =
-            "▶ Listen to a curated Trashwave set";
-        });
-    }
-
-    playPauseBtn.addEventListener("click", () => {
-      if (audio.paused) {
-        audio
-          .play()
-          .then(() => {
-            playPauseBtn.textContent = "⏸ Playing Trashwave Set";
-          })
-          .catch(() => {});
-      } else {
-        audio.pause();
-        playPauseBtn.textContent =
-          "▶ Listen to a curated Trashwave set";
-      }
-    });
-
-    volumeSlider.addEventListener("input", () => {
-      audio.volume = volumeSlider.value;
-    });
-
-    audio.addEventListener("loadedmetadata", () => {
-      seekBar.max = Math.floor(audio.duration) || 0;
-      durationEl.textContent = formatTime(audio.duration);
-    });
-
-    audio.addEventListener("timeupdate", () => {
-      seekBar.value = audio.currentTime;
-      currentTimeEl.textContent = formatTime(audio.currentTime);
-    });
-
-    seekBar.addEventListener("input", () => {
-      audio.currentTime = seekBar.value;
-    });
-
-    toggleBtn.addEventListener("click", () => {
-      const isCollapsed = audioPlayer.classList.toggle("collapsed");
-      toggleBtn.textContent = isCollapsed ? "▲" : "▼";
-      if (!isCollapsed) {
-        setTimeout(() => {
-          audioPlayer.scrollIntoView({
-            behavior: "smooth",
-            block: "center"
-          });
-        }, 200);
-      }
-    });
-
-    prevBtn.addEventListener("click", () => {
-      loadTrack(currentIndex - 1);
-    });
-
-    nextBtn.addEventListener("click", () => {
-      loadTrack(currentIndex + 1);
-    });
-
-    audio.addEventListener("ended", () => {
-      loadTrack(currentIndex + 1);
-    });
-
-    // init
-    loadTrack(currentIndex);
-  }
-
-  /* ==============================
-     7. MANIFEST GLITCH
-     ============================== */
-
-  function initManifestGlitch() {
-    const lines = $$("#manifest [data-glitch], #manifest p");
+  // =========================================================
+  // MANIFEST GLITCH
+  // =========================================================
+  function initInteractiveManifest() {
+    const lines = $$(".manifest-lines [data-glitch], .manifest-lines p");
     if (!lines.length) return;
 
-    const glitchChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<>/=+*-_";
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<>/\\|[]{}+=-_*";
     let audioCtx = null;
 
-    function blip(freq = 220, duration = 0.06, type = "square", gainValue = 0.015) {
+    function blip(freq = 220, duration = 0.06, type = "square", gainValue = 0.012) {
       try {
-        const AC = window.AudioContext || window.webkitAudioContext;
-        if (!AC) return;
-        if (!audioCtx) audioCtx = new AC();
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        if (!audioCtx) audioCtx = new AudioCtx();
         if (audioCtx.state === "suspended") audioCtx.resume();
 
         const osc = audioCtx.createOscillator();
@@ -440,17 +366,15 @@
 
         osc.start(now);
         osc.stop(now + duration);
-      } catch {
-        // ignore
-      }
+      } catch {}
     }
 
-    function scrambleText(el) {
+    function scramble(el) {
       if (el.dataset.animating === "1") return;
       el.dataset.animating = "1";
 
-      const original = el.dataset.originalText || el.textContent.trim();
-      el.dataset.originalText = original;
+      const original = el.dataset.original || el.textContent.trim();
+      el.dataset.original = original;
 
       let frame = 0;
       const totalFrames = 12;
@@ -464,14 +388,13 @@
           .map((ch, i) => {
             if (ch === " ") return " ";
             if (i < revealCount) return original[i];
-            return glitchChars[Math.floor(Math.random() * glitchChars.length)];
+            return chars[Math.floor(Math.random() * chars.length)];
           })
           .join("");
 
         frame++;
-        if (frame <= totalFrames) {
-          requestAnimationFrame(tick);
-        } else {
+        if (frame <= totalFrames) requestAnimationFrame(tick);
+        else {
           el.textContent = original;
           el.dataset.animating = "0";
         }
@@ -481,117 +404,266 @@
     }
 
     lines.forEach((line, i) => {
-      line.dataset.originalText = line.textContent.trim();
+      line.dataset.original = line.textContent.trim();
 
       line.addEventListener("mouseenter", () => {
-        scrambleText(line);
-        blip(160 + i * 35, 0.05, i % 2 ? "triangle" : "square", 0.01);
+        scramble(line);
+        if (!prefersReducedMotion()) {
+          blip(150 + i * 30, 0.05, i % 2 ? "triangle" : "square");
+        }
       });
 
       line.addEventListener("click", () => {
-        scrambleText(line);
-        blip(110 + i * 55, 0.09, "sawtooth", 0.018);
-        document.body.style.filter = "contrast(1.08) saturate(1.1)";
-        setTimeout(() => {
-          document.body.style.filter = "";
-        }, 120);
-      });
-    });
-
-    document.addEventListener("keydown", (e) => {
-      if (e.key !== "Shift") return;
-      lines.forEach((line, i) => {
-        setTimeout(() => scrambleText(line), i * 40);
+        scramble(line);
+        blip(110 + i * 50, 0.08, "sawtooth", 0.017);
       });
     });
   }
 
-  /* ==============================
-     8. PATTERN LAB / SEQUENCER
-     ============================== */
+  // =========================================================
+  // MAIN PLAYER
+  // =========================================================
+  function initMainPlayer() {
+    const audio = $("#bgTrack");
+    const playPauseBtn = $("#playPauseBtn");
+    const volumeSlider = $("#volumeSlider");
+    const seekBar = $("#seekBar");
+    const currentTimeEl = $("#currentTime");
+    const durationEl = $("#duration");
+    const toggleBtn = $("#togglePlayer");
+    const audioPlayer = $("#audioPlayer");
+    const prevBtn = $("#prevTrackBtn");
+    const nextBtn = $("#nextTrackBtn");
+    const trackTitle = $("#trackTitle");
 
+    if (
+      !audio || !playPauseBtn || !volumeSlider || !seekBar ||
+      !currentTimeEl || !durationEl || !toggleBtn || !audioPlayer ||
+      !prevBtn || !nextBtn || !trackTitle
+    ) {
+      return;
+    }
+
+    const playlist = [
+      "ybuocfiewu.mp3",
+      "track2.mp3",
+      "track3.mp3"
+    ];
+
+    let currentIndex = 0;
+
+    async function safePlayMedia(media) {
+      try {
+        await media.play();
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
+    function setButtonState() {
+      playPauseBtn.textContent = audio.paused
+        ? "Listen"
+        : "Pause";
+    }
+
+    async function loadTrack(index, autoplay = false) {
+      if (index < 0) index = playlist.length - 1;
+      if (index >= playlist.length) index = 0;
+      currentIndex = index;
+
+      audio.src = playlist[currentIndex];
+      audio.load();
+      trackTitle.textContent = `Track ${currentIndex + 1}`;
+
+      if (autoplay) {
+        const ok = await safePlayMedia(audio);
+        if (!ok) flashMessage("AUTOPLAY BLOCKED", "error");
+      }
+
+      setButtonState();
+    }
+
+    playPauseBtn.addEventListener("click", async () => {
+      if (audio.paused) {
+        const ok = await safePlayMedia(audio);
+        if (!ok) {
+          flashMessage("PRESS PLAY AGAIN", "error");
+          return;
+        }
+      } else {
+        audio.pause();
+      }
+      setButtonState();
+    });
+
+    volumeSlider.addEventListener("input", () => {
+      audio.volume = Number(volumeSlider.value);
+    });
+
+    audio.addEventListener("loadedmetadata", () => {
+      seekBar.max = String(Math.floor(audio.duration || 0));
+      durationEl.textContent = safeFormatTime(audio.duration);
+    });
+
+    audio.addEventListener("timeupdate", () => {
+      seekBar.value = String(audio.currentTime || 0);
+      currentTimeEl.textContent = safeFormatTime(audio.currentTime);
+    });
+
+    seekBar.addEventListener("input", () => {
+      audio.currentTime = Number(seekBar.value);
+    });
+
+    toggleBtn.addEventListener("click", () => {
+      const collapsed = audioPlayer.classList.toggle("collapsed");
+      toggleBtn.textContent = collapsed ? "♫" : "—";
+      if (!collapsed) {
+        setTimeout(() => {
+          audioPlayer.scrollIntoView({
+            behavior: prefersReducedMotion() ? "auto" : "smooth",
+            block: "center"
+          });
+        }, 200);
+      }
+    });
+
+    prevBtn.addEventListener("click", () => loadTrack(currentIndex - 1, true));
+    nextBtn.addEventListener("click", () => loadTrack(currentIndex + 1, true));
+    audio.addEventListener("ended", () => loadTrack(currentIndex + 1, true));
+    audio.addEventListener("play", setButtonState);
+    audio.addEventListener("pause", setButtonState);
+
+    audio.volume = Number(volumeSlider.value || 0.6);
+    loadTrack(currentIndex, false);
+  }
+
+  // =========================================================
+  // SEQUENCER
+  // =========================================================
   function initSequencer() {
-    const drumGridEl = document.getElementById("drumGrid");
-    const synthGridEl = document.getElementById("synthGrid");
+    const drumGridEl = $("#drumGrid");
+    const synthGridEl = $("#synthGrid");
     if (!drumGridEl || !synthGridEl) return;
 
-    const bpmSlider = document.getElementById("seqBpm");
-    const bpmValue = document.getElementById("seqBpmValue");
-    const playBtn = document.getElementById("seqPlayBtn");
-    const stopBtn = document.getElementById("seqStopBtn");
-    const randomBtn = document.getElementById("seqRandomBtn");
-    const clearBtn = document.getElementById("seqClearBtn");
-    const shareBtn = document.getElementById("seqShareBtn");
+    const playBtn = $("#seqPlayBtn");
+    const stopBtn = $("#seqStopBtn");
+    const randomBtn = $("#seqRandomBtn");
+    const clearBtn = $("#seqClearBtn");
+    const shareBtn = $("#seqShareBtn");
+    const bpmSlider = $("#seqBpm");
+    const bpmValue = $("#seqBpmValue");
+
+    if (!playBtn || !stopBtn || !randomBtn || !clearBtn || !shareBtn || !bpmSlider || !bpmValue) return;
 
     const steps = 16;
     const drumRows = ["kick", "snare", "hat"];
     const noteRows = ["C5", "B4", "A4", "G4", "F4", "E4", "D4", "C4"];
     const noteFreq = {
-      C5: 523.25,
-      B4: 493.88,
-      A4: 440.0,
-      G4: 392.0,
-      F4: 349.23,
-      E4: 329.63,
-      D4: 293.66,
-      C4: 261.63
+      C5: 523.25, B4: 493.88, A4: 440.0, G4: 392.0,
+      F4: 349.23, E4: 329.63, D4: 293.66, C4: 261.63
     };
 
     let audioCtx = null;
     let masterGain = null;
-    let analyser = null;
-    let playing = false;
     let stepIndex = 0;
+    let playing = false;
     let timer = null;
-    let bpm = Number(bpmSlider?.value || 118);
+    let bpm = Number(bpmSlider.value || 118);
 
     const drumState = drumRows.map(() => Array(steps).fill(false));
     const noteState = noteRows.map(() => Array(steps).fill(false));
 
     function ensureAudio() {
-      const AC = window.AudioContext || window.webkitAudioContext;
-      if (!AC) return false;
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return false;
+
       if (!audioCtx) {
-        audioCtx = new AC();
+        audioCtx = new AudioCtx();
         masterGain = audioCtx.createGain();
-        analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 256;
         masterGain.gain.value = 0.32;
-        masterGain.connect(analyser);
-        analyser.connect(audioCtx.destination);
+        masterGain.connect(audioCtx.destination);
       }
+
       if (audioCtx.state === "suspended") audioCtx.resume();
       return true;
+    }
+
+    function createCell(row, step, group, active) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "seq-cell";
+      if (active) btn.classList.add("active");
+      btn.dataset.row = String(row);
+      btn.dataset.step = String(step);
+      btn.dataset.group = group;
+      btn.setAttribute("aria-label", `${group} row ${row + 1} step ${step + 1}`);
+      return btn;
+    }
+
+    function buildGrid(container, rows, stateArr, group) {
+      container.innerHTML = "";
+
+      rows.forEach((_, rowIndex) => {
+        const row = document.createElement("div");
+        row.className = "cell-row";
+
+        for (let step = 0; step < steps; step++) {
+          const cell = createCell(rowIndex, step, group, stateArr[rowIndex][step]);
+          cell.addEventListener("click", () => {
+            stateArr[rowIndex][step] = !stateArr[rowIndex][step];
+            cell.classList.toggle("active", stateArr[rowIndex][step]);
+            syncUrl();
+          });
+          row.appendChild(cell);
+        }
+
+        container.appendChild(row);
+      });
+    }
+
+    function clearPlayingMarks() {
+      $$(".seq-cell.playing").forEach(c => c.classList.remove("playing"));
+    }
+
+    function markStep(step) {
+      clearPlayingMarks();
+      $$(`.seq-cell[data-step="${step}"]`).forEach(c => c.classList.add("playing"));
     }
 
     function playKick(time) {
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
+
       osc.type = "sine";
       osc.frequency.setValueAtTime(140, time);
       osc.frequency.exponentialRampToValueAtTime(42, time + 0.12);
+
       gain.gain.setValueAtTime(0.28, time);
       gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.14);
+
       osc.connect(gain).connect(masterGain);
       osc.start(time);
       osc.stop(time + 0.15);
     }
 
     function playSnare(time) {
-      const bufferSize = audioCtx.sampleRate * 0.12;
-      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-      const output = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        output[i] = Math.random() * 2 - 1;
-      }
-      const noise = audioCtx.createBufferSource();
-      noise.buffer = buffer;
+      const length = audioCtx.sampleRate * 0.12;
+      const buffer = audioCtx.createBuffer(1, length, audioCtx.sampleRate);
+      const data = buffer.getChannelData(0);
 
+      for (let i = 0; i < length; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+
+      const noise = audioCtx.createBufferSource();
       const filter = audioCtx.createBiquadFilter();
+      const gain = audioCtx.createGain();
+
+      noise.buffer = buffer;
       filter.type = "highpass";
       filter.frequency.value = 1200;
 
-      const gain = audioCtx.createGain();
       gain.gain.setValueAtTime(0.16, time);
       gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.12);
 
@@ -601,20 +673,22 @@
     }
 
     function playHat(time) {
-      const bufferSize = audioCtx.sampleRate * 0.04;
-      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-      const output = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        output[i] = Math.random() * 2 - 1;
-      }
-      const noise = audioCtx.createBufferSource();
-      noise.buffer = buffer;
+      const length = audioCtx.sampleRate * 0.04;
+      const buffer = audioCtx.createBuffer(1, length, audioCtx.sampleRate);
+      const data = buffer.getChannelData(0);
 
+      for (let i = 0; i < length; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+
+      const noise = audioCtx.createBufferSource();
       const filter = audioCtx.createBiquadFilter();
+      const gain = audioCtx.createGain();
+
+      noise.buffer = buffer;
       filter.type = "highpass";
       filter.frequency.value = 5000;
 
-      const gain = audioCtx.createGain();
       gain.gain.setValueAtTime(0.08, time);
       gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.035);
 
@@ -626,8 +700,8 @@
     function playSynth(freq, time, duration = 0.22) {
       const osc = audioCtx.createOscillator();
       const sub = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
       const filter = audioCtx.createBiquadFilter();
+      const gain = audioCtx.createGain();
 
       osc.type = "sawtooth";
       sub.type = "triangle";
@@ -653,63 +727,106 @@
       sub.stop(time + duration);
     }
 
-    function buildGrid(container, rows, state, groupName) {
-      container.innerHTML = "";
-      rows.forEach((rowName, rowIndex) => {
-        const row = document.createElement("div");
-        row.className = "row";
-        for (let step = 0; step < steps; step++) {
-          const cell = document.createElement("button");
-          cell.type = "button";
-          cell.className = "cell";
-          cell.dataset.group = groupName;
-          cell.dataset.row = String(rowIndex);
-          cell.dataset.step = String(step);
-          cell.setAttribute(
-            "aria-label",
-            `${groupName} ${rowName} step ${step + 1}`
-          );
-          if (state[rowIndex][step]) cell.classList.add("active");
-          cell.addEventListener("click", () => {
-            state[rowIndex][step] = !state[rowIndex][step];
-            cell.classList.toggle("active", state[rowIndex][step]);
-          });
-          row.appendChild(cell);
+    function triggerStep(step, time) {
+      markStep(step);
+
+      if (drumState[0][step]) playKick(time);
+      if (drumState[1][step]) playSnare(time);
+      if (drumState[2][step]) playHat(time);
+
+      noteRows.forEach((note, rowIndex) => {
+        if (noteState[rowIndex][step]) {
+          playSynth(noteFreq[note], time, 0.24);
         }
-        container.appendChild(row);
       });
     }
 
-    function clearPlayingMarks() {
-      $$(".cell.playing").forEach((c) => c.classList.remove("playing"));
+    function tick() {
+      if (!audioCtx) return;
+      triggerStep(stepIndex, audioCtx.currentTime + 0.01);
+      stepIndex = (stepIndex + 1) % steps;
     }
 
-    function markStep(step) {
+    function startSequencer() {
+      if (playing) return;
+      if (!ensureAudio()) {
+        flashMessage("AUDIO NOT AVAILABLE", "error");
+        return;
+      }
+
+      const intervalMs = (60 / bpm / 4) * 1000;
+      playing = true;
+      tick();
+      timer = setInterval(tick, intervalMs);
+      flashMessage("SEQUENCER ON", "success");
+    }
+
+    function stopSequencer() {
+      playing = false;
+      clearInterval(timer);
+      timer = null;
+      stepIndex = 0;
       clearPlayingMarks();
-      $$(`.cell[data-step="${step}"]`).forEach((c) =>
-        c.classList.add("playing")
-      );
+      flashMessage("SEQUENCER STOPPED");
+    }
+
+    function randomizePattern() {
+      drumState.forEach((row, r) => {
+        row.forEach((_, s) => {
+          const chance = r === 2 ? 0.38 : 0.24;
+          row[s] = Math.random() < chance;
+        });
+      });
+
+      noteState.forEach((row, r) => {
+        row.forEach((_, s) => {
+          const chance = r < 2 ? 0.08 : 0.14;
+          row[s] = Math.random() < chance;
+        });
+      });
+
+      renderGridState();
+      syncUrl();
+      flashMessage("RANDOM PATTERN", "accent");
+    }
+
+    function clearPattern() {
+      drumState.forEach(row => row.fill(false));
+      noteState.forEach(row => row.fill(false));
+      renderGridState();
+      syncUrl();
+      flashMessage("PATTERN CLEARED");
+    }
+
+    function renderGridState() {
+      $$(".seq-cell[data-group='drum']").forEach(cell => {
+        const r = Number(cell.dataset.row);
+        const s = Number(cell.dataset.step);
+        cell.classList.toggle("active", drumState[r][s]);
+      });
+
+      $$(".seq-cell[data-group='synth']").forEach(cell => {
+        const r = Number(cell.dataset.row);
+        const s = Number(cell.dataset.step);
+        cell.classList.toggle("active", noteState[r][s]);
+      });
     }
 
     function encodePattern() {
-      const drum = drumState
-        .flat()
-        .map((v) => (v ? "1" : "0"))
-        .join("");
-      const synth = noteState
-        .flat()
-        .map((v) => (v ? "1" : "0"))
-        .join("");
+      const drum = drumState.flat().map(v => v ? "1" : "0").join("");
+      const synth = noteState.flat().map(v => v ? "1" : "0").join("");
       return `${drum}.${synth}.${bpm}`;
     }
 
     function decodePattern(serialized) {
       if (!serialized) return;
+
       const [drumBits, synthBits, bpmBits] = serialized.split(".");
+
       if (bpmBits) {
-        bpm = Math.min(Math.max(Number(bpmBits) || 118, 70), 170);
-        if (bpmSlider) bpmSlider.value = String(bpm);
-        if (bpmValue) bpmValue.textContent = String(bpm);
+        bpm = clamp(Number(bpmBits) || 118, 70, 170);
+        bpmSlider.value = String(bpm);
+        bpmValue.textContent = String(bpm);
       }
 
       if (drumBits && drumBits.length === drumRows.length * steps) {
@@ -737,145 +854,49 @@
       history.replaceState({}, "", url);
     }
 
-    function triggerStep(step, time) {
-      markStep(step);
-
-      if (drumState[0][step]) playKick(time);
-      if (drumState[1][step]) playSnare(time);
-      if (drumState[2][step]) playHat(time);
-
-      noteRows.forEach((note, rowIndex) => {
-        if (noteState[rowIndex][step]) {
-          playSynth(noteFreq[note], time, 0.24);
-        }
-      });
-    }
-
-    function tick() {
-      if (!audioCtx) return;
-      const now = audioCtx.currentTime;
-      triggerStep(stepIndex, now + 0.01);
-      stepIndex = (stepIndex + 1) % steps;
-    }
-
-    function startSequencer() {
-      if (playing) return;
-      if (!ensureAudio()) return;
-      const intervalMs = (60 / bpm / 4) * 1000;
-      playing = true;
-      tick();
-      timer = setInterval(tick, intervalMs);
-      flashMessage("SEQUENCER ON", "success");
-    }
-
-    function stopSequencer() {
-      playing = false;
-      clearInterval(timer);
-      timer = null;
-      stepIndex = 0;
-      clearPlayingMarks();
-      flashMessage("SEQUENCER OFF");
-    }
-
-    function randomizePattern() {
-      drumState.forEach((row, r) => {
-        row.forEach((_, s) => {
-          const chance = r === 2 ? 0.38 : 0.24;
-          drumState[r][s] = Math.random() < chance;
-        });
-      });
-
-      noteState.forEach((row, r) => {
-        row.forEach((_, s) => {
-          const chance = r < 2 ? 0.08 : 0.14;
-          noteState[r][s] = Math.random() < chance;
-        });
-      });
-
-      renderGridState();
-      syncUrl();
-      flashMessage("RANDOM PATTERN", "accent");
-    }
-
-    function clearPattern() {
-      drumState.forEach((row) => row.fill(false));
-      noteState.forEach((row) => row.fill(false));
-      renderGridState();
-      syncUrl();
-      flashMessage("PATTERN CLEARED");
-    }
-
-    function renderGridState() {
-      $$(".cell[data-group='drum']").forEach((cell) => {
-        const r = Number(cell.dataset.row);
-        const s = Number(cell.dataset.step);
-        cell.classList.toggle("active", drumState[r][s]);
-      });
-
-      $$(".cell[data-group='synth']").forEach((cell) => {
-        const r = Number(cell.dataset.row);
-        const s = Number(cell.dataset.step);
-        cell.classList.toggle("active", noteState[r][s]);
-      });
-    }
-
-    function applyPatternFromUrl() {
+    function readUrlPattern() {
       const params = new URLSearchParams(window.location.search);
       const pattern = params.get("pattern");
       if (pattern) decodePattern(pattern);
     }
 
-    // init
-    applyPatternFromUrl();
+    readUrlPattern();
     buildGrid(drumGridEl, drumRows, drumState, "drum");
     buildGrid(synthGridEl, noteRows, noteState, "synth");
     renderGridState();
+    bpmValue.textContent = String(bpm);
 
-    if (bpmValue) bpmValue.textContent = String(bpm);
-
-    bpmSlider?.addEventListener("input", () => {
+    bpmSlider.addEventListener("input", () => {
       bpm = Number(bpmSlider.value);
-      if (bpmValue) bpmValue.textContent = String(bpm);
+      bpmValue.textContent = String(bpm);
       syncUrl();
+
       if (playing) {
         stopSequencer();
         startSequencer();
       }
     });
 
-    playBtn?.addEventListener("click", startSequencer);
-    stopBtn?.addEventListener("click", stopSequencer);
-    randomBtn?.addEventListener("click", randomizePattern);
-    clearBtn?.addEventListener("click", clearPattern);
+    playBtn.addEventListener("click", startSequencer);
+    stopBtn.addEventListener("click", stopSequencer);
+    randomBtn.addEventListener("click", randomizePattern);
+    clearBtn.addEventListener("click", clearPattern);
 
-    shareBtn?.addEventListener("click", async () => {
+    shareBtn.addEventListener("click", async () => {
       syncUrl();
-      const url = window.location.href;
-      try {
-        if (navigator.clipboard?.writeText) {
-          await navigator.clipboard.writeText(url);
-          flashMessage("LINK COPIED", "success");
-        } else {
-          throw new Error("clipboard unsupported");
-        }
-      } catch {
-        flashMessage("COPY FAILED", "error");
-      }
+      const ok = await safeCopy(window.location.href);
+      flashMessage(ok ? "LINK COPIED" : "COPY FAILED", ok ? "success" : "error");
     });
-
-    drumGridEl.addEventListener("click", debounce(syncUrl, 120));
-    synthGridEl.addEventListener("click", debounce(syncUrl, 120));
   }
 
-  /* ==============================
-     9. SOUNDLAB (DRONE / NOISE / PULSE)
-     ============================== */
-
+  // =========================================================
+  // SOUNDLAB
+  // =========================================================
   function initSoundLab() {
-    const initBtn = document.getElementById("soundLabInit");
-    const droneSlider = document.getElementById("ambienceDrone");
-    const noiseSlider = document.getElementById("ambienceNoise");
-    const pulseSlider = document.getElementById("ambiencePulse");
+    const initBtn = $("#soundLabInit");
+    const droneSlider = $("#ambienceDrone");
+    const noiseSlider = $("#ambienceNoise");
+    const pulseSlider = $("#ambiencePulse");
 
     if (!initBtn || !droneSlider || !noiseSlider || !pulseSlider) return;
 
@@ -891,7 +912,7 @@
     let lfoGain = null;
     let ready = false;
 
-    function createNoiseBuffer(ctx, seconds = 2) {
+    function createNoiseBuffer(ctx, seconds = 2.5) {
       const buffer = ctx.createBuffer(1, ctx.sampleRate * seconds, ctx.sampleRate);
       const data = buffer.getChannelData(0);
       for (let i = 0; i < data.length; i++) {
@@ -902,12 +923,13 @@
 
     function boot() {
       if (ready) return true;
-      const AC = window.AudioContext || window.webkitAudioContext;
-      if (!AC) return false;
 
-      audioCtx = new AC();
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return false;
 
-      // Drone
+      audioCtx = new AudioCtx();
+
+      // drone
       droneOsc = audioCtx.createOscillator();
       droneSub = audioCtx.createOscillator();
       droneGain = audioCtx.createGain();
@@ -925,18 +947,20 @@
       droneSub.connect(droneFilter);
       droneFilter.connect(droneGain).connect(audioCtx.destination);
 
-      // Noise
+      // noise
       noiseSource = audioCtx.createBufferSource();
       noiseSource.buffer = createNoiseBuffer(audioCtx, 3);
       noiseSource.loop = true;
+
       noiseGain = audioCtx.createGain();
       const noiseFilter = audioCtx.createBiquadFilter();
       noiseFilter.type = "highpass";
       noiseFilter.frequency.value = 2800;
       noiseGain.gain.value = 0;
+
       noiseSource.connect(noiseFilter).connect(noiseGain).connect(audioCtx.destination);
 
-      // Pulse
+      // pulse
       pulseOsc = audioCtx.createOscillator();
       pulseGain = audioCtx.createGain();
       pulseOsc.type = "square";
@@ -964,28 +988,15 @@
 
     function applyValues() {
       if (!ready) return;
-      const now = audioCtx.currentTime;
-      droneGain.gain.setTargetAtTime(
-        Number(droneSlider.value) / 500,
-        now,
-        0.08
-      );
-      noiseGain.gain.setTargetAtTime(
-        Number(noiseSlider.value) / 900,
-        now,
-        0.08
-      );
-      pulseGain.gain.setTargetAtTime(
-        Number(pulseSlider.value) / 800,
-        now,
-        0.08
-      );
+      droneGain.gain.setTargetAtTime(Number(droneSlider.value) / 500, audioCtx.currentTime, 0.08);
+      noiseGain.gain.setTargetAtTime(Number(noiseSlider.value) / 900, audioCtx.currentTime, 0.08);
+      pulseGain.gain.setTargetAtTime(Number(pulseSlider.value) / 800, audioCtx.currentTime, 0.08);
     }
 
     initBtn.addEventListener("click", async () => {
       const ok = boot();
       if (!ok) {
-        flashMessage("WEB AUDIO NOT SUPPORTED", "error");
+        flashMessage("SOUNDLAB OFFLINE", "error");
         return;
       }
       if (audioCtx.state === "suspended") await audioCtx.resume();
@@ -993,24 +1004,23 @@
       flashMessage("SOUNDLAB ACTIVE", "success");
     });
 
-    [droneSlider, noiseSlider, pulseSlider].forEach((slider) => {
+    [droneSlider, noiseSlider, pulseSlider].forEach(slider => {
       slider.addEventListener("input", applyValues);
     });
   }
 
-  /* ==============================
-     10. TRACK ANATOMY
-     ============================== */
-
+  // =========================================================
+  // TRACK ANATOMY
+  // =========================================================
   function initTrackAnatomy() {
-    const audio = document.getElementById("anatomyTrack");
-    const playBtn = document.getElementById("anatomyPlay");
-    const lowpass = document.getElementById("anatomyLowpass");
-    const drive = document.getElementById("anatomyDrive");
-    const now = document.getElementById("anatomyNow");
+    const audio = $("#anatomyTrack");
+    const playBtn = $("#anatomyPlay");
+    const lowpass = $("#anatomyLowpass");
+    const drive = $("#anatomyDrive");
+    const now = $("#anatomyNow");
     const seekMarkers = $$("[data-seek-anatomy]");
 
-    if (!audio || !playBtn || !lowpass || !drive) return;
+    if (!audio || !playBtn || !lowpass || !drive || !now) return;
 
     let audioCtx = null;
     let source = null;
@@ -1027,8 +1037,7 @@
 
       for (let i = 0; i < n; i++) {
         const x = (i * 2) / n - 1;
-        curve[i] = ((3 + k) * x * 20 * deg) /
-          (Math.PI + k * Math.abs(x));
+        curve[i] = ((3 + k) * x * 20 * deg) / (Math.PI + k * Math.abs(x));
       }
       return curve;
     }
@@ -1039,10 +1048,10 @@
         return true;
       }
 
-      const AC = window.AudioContext || window.webkitAudioContext;
-      if (!AC) return false;
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return false;
 
-      audioCtx = new AC();
+      audioCtx = new AudioCtx();
       source = audioCtx.createMediaElementSource(audio);
       filter = audioCtx.createBiquadFilter();
       distortion = audioCtx.createWaveShaper();
@@ -1060,7 +1069,6 @@
       outputGain.connect(audioCtx.destination);
 
       if (audioCtx.state === "suspended") await audioCtx.resume();
-
       graphReady = true;
       return true;
     }
@@ -1073,7 +1081,11 @@
       }
 
       if (audio.paused) {
-        audio.play().catch(() => {});
+        try {
+          await audio.play();
+        } catch {
+          flashMessage("PLAYBACK BLOCKED", "error");
+        }
       } else {
         audio.pause();
       }
@@ -1087,549 +1099,335 @@
       if (distortion) distortion.curve = makeDistortionCurve(Number(drive.value));
     });
 
-    seekMarkers.forEach((btn) => {
+    seekMarkers.forEach(btn => {
       btn.addEventListener("click", () => {
         audio.currentTime = Number(btn.dataset.seekAnatomy || 0);
       });
     });
 
     audio.addEventListener("timeupdate", () => {
-      if (now) now.textContent = formatTime(audio.currentTime);
+      now.textContent = safeFormatTime(audio.currentTime);
     });
 
     audio.addEventListener("play", () => {
-      playBtn.textContent = "PAUSE TRACK";
+      playBtn.textContent = "Pause Track";
     });
 
     audio.addEventListener("pause", () => {
-      playBtn.textContent = "PLAY TRACK";
+      playBtn.textContent = "Play Track";
     });
   }
 
-  /* ==============================
-     11. LAZY LOAD SOUNDCLOUD PLAYER
-     ============================== */
+  // =========================================================
+  // EASTER EGGS
+  // =========================================================
+  function initEasterEggs() {
+    const eggs = $$(".egg");
+    if (!eggs.length) return;
 
-  function initSoundCloudLazy() {
-    const section = document.getElementById("music");
-    const iframe = document.getElementById("scPlayer");
-    if (!section || !iframe) return;
-
-    const observer = new IntersectionObserver(
-      (entries, obs) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && iframe.dataset.src) {
-            iframe.src = iframe.dataset.src;
-            obs.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.25 }
-    );
-
-    observer.observe(section);
-  }
-
-  /* ==============================
-     DOM READY
-     ============================== */
-
-document.addEventListener("DOMContentLoaded", () => {
-  initLoader();
-  initSnow();
-  initScrollSpy();
-  initEasterEggs();
-  initClickSound();
-  initGlobalPlayer();
-  initManifestGlitch();
-  initSequencer();
-  initSoundLab();
-  initTrackAnatomy();
-  initSoundCloudLazy();
-  initSpectrum3D();
-});
-})();
-/* ==============================
-   12. 3D SPECTRUM VISUALIZER
-   ============================== */
-function initSpectrum3D() {
-  const mount = document.getElementById("spectrum3d-canvas");
-  const audio = document.getElementById("bgTrack");
-
-  if (!mount || !audio) return;
-  if (!window.THREE) {
-    console.warn("THREE is not loaded");
-    return;
-  }
-
-  const THREE = window.THREE;
-  const OrbitControls = window.OrbitControls;
-
-  let renderer;
-  let scene;
-  let camera;
-  let controls;
-  let analyser;
-  let audioCtx;
-  let sourceNode;
-  let dataArray;
-  let bars = [];
-  let animationId = null;
-  let connected = false;
-
-  const BAR_COUNT = 96;
-  const RADIUS = 10;
-  const BAR_WIDTH = 0.22;
-  const BAR_DEPTH = 0.22;
-  const BASE_HEIGHT = 0.25;
-
-  function createAudioGraph() {
-    if (connected) return true;
-
-    const AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) return false;
-
-    audioCtx = new AC();
-    analyser = audioCtx.createAnalyser();
-    analyser.fftSize = 256;
-    analyser.smoothingTimeConstant = 0.82;
-
-    sourceNode = audioCtx.createMediaElementSource(audio);
-    sourceNode.connect(analyser);
-    analyser.connect(audioCtx.destination);
-
-    dataArray = new Uint8Array(analyser.frequencyBinCount);
-    connected = true;
-    return true;
-  }
-
-  function initScene() {
-    scene = new THREE.Scene();
-    scene.fog = new THREE.Fog(0x020202, 18, 38);
-
-    const width = mount.clientWidth || 800;
-    const height = mount.clientHeight || 520;
-
-    camera = new THREE.PerspectiveCamera(55, width / height, 0.1, 100);
-    camera.position.set(0, 8, 18);
-
-    renderer = new THREE.WebGLRenderer({
-      antialias: true,
-      alpha: true,
-      powerPreference: "high-performance"
-    });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setSize(width, height);
-    renderer.outputColorSpace = THREE.SRGBColorSpace;
-    mount.innerHTML = "";
-    mount.appendChild(renderer.domElement);
-
-    if (OrbitControls) {
-      controls = new OrbitControls(camera, renderer.domElement);
-      controls.enableDamping = true;
-      controls.enablePan = false;
-      controls.minDistance = 10;
-      controls.maxDistance = 28;
-      controls.maxPolarAngle = Math.PI * 0.48;
-    }
-
-    const ambient = new THREE.AmbientLight(0xffffff, 0.45);
-    scene.add(ambient);
-
-    const pointA = new THREE.PointLight(0x00ff99, 2.2, 40, 2);
-    pointA.position.set(0, 10, 10);
-    scene.add(pointA);
-
-    const pointB = new THREE.PointLight(0x00eaff, 1.8, 40, 2);
-    pointB.position.set(0, 4, -12);
-    scene.add(pointB);
-
-    const floor = new THREE.Mesh(
-      new THREE.CircleGeometry(11, 64),
-      new THREE.MeshBasicMaterial({
-        color: 0x07110b,
-        transparent: true,
-        opacity: 0.75
-      })
-    );
-    floor.rotation.x = -Math.PI / 2;
-    floor.position.y = -0.02;
-    scene.add(floor);
-
-    const ring = new THREE.Mesh(
-      new THREE.RingGeometry(9.6, 10.2, 128),
-      new THREE.MeshBasicMaterial({
-        color: 0x00ffaa,
-        transparent: true,
-        opacity: 0.22,
-        side: THREE.DoubleSide
-      })
-    );
-    ring.rotation.x = -Math.PI / 2;
-    ring.position.y = 0.01;
-    scene.add(ring);
-
-    const core = new THREE.Mesh(
-      new THREE.IcosahedronGeometry(1.2, 1),
-      new THREE.MeshStandardMaterial({
-        color: 0x99ffee,
-        emissive: 0x00ff99,
-        emissiveIntensity: 0.35,
-        roughness: 0.35,
-        metalness: 0.15
-      })
-    );
-    core.name = "core";
-    core.position.y = 1.4;
-    scene.add(core);
-
-    const barGeometry = new THREE.BoxGeometry(BAR_WIDTH, 1, BAR_DEPTH);
-
-    for (let i = 0; i < BAR_COUNT; i++) {
-      const angle = (i / BAR_COUNT) * Math.PI * 2;
-      const x = Math.cos(angle) * RADIUS;
-      const z = Math.sin(angle) * RADIUS;
-
-      const material = new THREE.MeshStandardMaterial({
-        color: new THREE.Color(`hsl(${140 + (i / BAR_COUNT) * 60}, 100%, 50%)`),
-        emissive: new THREE.Color(`hsl(${140 + (i / BAR_COUNT) * 60}, 100%, 28%)`),
-        emissiveIntensity: 0.28,
-        roughness: 0.45,
-        metalness: 0.08
-      });
-
-      const bar = new THREE.Mesh(barGeometry, material);
-      bar.position.set(x, BASE_HEIGHT / 2, z);
-      bar.lookAt(0, BASE_HEIGHT / 2, 0);
-      bar.userData.angle = angle;
-      bar.userData.index = i;
-      scene.add(bar);
-      bars.push(bar);
-    }
-  }
-
-  function updateSpectrum() {
-    if (!analyser || !dataArray) return;
-
-    analyser.getByteFrequencyData(dataArray);
-
-    const core = scene.getObjectByName("core");
-    let energySum = 0;
-
-    for (let i = 0; i < BAR_COUNT; i++) {
-      const dataIndex = Math.floor((i / BAR_COUNT) * dataArray.length);
-      const value = dataArray[dataIndex] || 0;
-      const normalized = value / 255;
-      energySum += normalized;
-
-      const bar = bars[i];
-      const h = BASE_HEIGHT + normalized * 8.5;
-
-      bar.scale.y += (h - bar.scale.y) * 0.22;
-      bar.position.y += ((h / 2) - bar.position.y) * 0.22;
-
-      const pulseRadius = RADIUS + normalized * 1.3;
-      bar.position.x = Math.cos(bar.userData.angle) * pulseRadius;
-      bar.position.z = Math.sin(bar.userData.angle) * pulseRadius;
-
-      const hue = 135 + normalized * 70 + i * 0.15;
-      bar.material.color.setHSL((hue % 360) / 360, 1, 0.5);
-      bar.material.emissive.setHSL((hue % 360) / 360, 1, 0.24 + normalized * 0.2);
-      bar.material.emissiveIntensity = 0.22 + normalized * 0.9;
-    }
-
-    const avg = energySum / BAR_COUNT;
-
-    if (core) {
-      core.rotation.x += 0.004 + avg * 0.03;
-      core.rotation.y += 0.006 + avg * 0.04;
-      const s = 1 + avg * 0.45;
-      core.scale.setScalar(s);
-      core.material.emissiveIntensity = 0.25 + avg * 1.15;
-    }
-
-    scene.rotation.y += 0.0018 + avg * 0.005;
-  }
-
-  function animate() {
-    updateSpectrum();
-    controls?.update();
-    renderer.render(scene, camera);
-    animationId = requestAnimationFrame(animate);
-  }
-
-  function onResize() {
-    if (!renderer || !camera) return;
-    const width = mount.clientWidth || 800;
-    const height = mount.clientHeight || 520;
-    camera.aspect = width / height;
-    camera.updateProjectionMatrix();
-    renderer.setSize(width, height);
-  }
-
-  function startVisualizer() {
-    if (!connected) {
-      const ok = createAudioGraph();
-      if (!ok) return;
-    }
-
-    if (audioCtx && audioCtx.state === "suspended") {
-      audioCtx.resume().catch(() => {});
-    }
-
-    if (!animationId) animate();
-  }
-
-  function stopVisualizer() {
-    if (animationId) {
-      cancelAnimationFrame(animationId);
-      animationId = null;
-    }
-  }
-
-  initScene();
-  onResize();
-  window.addEventListener("resize", onResize);
-
-  audio.addEventListener("play", startVisualizer);
-  audio.addEventListener("pause", () => {
-    // оставляем сцену живой ещё чуть-чуть, но без обязательной остановки
-  });
-
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) stopVisualizer();
-    else if (!audio.paused) startVisualizer();
-  });
-
-  // first user gesture fallback
-  document.addEventListener(
-    "click",
-    () => {
-      if (!connected && !audio.paused) startVisualizer();
-    },
-    { once: false }
-  );
-}
-/* =========================================================
-   TWOVANDALS SECRET GLITCH / BLEED EASTER EGG
-   Добавить в конец текущего JS
-   ========================================================= */
-
-(() => {
-  "use strict";
-
-  const state = {
-    eggsFoundClicks: 0,
-    keySequenceProgress: 0,
-    keySequenceStartedAt: 0,
-    heroDoubleClicked: false,
-    triggered: false
-  };
-
-  const REQUIRED_KEYS = ["KeyT", "KeyV", "KeyD"];
-  const KEY_TIMEOUT = 4000;
-
-  function initTwoVandalsSecretBanner() {
-    const banner = document.getElementById("tv-easter-banner");
-    const title = document.getElementById("tv-easter-title");
-    if (!banner || !title) return;
-
-    bindEggProgressWatcher();
-    bindKeySequenceWatcher();
-    bindFinalDoubleClickWatcher();
-  }
-
-  function bindEggProgressWatcher() {
-    document.addEventListener("click", (e) => {
-      const egg = e.target.closest(".egg");
-      if (!egg) return;
-
-      if (state.eggsFoundClicks < 3) {
-        state.eggsFoundClicks += 1;
-      }
-    });
-  }
-
-  function bindKeySequenceWatcher() {
-    document.addEventListener("keydown", (e) => {
-      if (state.triggered) return;
-      if (state.eggsFoundClicks < 3) return;
-
-      const now = Date.now();
-
-      if (!state.keySequenceStartedAt || now - state.keySequenceStartedAt > KEY_TIMEOUT) {
-        state.keySequenceProgress = 0;
-        state.keySequenceStartedAt = now;
-      }
-
-      const expected = REQUIRED_KEYS[state.keySequenceProgress];
-
-      if (e.code === expected) {
-        state.keySequenceProgress += 1;
-
-        if (state.keySequenceProgress === REQUIRED_KEYS.length) {
-          state.keySequenceStartedAt = now;
-          pulsePageHint();
+    eggs.forEach(egg => {
+      egg.addEventListener("click", (e) => {
+        if (egg.tagName === "A" && egg.getAttribute("href")?.startsWith("#")) {
+          e.preventDefault();
+          const href = egg.getAttribute("href");
+          const target = $(href);
+          if (target) softScrollTo(target);
         }
-      } else {
-        state.keySequenceProgress = e.code === REQUIRED_KEYS[0] ? 1 : 0;
-        state.keySequenceStartedAt = now;
-      }
-    });
-  }
 
-  function bindFinalDoubleClickWatcher() {
-    const candidates = [
-      document.querySelector(".logo"),
-      document.querySelector(".brand"),
-      document.querySelector(".hero"),
-      document.querySelector("header h1"),
-      document.querySelector("nav"),
-      document.body
-    ].filter(Boolean);
+        if (!egg.classList.contains("found")) {
+          egg.classList.add("found");
+          updateEggProgress();
 
-    candidates.forEach((el) => {
-      el.addEventListener("dblclick", () => {
-        if (state.triggered) return;
-        if (state.eggsFoundClicks < 3) return;
-        if (state.keySequenceProgress < REQUIRED_KEYS.length) return;
-        if (Date.now() - state.keySequenceStartedAt > KEY_TIMEOUT) return;
-
-        state.heroDoubleClicked = true;
-        revealTwoVandalsBanner();
+          const found = $$(".egg.found").length;
+          if (found === eggs.length && !$("#secret-section")) {
+            const section = document.createElement("section");
+            section.id = "secret-section";
+            section.innerHTML = `
+              <div class="secret-box">
+                <h2>You unlocked the core.</h2>
+                <p>
+                  This hidden layer rewards anyone who stayed long enough to notice the small things.
+                  The next version can turn this zone into a private archive, hidden track hub, or invitation-only collector room.
+                </p>
+              </div>
+            `;
+            document.body.appendChild(section);
+            flashMessage("CORE UNLOCKED", "success");
+          }
+        }
       });
     });
   }
 
-  function pulsePageHint() {
-    document.documentElement.style.transition = "filter 120ms ease";
-    document.documentElement.style.filter = "contrast(1.12) brightness(1.05)";
-    setTimeout(() => {
-      document.documentElement.style.filter = "";
-    }, 120);
-  }
+  function updateEggProgress() {
+    const eggs = $$(".egg");
+    if (!eggs.length) return;
 
-  function revealTwoVandalsBanner() {
-    if (state.triggered) return;
-
-    const banner = document.getElementById("tv-easter-banner");
-    const title = document.getElementById("tv-easter-title");
-    if (!banner || !title) return;
-
-    state.triggered = true;
-
-    banner.classList.add("active", "flash");
-    document.body.classList.add("tv-secret-awakened");
-
-    playFabricTearSound().catch(() => {});
-    launchMicroGlitches(title);
-    launchScreenFlicker();
-
-    setTimeout(() => banner.classList.remove("flash"), 260);
-  }
-
-  async function playFabricTearSound() {
-    const AudioCtx = window.AudioContext || window.webkitAudioContext;
-    if (!AudioCtx) return;
-
-    const ctx = new AudioCtx();
-    if (ctx.state === "suspended") {
-      await ctx.resume();
+    let badge = $("#egg-progress");
+    if (!badge) {
+      badge = document.createElement("div");
+      badge.id = "egg-progress";
+      document.body.appendChild(badge);
     }
 
-    const now = ctx.currentTime;
-    const duration = 0.55;
-    const bufferSize = Math.floor(ctx.sampleRate * duration);
-    const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-    const data = noiseBuffer.getChannelData(0);
+    const found = $$(".egg.found").length;
+    badge.textContent = `ARTIFACTS ${found}/${eggs.length}`;
+    badge.style.borderColor = found === eggs.length
+      ? "rgba(116,246,255,.35)"
+      : "rgba(255,255,255,.12)";
+    badge.style.color = found === eggs.length ? "#74f6ff" : "#fff";
+  }
 
-    for (let i = 0; i < bufferSize; i++) {
-      const t = i / bufferSize;
-      const burst = Math.random() * 2 - 1;
-      const grain = Math.sin(i * 0.018) * 0.15;
-      const rasp = Math.sin(i * 0.09) * 0.07;
-      data[i] = burst * (1 - t * 0.55) + grain + rasp;
+  // =========================================================
+  // OPTIONAL TRACK LIST SUPPORT
+  // =========================================================
+  async function loadTracks(fileList = []) {
+    const listContainer = $("#trackList");
+    const template = $("#audio-template");
+    if (!listContainer || !template) return;
+
+    listContainer.innerHTML = "";
+
+    for (const file of fileList) {
+      const name = file?.name || "Unknown";
+      if (!/\.(mp3|wav)$/i.test(name)) continue;
+
+      const clone = template.content.cloneNode(true);
+      const audio = clone.querySelector("audio");
+      const canvas = clone.querySelector(".visualizer");
+      const vizCtx = canvas?.getContext("2d");
+      const title = clone.querySelector(".track-title");
+      const playBtn = clone.querySelector(".play-btn");
+      const seek = clone.querySelector(".seek-bar");
+      const volume = clone.querySelector(".volume-bar");
+      const currentTimeEl = clone.querySelector(".current-time");
+      const durationEl = clone.querySelector(".duration");
+      const deleteBtn = clone.querySelector(".delete-btn");
+      const likeBtn = clone.querySelector(".like-btn");
+      const likeCount = clone.querySelector(".like-count");
+
+      if (!audio || !canvas || !vizCtx || !title || !playBtn || !seek || !volume || !currentTimeEl || !durationEl) {
+        continue;
+      }
+
+      title.textContent = name.replace(/\.[^/.]+$/, "");
+      audio.src = file.url || file.publicUrl || "";
+      audio.crossOrigin = "anonymous";
+
+      let audioCtx = null;
+      let analyser = null;
+      let source = null;
+      let animationId = null;
+      let graphReady = false;
+
+      function drawBars() {
+        if (!analyser || !vizCtx || !canvas) return;
+
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+        analyser.getByteFrequencyData(dataArray);
+
+        vizCtx.clearRect(0, 0, canvas.width, canvas.height);
+        const barWidth = (canvas.width / bufferLength) * 2.1;
+        let x = 0;
+
+        for (let i = 0; i < bufferLength; i++) {
+          const barHeight = dataArray[i] / 2;
+          vizCtx.fillStyle = `rgba(${Math.min(255, barHeight + 70)}, ${Math.min(255, 120 + barHeight / 4)}, 90, .85)`;
+          vizCtx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+          x += barWidth + 1;
+        }
+
+        animationId = requestAnimationFrame(drawBars);
+      }
+
+      async function ensureGraph() {
+        if (graphReady) {
+          if (audioCtx.state === "suspended") await audioCtx.resume();
+          return true;
+        }
+
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return false;
+
+        audioCtx = new AudioCtx();
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 256;
+
+        source = audioCtx.createMediaElementSource(audio);
+        source.connect(analyser);
+        analyser.connect(audioCtx.destination);
+
+        if (audioCtx.state === "suspended") await audioCtx.resume();
+        graphReady = true;
+        return true;
+      }
+
+      playBtn.addEventListener("click", async () => {
+        if (audio.paused) {
+          const ok = await ensureGraph();
+          if (!ok) {
+            flashMessage("VISUALIZER OFFLINE", "error");
+            return;
+          }
+
+          document.querySelectorAll("audio").forEach(a => {
+            if (a !== audio) a.pause();
+          });
+
+          try {
+            await audio.play();
+          } catch {
+            flashMessage("PLAYBACK BLOCKED", "error");
+          }
+        } else {
+          audio.pause();
+        }
+      });
+
+      audio.addEventListener("play", () => {
+        playBtn.textContent = "⏸";
+        if (animationId) cancelAnimationFrame(animationId);
+        drawBars();
+      });
+
+      audio.addEventListener("pause", () => {
+        playBtn.textContent = "▶";
+        if (animationId) cancelAnimationFrame(animationId);
+        vizCtx.clearRect(0, 0, canvas.width, canvas.height);
+      });
+
+      audio.addEventListener("ended", () => {
+        if (animationId) cancelAnimationFrame(animationId);
+        vizCtx.clearRect(0, 0, canvas.width, canvas.height);
+      });
+
+      audio.addEventListener("loadedmetadata", () => {
+        if (Number.isFinite(audio.duration)) {
+          seek.max = String(Math.floor(audio.duration));
+          durationEl.textContent = safeFormatTime(audio.duration);
+        }
+      });
+
+      audio.addEventListener("timeupdate", () => {
+        seek.value = String(audio.currentTime || 0);
+        currentTimeEl.textContent = safeFormatTime(audio.currentTime);
+      });
+
+      seek.addEventListener("input", () => {
+        audio.currentTime = Number(seek.value);
+      });
+
+      volume.addEventListener("input", () => {
+        audio.volume = Number(volume.value);
+      });
+
+      if (likeBtn && likeCount) {
+        likeBtn.addEventListener("click", () => {
+          const current = Number(likeCount.textContent || "0");
+          likeCount.textContent = String(current + 1);
+          likeBtn.classList.add("liked");
+        });
+      }
+
+      if (deleteBtn) {
+        deleteBtn.addEventListener("click", () => {
+          const wrapper = deleteBtn.closest("article, .panel");
+          wrapper?.remove();
+          flashMessage(`DELETED ${name.toUpperCase()}`, "accent");
+        });
+      }
+
+      listContainer.appendChild(clone);
+    }
+  }
+
+  window.loadTracks = loadTracks;
+
+  // =========================================================
+  // SAFE DRAG & DROP HOOKS
+  // =========================================================
+  function initUploadArea() {
+    const dropZone = $("#upload-area");
+    const fileInput = $("#fileInput");
+    const uploadStatus = $("#uploadStatus");
+    const uploadBtn = $("#uploadBtn");
+
+    if (!dropZone || !fileInput || !uploadBtn || !uploadStatus) return;
+
+    function handleFile(file) {
+      if (!file) return;
+      if (!/\.(mp3|wav)$/i.test(file.name)) {
+        uploadStatus.textContent = "❌ Only .mp3 or .wav allowed.";
+        return;
+      }
+      uploadStatus.textContent = `✅ Ready: ${file.name}`;
+      flashMessage("FILE READY", "success");
     }
 
-    const source = ctx.createBufferSource();
-    source.buffer = noiseBuffer;
+    dropZone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      dropZone.classList.add("dragging");
+    });
 
-    const bandpass = ctx.createBiquadFilter();
-    bandpass.type = "bandpass";
-    bandpass.frequency.setValueAtTime(1450, now);
-    bandpass.Q.setValueAtTime(0.9, now);
+    dropZone.addEventListener("dragleave", () => {
+      dropZone.classList.remove("dragging");
+    });
 
-    const highpass = ctx.createBiquadFilter();
-    highpass.type = "highpass";
-    highpass.frequency.setValueAtTime(500, now);
+    dropZone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      dropZone.classList.remove("dragging");
+      const file = e.dataTransfer?.files?.[0];
+      if (file) handleFile(file);
+    });
 
-    const lowpass = ctx.createBiquadFilter();
-    lowpass.type = "lowpass";
-    lowpass.frequency.setValueAtTime(5200, now);
-
-    const gain = ctx.createGain();
-    gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.linearRampToValueAtTime(0.9, now + 0.018);
-    gain.gain.exponentialRampToValueAtTime(0.22, now + 0.12);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-
-    source.connect(bandpass);
-    bandpass.connect(highpass);
-    highpass.connect(lowpass);
-    lowpass.connect(gain);
-    gain.connect(ctx.destination);
-
-    source.start(now);
-    source.stop(now + duration + 0.02);
-
-    source.onended = () => {
-      setTimeout(() => ctx.close().catch(() => {}), 80);
-    };
+    uploadBtn.addEventListener("click", () => {
+      const file = fileInput.files?.[0];
+      if (file) handleFile(file);
+      else uploadStatus.textContent = "❗ Choose a file first.";
+    });
   }
 
-  function launchMicroGlitches(title) {
-    let bursts = 0;
+  // =========================================================
+  // SECRET NAV / INTERNAL LINKS
+  // =========================================================
+  function initHashLinks() {
+    document.addEventListener("click", (e) => {
+      const link = e.target.closest('a[href^="#"]');
+      if (!link) return;
 
-    const interval = setInterval(() => {
-      bursts += 1;
+      const href = link.getAttribute("href");
+      if (!href || href === "#") return;
 
-      title.style.transform = `
-        translate(${rand(-4, 4)}px, ${rand(-2, 2)}px)
-        skewX(${rand(-8, 8)}deg)
-      `;
+      const target = $(href);
+      if (!target) return;
 
-      title.style.filter = `
-        contrast(${1 + Math.random() * 0.45})
-        saturate(${1 + Math.random() * 0.35})
-        blur(${Math.random() * 0.8}px)
-      `;
-
-      if (bursts > 14) {
-        clearInterval(interval);
-        title.style.transform = "";
-        title.style.filter = "";
-      }
-    }, 70);
+      e.preventDefault();
+      softScrollTo(target);
+    });
   }
 
-  function launchScreenFlicker() {
-    let count = 0;
-    const flicker = setInterval(() => {
-      count += 1;
-      document.body.style.filter =
-        count % 2
-          ? "contrast(1.18) saturate(1.08) brightness(1.02)"
-          : "contrast(0.96) brightness(0.98)";
-      if (count > 7) {
-        clearInterval(flicker);
-        document.body.style.filter = "";
-      }
-    }, 45);
+  // =========================================================
+  // INIT
+  // =========================================================
+  function init() {
+    initTheme();
+    initLoader();
+    initReveal();
+    initScrollSpy();
+    initCursorGlow();
+    initSnow();
+    initClickSound();
+    initInteractiveManifest();
+    initMainPlayer();
+    initSequencer();
+    initSoundLab();
+    initTrackAnatomy();
+    initEasterEggs();
+    updateEggProgress();
+    initUploadArea();
+    initHashLinks();
   }
 
-  function rand(min, max) {
-    return Math.random() * (max - min) + min;
-  }
-
-  document.addEventListener("DOMContentLoaded", initTwoVandalsSecretBanner);
+  document.addEventListener("DOMContentLoaded", init);
 })();
