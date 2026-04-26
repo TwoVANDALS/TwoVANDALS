@@ -751,3 +751,63 @@ footer {
     height: 22px;
   }
 }
+.sequencer-actions,
+.lab-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.lab-meta label,
+.lab-meta span {
+  min-width: 70px;
+  text-align: left;
+}
+
+#lab,
+#soundlab,
+#track-anatomy {
+  content-visibility: auto;
+}
+
+#track-anatomy audio {
+  width: 100%;
+  max-width: 640px;
+  margin: 1rem auto 0;
+  display: block;
+  filter: invert(1) contrast(1.1);
+}
+
+.manifest [data-glitch],
+.manifest p {
+  cursor: crosshair;
+  transition: transform 0.16s ease, color 0.16s ease, text-shadow 0.16s ease;
+}
+
+.manifest [data-glitch]:hover,
+.manifest p:hover {
+  color: #0ff;
+  transform: translateX(2px);
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.45);
+}
+
+@media (max-width: 768px) {
+  .sequencer-actions,
+  .lab-meta {
+    align-items: stretch;
+    justify-content: stretch;
+  }
+
+  .sequencer-actions > *,
+  .lab-meta > * {
+    width: 100%;
+  }
+
+  .lab-meta label,
+  .lab-meta span {
+    min-width: auto;
+  }
+}
