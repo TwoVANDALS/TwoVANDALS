@@ -1,217 +1,212 @@
-(() => {
+/* =========================================================
+   TwoVANDALS — MAIN SCRIPT
+   ========================================================= */
+
+(function () {
   "use strict";
 
-  // =========================================================
-  // CONFIG
-  // =========================================================
-  const SUPABASE_URL = "https://qqffjsnlsbzhzhlvbexb.supabase.co";
-  const SUPABASE_ANON_KEY = "YOUR_ANON_KEY"; // <-- replace
-  const TRACKS_BUCKET = "tracks";
+  const $ = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
-  const MAIN_PLAYLIST = [
-    "ybuocfiewu.mp3",
-    "track2.mp3",
-    "track3.mp3"
-  ];
-
-  let supabaseClientPromise = null;
-
-  // =========================================================
-  // HELPERS
-  // =========================================================
-  const $ = (selector, root = document) => root.querySelector(selector);
-  const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+  /* ==============================
+     0. GLOBAL HELPERS
+     ============================== */
 
   function formatTime(sec) {
     if (!Number.isFinite(sec) || sec < 0) return "0:00";
-    const minutes = Math.floor(sec / 60);
-    const seconds = Math.floor(sec % 60).toString().padStart(2, "0");
-    return `${minutes}:${seconds}`;
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60)
+      .toString()
+      .padStart(2, "0");
+    return `${m}:${s}`;
   }
 
-  async function safePlay(media) {
-    if (!media) return false;
-    try {
-      const result = media.play();
-      if (result && typeof result.then === "function") {
-        await result;
-      }
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  function supportsReducedMotion() {
+  function prefersReducedMotion() {
     return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   }
 
-  function isValidAudioFilename(name = "") {
-    return /\.(mp3|wav)$/i.test(name);
-  }
-
-  async function getSupabase() {
-    if (window.supabase) return window.supabase;
-    if (supabaseClientPromise) return supabaseClientPromise;
-
-    supabaseClientPromise = import("https://esm.sh/@supabase/supabase-js")
-      .then(({ createClient }) => createClient(SUPABASE_URL, SUPABASE_ANON_KEY))
-      .catch((err) => {
-        console.error("Supabase init error:", err);
-        return null;
-      });
-
-    return supabaseClientPromise;
-  }
-
-  function notify(message, type = "info") {
-    let toast = document.getElementById("site-toast");
-
-    if (!toast) {
-      toast = document.createElement("div");
-      toast.id = "site-toast";
-      toast.style.cssText = `
-        position: fixed;
-        right: 16px;
-        bottom: 84px;
-        z-index: 100000;
-        background: rgba(0,0,0,.92);
-        color: #fff;
-        border: 1px solid #444;
-        padding: 10px 14px;
-        font-family: VT323, monospace;
-        font-size: 20px;
-        letter-spacing: .06em;
-        box-shadow: 0 8px 30px rgba(0,0,0,.35);
-        opacity: 0;
-        transform: translateY(8px);
-        transition: opacity .2s ease, transform .2s ease, border-color .2s ease;
-        pointer-events: none;
+  function flashMessage(message, type = "info") {
+    let box = document.getElementById("tv-status-toast");
+    if (!box) {
+      box = document.createElement("div");
+      box.id = "tv-status-toast";
+      box.style.cssText = `
+        position:fixed;right:16px;bottom:90px;z-index:99999;
+        padding:10px 14px;background:#000;border:1px solid #444;color:#fff;
+        font-family:VT323,monospace;font-size:20px;letter-spacing:.06em;
+        box-shadow:0 0 18px rgba(0,0,0,.5);
+        opacity:0;transform:translateY(8px);
+        transition:opacity .2s ease, transform .2s ease;
       `;
-      document.body.appendChild(toast);
+      document.body.appendChild(box);
     }
-
-    toast.textContent = message;
-    toast.style.borderColor =
-      type === "success" ? "#00ff99" :
-      type === "error" ? "#ff4d6d" :
-      type === "accent" ? "#00e5ff" :
-      "#444";
-
-    toast.style.opacity = "1";
-    toast.style.transform = "translateY(0)";
-
-    clearTimeout(toast._timer);
-    toast._timer = setTimeout(() => {
-      toast.style.opacity = "0";
-      toast.style.transform = "translateY(8px)";
+    box.textContent = message;
+    box.style.borderColor =
+      type === "success"
+        ? "#0f0"
+        : type === "error"
+        ? "#f44"
+        : type === "accent"
+        ? "#0ff"
+        : "#666";
+    box.style.opacity = "1";
+    box.style.transform = "translateY(0)";
+    clearTimeout(box._timer);
+    box._timer = setTimeout(() => {
+      box.style.opacity = "0";
+      box.style.transform = "translateY(8px)";
     }, 1800);
   }
 
-  // =========================================================
-  // LOADER
-  // =========================================================
-  function initLoaders() {
-    window.addEventListener("load", () => {
-      const loader = document.getElementById("loader");
-      if (loader) loader.style.display = "none";
-    });
+  function debounce(fn, delay = 120) {
+    let t;
+    return (...args) => {
+      clearTimeout(t);
+      t = setTimeout(() => fn(...args), delay);
+    };
+  }
 
-    const loaderScreen = document.getElementById("loader-screen");
-    const loaderText = document.getElementById("loader-text");
+  /* ==============================
+     1. LOADER (TEXT "TwoVANDALS")
+     ============================== */
 
-    if (!loaderScreen || !loaderText) return;
+  function initLoader() {
+    const loader = document.getElementById("loader-screen");
+    const text = document.getElementById("loader-text");
+    if (!loader || !text) return;
 
-    const finalText = "TwoVANDALS";
+    const final = "TwoVANDALS";
     let index = 1;
-    loaderText.textContent = finalText[0] || "";
 
-    const interval = setInterval(() => {
-      if (index < finalText.length) {
-        loaderText.textContent += finalText[index];
+    const timer = setInterval(() => {
+      if (index < final.length) {
+        text.textContent += final[index];
         index++;
       } else {
-        clearInterval(interval);
-        setTimeout(() => loaderScreen.classList.add("hidden"), 500);
+        clearInterval(timer);
+        setTimeout(() => {
+          loader.classList.add("hidden");
+        }, 500);
       }
     }, 150);
   }
 
-  // =========================================================
-  // SNOW
-  // =========================================================
+  /* ==============================
+     2. CANVAS SNOW
+     ============================== */
+
   function initSnow() {
-    const snowCanvas = document.getElementById("snow-canvas");
-    if (!snowCanvas) return;
+    const canvas = document.getElementById("snow-canvas");
+    if (!canvas) return;
+    if (prefersReducedMotion()) return;
 
-    const snowCtx = snowCanvas.getContext("2d");
-    if (!snowCtx) return;
-    if (supportsReducedMotion()) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
-    let animationId = null;
     let snowflakes = [];
+    let animationId = null;
 
-    function resizeCanvas() {
-      snowCanvas.width = window.innerWidth;
-      snowCanvas.height = window.innerHeight;
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
     }
 
     function createSnowflake() {
       return {
-        x: Math.random() * snowCanvas.width,
-        y: Math.random() * -snowCanvas.height,
+        x: Math.random() * canvas.width,
+        y: Math.random() * -canvas.height,
         radius: Math.random() * 2 + 1,
         speed: Math.random() * 1 + 0.5,
-        drift: (Math.random() - 0.5) * 0.35,
-        alpha: Math.random() * 0.45 + 0.25
+        alpha: Math.random() * 0.5 + 0.3
       };
     }
 
-    function drawSnow() {
-      snowCtx.clearRect(0, 0, snowCanvas.width, snowCanvas.height);
-
+    function update() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
       snowflakes.forEach((flake, i) => {
         flake.y += flake.speed;
-        flake.x += flake.drift;
-
-        if (flake.y > snowCanvas.height || flake.x < -10 || flake.x > snowCanvas.width + 10) {
+        if (flake.y > canvas.height) {
           snowflakes[i] = createSnowflake();
         }
-
-        snowCtx.beginPath();
-        snowCtx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
-        snowCtx.fillStyle = `rgba(255,255,255,${flake.alpha})`;
-        snowCtx.fill();
+        ctx.beginPath();
+        ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,255,${flake.alpha})`;
+        ctx.fill();
       });
-
-      animationId = requestAnimationFrame(drawSnow);
+      animationId = requestAnimationFrame(update);
     }
 
-    function startSnow() {
-      if (animationId == null) drawSnow();
+    function start() {
+      if (animationId == null) {
+        update();
+      }
     }
 
-    function stopSnow() {
+    function stop() {
       if (animationId != null) {
         cancelAnimationFrame(animationId);
         animationId = null;
       }
     }
 
-    resizeCanvas();
+    resize();
     snowflakes = Array.from({ length: 100 }, createSnowflake);
-    startSnow();
+    start();
 
-    window.addEventListener("resize", resizeCanvas);
+    window.addEventListener("resize", () => {
+      resize();
+      snowflakes = Array.from({ length: 100 }, createSnowflake);
+    });
+
     document.addEventListener("visibilitychange", () => {
-      if (document.hidden) stopSnow();
-      else startSnow();
+      if (document.hidden) stop();
+      else start();
     });
   }
 
-  // =========================================================
-  // EASTER EGGS
-  // =========================================================
+  /* ==============================
+     3. NAV ACTIVE (SCROLL SPY)
+     ============================== */
+
+  function initScrollSpy() {
+    const sections = $$("section[id]");
+    const navLinks = $$("nav a");
+    if (!sections.length || !navLinks.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const id = entry.target.getAttribute("id");
+          const link = document.querySelector(`nav a[href="#${id}"]`);
+          if (entry.isIntersecting) {
+            navLinks.forEach((a) => a.classList.remove("active"));
+            if (link) link.classList.add("active");
+          }
+        });
+      },
+      {
+        rootMargin: "-30% 0px -60% 0px",
+        threshold: 0.1
+      }
+    );
+
+    sections.forEach((section) => observer.observe(section));
+
+    const firstVisible = sections.find(
+      (sec) => sec.getBoundingClientRect().top >= 0
+    );
+    if (firstVisible) {
+      const id = firstVisible.getAttribute("id");
+      const link = document.querySelector(`nav a[href="#${id}"]`);
+      navLinks.forEach((a) => a.classList.remove("active"));
+      if (link) link.classList.add("active");
+    }
+  }
+
+  /* ==============================
+     4. EASTER EGGS + PROGRESS
+     ============================== */
+
   function initEasterEggs() {
     const eggs = $$(".egg");
     if (!eggs.length) return;
@@ -219,52 +214,41 @@
     eggs.forEach((egg) => {
       egg.addEventListener("click", (e) => {
         e.preventDefault();
-
         if (!egg.classList.contains("found")) {
           egg.classList.add("found");
-          const total = $$(".egg").length;
-          const found = $$(".egg.found").length;
 
-          if (found === total && !document.getElementById("secret-section")) {
+          // Secret section once all found
+          const foundCount = $$(".egg.found").length;
+          if (foundCount === eggs.length && !document.getElementById("secret-section")) {
             const section = document.createElement("section");
             section.id = "secret-section";
             section.innerHTML = `
-              <h2>You unlocked the core.</h2>
-              <p>This is only the beginning.</p>
+              <h2>Core unlocked</h2>
+              <p>Trashwave is a glitch in the archive. Welcome inside.</p>
             `;
-            document.body.appendChild(section);
-            notify("ALL ARTIFACTS FOUND", "success");
+            document.body.insertBefore(
+              section,
+              document.querySelector("footer")
+            );
+            flashMessage("CORE UNLOCKED", "accent");
           }
         }
-
-        const href = egg.getAttribute("href");
-        if (href) {
-          window.open(href, "_blank", "noopener,noreferrer");
+        if (egg.href) {
+          window.open(egg.href, "_blank", "noopener,noreferrer");
         }
       });
     });
-  }
 
-  function initEasterProgress() {
-    const eggs = $$(".egg");
-    if (!eggs.length) return;
-
+    // Progress badge
     let badge = document.getElementById("egg-progress");
     if (!badge) {
       badge = document.createElement("div");
       badge.id = "egg-progress";
       badge.style.cssText = `
-        position: fixed;
-        left: 14px;
-        bottom: 84px;
-        z-index: 9998;
-        padding: 6px 10px;
-        background: rgba(0,0,0,.85);
-        color: #fff;
-        border: 1px solid #333;
-        font-family: VT323, monospace;
-        font-size: 18px;
-        letter-spacing: .08em;
+        position:fixed;left:14px;bottom:86px;z-index:9998;
+        padding:6px 10px;background:rgba(0,0,0,.85);color:#fff;
+        border:1px solid #333;font-family:VT323,monospace;font-size:18px;
+        letter-spacing:.08em;
       `;
       document.body.appendChild(badge);
     }
@@ -272,18 +256,40 @@
     const update = () => {
       const found = $$(".egg.found").length;
       badge.textContent = `ARTIFACTS ${found}/${eggs.length}`;
-      badge.style.borderColor = found === eggs.length ? "#00ff99" : "#333";
-      badge.style.color = found === eggs.length ? "#00ff99" : "#fff";
+      badge.style.borderColor = found === eggs.length ? "#0f0" : "#333";
+      badge.style.color = found === eggs.length ? "#0f0" : "#fff";
     };
 
     update();
-    eggs.forEach((egg) => egg.addEventListener("click", () => setTimeout(update, 0)));
+    eggs.forEach((egg) =>
+      egg.addEventListener("click", () => setTimeout(update, 0))
+    );
   }
 
-  // =========================================================
-  // MAIN AUDIO PLAYER
-  // =========================================================
-  function initMainAudioPlayer() {
+  /* ==============================
+     5. CLICK SOUND
+     ============================== */
+
+  function initClickSound() {
+    const clickAudio = document.getElementById("clickSound");
+    if (!clickAudio) return;
+
+    document.addEventListener("click", (e) => {
+      const isButton = e.target.closest(
+        "button, .pixel-btn, .egg, a, .like-btn"
+      );
+      if (isButton) {
+        clickAudio.currentTime = 0;
+        clickAudio.play().catch(() => {});
+      }
+    });
+  }
+
+  /* ==============================
+     6. MAIN AUDIO PLAYER (PLAYLIST)
+     ============================== */
+
+  function initGlobalPlayer() {
     const audio = document.getElementById("bgTrack");
     const playPauseBtn = document.getElementById("playPauseBtn");
     const volumeSlider = document.getElementById("volumeSlider");
@@ -297,65 +303,78 @@
     const trackTitle = document.getElementById("trackTitle");
 
     if (
-      !audio || !playPauseBtn || !volumeSlider || !seekBar || !currentTimeEl ||
-      !durationEl || !toggleBtn || !audioPlayer || !prevBtn || !nextBtn || !trackTitle
-    ) return;
+      !audio ||
+      !playPauseBtn ||
+      !volumeSlider ||
+      !seekBar ||
+      !currentTimeEl ||
+      !durationEl ||
+      !toggleBtn ||
+      !audioPlayer ||
+      !prevBtn ||
+      !nextBtn ||
+      !trackTitle
+    ) {
+      return;
+    }
 
+    const playlist = [
+      "ybuocfiewu.mp3",
+      "track2.mp3",
+      "track3.mp3"
+    ];
     let currentIndex = 0;
 
-    function setPlayButtonState(isPlaying) {
-      playPauseBtn.textContent = isPlaying
-        ? "⏸ Playing Trashwave Set"
-        : "▶ Listen to a curated Trashwave set";
-    }
-
-    async function loadTrack(index, autoplay = true) {
-      if (!MAIN_PLAYLIST.length) return;
-
-      if (index < 0) index = MAIN_PLAYLIST.length - 1;
-      if (index >= MAIN_PLAYLIST.length) index = 0;
-
+    function loadTrack(index) {
+      if (index < 0) index = playlist.length - 1;
+      if (index >= playlist.length) index = 0;
       currentIndex = index;
-      audio.src = MAIN_PLAYLIST[currentIndex];
+      audio.src = playlist[currentIndex];
       trackTitle.textContent = `Track ${currentIndex + 1}`;
       audio.load();
-
-      if (autoplay) {
-        const started = await safePlay(audio);
-        setPlayButtonState(started);
-      } else {
-        setPlayButtonState(false);
-      }
+      audio
+        .play()
+        .then(() => {
+          playPauseBtn.textContent = "⏸ Playing Trashwave Set";
+        })
+        .catch(() => {
+          // autoplay blocked, leave in paused state
+          playPauseBtn.textContent =
+            "▶ Listen to a curated Trashwave set";
+        });
     }
 
-    playPauseBtn.addEventListener("click", async () => {
+    playPauseBtn.addEventListener("click", () => {
       if (audio.paused) {
-        const started = await safePlay(audio);
-        setPlayButtonState(started);
+        audio
+          .play()
+          .then(() => {
+            playPauseBtn.textContent = "⏸ Playing Trashwave Set";
+          })
+          .catch(() => {});
       } else {
         audio.pause();
-        setPlayButtonState(false);
+        playPauseBtn.textContent =
+          "▶ Listen to a curated Trashwave set";
       }
     });
 
     volumeSlider.addEventListener("input", () => {
-      audio.volume = Number(volumeSlider.value);
+      audio.volume = volumeSlider.value;
     });
 
     audio.addEventListener("loadedmetadata", () => {
-      if (Number.isFinite(audio.duration)) {
-        seekBar.max = Math.floor(audio.duration);
-        durationEl.textContent = formatTime(audio.duration);
-      }
+      seekBar.max = Math.floor(audio.duration) || 0;
+      durationEl.textContent = formatTime(audio.duration);
     });
 
     audio.addEventListener("timeupdate", () => {
-      seekBar.value = String(audio.currentTime || 0);
+      seekBar.value = audio.currentTime;
       currentTimeEl.textContent = formatTime(audio.currentTime);
     });
 
     seekBar.addEventListener("input", () => {
-      audio.currentTime = Number(seekBar.value);
+      audio.currentTime = seekBar.value;
     });
 
     toggleBtn.addEventListener("click", () => {
@@ -363,513 +382,769 @@
       toggleBtn.textContent = isCollapsed ? "▲" : "▼";
       if (!isCollapsed) {
         setTimeout(() => {
-          audioPlayer.scrollIntoView({ behavior: "smooth", block: "center" });
+          audioPlayer.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+          });
         }, 200);
       }
     });
 
-    prevBtn.addEventListener("click", () => loadTrack(currentIndex - 1, true));
-    nextBtn.addEventListener("click", () => loadTrack(currentIndex + 1, true));
-    audio.addEventListener("ended", () => loadTrack(currentIndex + 1, true));
-    audio.addEventListener("pause", () => setPlayButtonState(false));
-    audio.addEventListener("play", () => setPlayButtonState(true));
+    prevBtn.addEventListener("click", () => {
+      loadTrack(currentIndex - 1);
+    });
 
-    audio.volume = Number(volumeSlider.value || 1);
-    loadTrack(currentIndex, false);
+    nextBtn.addEventListener("click", () => {
+      loadTrack(currentIndex + 1);
+    });
+
+    audio.addEventListener("ended", () => {
+      loadTrack(currentIndex + 1);
+    });
+
+    // init
+    loadTrack(currentIndex);
   }
 
-  // =========================================================
-  // CLICK SOUND
-  // =========================================================
-  function initClickSound() {
-    const clickAudio = document.getElementById("clickSound");
-    if (!clickAudio) return;
+  /* ==============================
+     7. MANIFEST GLITCH
+     ============================== */
 
-    document.addEventListener("click", (e) => {
-      const isButton = e.target.closest("button, .pixel-btn, .egg, a");
-      if (!isButton) return;
+  function initManifestGlitch() {
+    const lines = $$("#manifest [data-glitch], #manifest p");
+    if (!lines.length) return;
 
-      clickAudio.currentTime = 0;
-      clickAudio.play().catch(() => {});
+    const glitchChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<>/=+*-_";
+    let audioCtx = null;
+
+    function blip(freq = 220, duration = 0.06, type = "square", gainValue = 0.015) {
+      try {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return;
+        if (!audioCtx) audioCtx = new AC();
+        if (audioCtx.state === "suspended") audioCtx.resume();
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = type;
+        osc.frequency.value = freq;
+        gain.gain.value = gainValue;
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        const now = audioCtx.currentTime;
+        gain.gain.setValueAtTime(gainValue, now);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+        osc.start(now);
+        osc.stop(now + duration);
+      } catch {
+        // ignore
+      }
+    }
+
+    function scrambleText(el) {
+      if (el.dataset.animating === "1") return;
+      el.dataset.animating = "1";
+
+      const original = el.dataset.originalText || el.textContent.trim();
+      el.dataset.originalText = original;
+
+      let frame = 0;
+      const totalFrames = 12;
+
+      const tick = () => {
+        const progress = frame / totalFrames;
+        const revealCount = Math.floor(original.length * progress);
+
+        el.textContent = original
+          .split("")
+          .map((ch, i) => {
+            if (ch === " ") return " ";
+            if (i < revealCount) return original[i];
+            return glitchChars[Math.floor(Math.random() * glitchChars.length)];
+          })
+          .join("");
+
+        frame++;
+        if (frame <= totalFrames) {
+          requestAnimationFrame(tick);
+        } else {
+          el.textContent = original;
+          el.dataset.animating = "0";
+        }
+      };
+
+      tick();
+    }
+
+    lines.forEach((line, i) => {
+      line.dataset.originalText = line.textContent.trim();
+
+      line.addEventListener("mouseenter", () => {
+        scrambleText(line);
+        blip(160 + i * 35, 0.05, i % 2 ? "triangle" : "square", 0.01);
+      });
+
+      line.addEventListener("click", () => {
+        scrambleText(line);
+        blip(110 + i * 55, 0.09, "sawtooth", 0.018);
+        document.body.style.filter = "contrast(1.08) saturate(1.1)";
+        setTimeout(() => {
+          document.body.style.filter = "";
+        }, 120);
+      });
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key !== "Shift") return;
+      lines.forEach((line, i) => {
+        setTimeout(() => scrambleText(line), i * 40);
+      });
     });
   }
 
-  // =========================================================
-  // SPECTRUM VISUALIZER HELPERS
-  // =========================================================
-  function createSpectrumVisualizer(audio, canvas) {
-    if (!audio || !canvas) return null;
+  /* ==============================
+     8. PATTERN LAB / SEQUENCER
+     ============================== */
 
-    const vizCtx = canvas.getContext("2d");
-    if (!vizCtx) return null;
+  function initSequencer() {
+    const drumGridEl = document.getElementById("drumGrid");
+    const synthGridEl = document.getElementById("synthGrid");
+    if (!drumGridEl || !synthGridEl) return;
+
+    const bpmSlider = document.getElementById("seqBpm");
+    const bpmValue = document.getElementById("seqBpmValue");
+    const playBtn = document.getElementById("seqPlayBtn");
+    const stopBtn = document.getElementById("seqStopBtn");
+    const randomBtn = document.getElementById("seqRandomBtn");
+    const clearBtn = document.getElementById("seqClearBtn");
+    const shareBtn = document.getElementById("seqShareBtn");
+
+    const steps = 16;
+    const drumRows = ["kick", "snare", "hat"];
+    const noteRows = ["C5", "B4", "A4", "G4", "F4", "E4", "D4", "C4"];
+    const noteFreq = {
+      C5: 523.25,
+      B4: 493.88,
+      A4: 440.0,
+      G4: 392.0,
+      F4: 349.23,
+      E4: 329.63,
+      D4: 293.66,
+      C4: 261.63
+    };
 
     let audioCtx = null;
+    let masterGain = null;
     let analyser = null;
-    let source = null;
-    let animationId = null;
-    let dataArray = null;
-    let gradient = null;
+    let playing = false;
+    let stepIndex = 0;
+    let timer = null;
+    let bpm = Number(bpmSlider?.value || 118);
 
-    function getLogicalWidth() {
-      return Math.max(280, Math.floor(canvas.clientWidth || 600));
-    }
+    const drumState = drumRows.map(() => Array(steps).fill(false));
+    const noteState = noteRows.map(() => Array(steps).fill(false));
 
-    function getLogicalHeight() {
-      return Math.max(60, Math.floor(canvas.clientHeight || 90));
-    }
-
-    function resize() {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const width = getLogicalWidth();
-      const height = getLogicalHeight();
-
-      canvas.width = Math.floor(width * dpr);
-      canvas.height = Math.floor(height * dpr);
-
-      vizCtx.setTransform(1, 0, 0, 1, 0, 0);
-      vizCtx.scale(dpr, dpr);
-
-      gradient = vizCtx.createLinearGradient(0, 0, width, 0);
-      gradient.addColorStop(0, "#00ff99");
-      gradient.addColorStop(0.45, "#00d9ff");
-      gradient.addColorStop(1, "#ffffff");
-    }
-
-    async function ensureGraph() {
+    function ensureAudio() {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return false;
       if (!audioCtx) {
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        if (!AudioCtx) return false;
-
-        audioCtx = new AudioCtx();
+        audioCtx = new AC();
+        masterGain = audioCtx.createGain();
         analyser = audioCtx.createAnalyser();
-
-        // Each MediaElementAudioSourceNode is created from one specific HTMLMediaElement.
-        source = audioCtx.createMediaElementSource(audio);
-
-        analyser.fftSize = 512;
-        analyser.smoothingTimeConstant = 0.82;
-        analyser.minDecibels = -92;
-        analyser.maxDecibels = -18;
-
-        source.connect(analyser);
+        analyser.fftSize = 256;
+        masterGain.gain.value = 0.32;
+        masterGain.connect(analyser);
         analyser.connect(audioCtx.destination);
-
-        dataArray = new Uint8Array(analyser.frequencyBinCount);
       }
-
-      if (audioCtx.state === "suspended") {
-        await audioCtx.resume();
-      }
-
+      if (audioCtx.state === "suspended") audioCtx.resume();
       return true;
     }
 
-    function clear() {
-      const width = getLogicalWidth();
-      const height = getLogicalHeight();
-      vizCtx.clearRect(0, 0, width, height);
-
-      // faint idle frame
-      vizCtx.fillStyle = "rgba(255,255,255,0.02)";
-      vizCtx.fillRect(0, 0, width, height);
+    function playKick(time) {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(140, time);
+      osc.frequency.exponentialRampToValueAtTime(42, time + 0.12);
+      gain.gain.setValueAtTime(0.28, time);
+      gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.14);
+      osc.connect(gain).connect(masterGain);
+      osc.start(time);
+      osc.stop(time + 0.15);
     }
 
-    function stop() {
-      if (animationId != null) {
-        cancelAnimationFrame(animationId);
-        animationId = null;
+    function playSnare(time) {
+      const bufferSize = audioCtx.sampleRate * 0.12;
+      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const output = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        output[i] = Math.random() * 2 - 1;
       }
-      clear();
+      const noise = audioCtx.createBufferSource();
+      noise.buffer = buffer;
+
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = "highpass";
+      filter.frequency.value = 1200;
+
+      const gain = audioCtx.createGain();
+      gain.gain.setValueAtTime(0.16, time);
+      gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.12);
+
+      noise.connect(filter).connect(gain).connect(masterGain);
+      noise.start(time);
+      noise.stop(time + 0.12);
     }
 
-    function draw() {
-      if (!analyser || !dataArray) return;
-
-      const width = getLogicalWidth();
-      const height = getLogicalHeight();
-
-      analyser.getByteFrequencyData(dataArray);
-      vizCtx.clearRect(0, 0, width, height);
-
-      const bg = vizCtx.createLinearGradient(0, 0, 0, height);
-      bg.addColorStop(0, "rgba(10,10,10,0.08)");
-      bg.addColorStop(1, "rgba(0,0,0,0.32)");
-      vizCtx.fillStyle = bg;
-      vizCtx.fillRect(0, 0, width, height);
-
-      // horizontal guide lines
-      vizCtx.strokeStyle = "rgba(255,255,255,0.05)";
-      vizCtx.lineWidth = 1;
-      for (let y = 0; y < height; y += 18) {
-        vizCtx.beginPath();
-        vizCtx.moveTo(0, y);
-        vizCtx.lineTo(width, y);
-        vizCtx.stroke();
+    function playHat(time) {
+      const bufferSize = audioCtx.sampleRate * 0.04;
+      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const output = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        output[i] = Math.random() * 2 - 1;
       }
+      const noise = audioCtx.createBufferSource();
+      noise.buffer = buffer;
 
-      const visibleBars = 56;
-      const step = Math.max(1, Math.floor(dataArray.length / visibleBars));
-      const gap = 3;
-      const barWidth = (width - (visibleBars - 1) * gap) / visibleBars;
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = "highpass";
+      filter.frequency.value = 5000;
 
-      let x = 0;
+      const gain = audioCtx.createGain();
+      gain.gain.setValueAtTime(0.08, time);
+      gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.035);
 
-      for (let i = 0; i < visibleBars; i++) {
-        const raw = dataArray[i * step] || 0;
-        const weight = 1.16 - (i / visibleBars) * 0.42;
-        const scaled = Math.min(255, raw * weight);
-        const barHeight = Math.max(2, (scaled / 255) * height);
-
-        vizCtx.fillStyle = gradient;
-        vizCtx.fillRect(x, height - barHeight, barWidth, barHeight);
-
-        vizCtx.fillStyle = "rgba(255,255,255,0.82)";
-        vizCtx.fillRect(x, height - barHeight, barWidth, 2);
-
-        x += barWidth + gap;
-      }
-
-      animationId = requestAnimationFrame(draw);
+      noise.connect(filter).connect(gain).connect(masterGain);
+      noise.start(time);
+      noise.stop(time + 0.04);
     }
 
-    const onResize = () => resize();
-    window.addEventListener("resize", onResize);
+    function playSynth(freq, time, duration = 0.22) {
+      const osc = audioCtx.createOscillator();
+      const sub = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      const filter = audioCtx.createBiquadFilter();
 
-    document.addEventListener("visibilitychange", () => {
-      if (document.hidden) stop();
-      else if (!audio.paused) draw();
+      osc.type = "sawtooth";
+      sub.type = "triangle";
+      osc.frequency.value = freq;
+      sub.frequency.value = freq / 2;
+
+      filter.type = "lowpass";
+      filter.frequency.value = 1400;
+      filter.Q.value = 2.2;
+
+      gain.gain.setValueAtTime(0.0001, time);
+      gain.gain.linearRampToValueAtTime(0.08, time + 0.012);
+      gain.gain.exponentialRampToValueAtTime(0.0001, time + duration);
+
+      osc.connect(filter);
+      sub.connect(filter);
+      filter.connect(gain);
+      gain.connect(masterGain);
+
+      osc.start(time);
+      sub.start(time);
+      osc.stop(time + duration);
+      sub.stop(time + duration);
+    }
+
+    function buildGrid(container, rows, state, groupName) {
+      container.innerHTML = "";
+      rows.forEach((rowName, rowIndex) => {
+        const row = document.createElement("div");
+        row.className = "row";
+        for (let step = 0; step < steps; step++) {
+          const cell = document.createElement("button");
+          cell.type = "button";
+          cell.className = "cell";
+          cell.dataset.group = groupName;
+          cell.dataset.row = String(rowIndex);
+          cell.dataset.step = String(step);
+          cell.setAttribute(
+            "aria-label",
+            `${groupName} ${rowName} step ${step + 1}`
+          );
+          if (state[rowIndex][step]) cell.classList.add("active");
+          cell.addEventListener("click", () => {
+            state[rowIndex][step] = !state[rowIndex][step];
+            cell.classList.toggle("active", state[rowIndex][step]);
+          });
+          row.appendChild(cell);
+        }
+        container.appendChild(row);
+      });
+    }
+
+    function clearPlayingMarks() {
+      $$(".cell.playing").forEach((c) => c.classList.remove("playing"));
+    }
+
+    function markStep(step) {
+      clearPlayingMarks();
+      $$(`.cell[data-step="${step}"]`).forEach((c) =>
+        c.classList.add("playing")
+      );
+    }
+
+    function encodePattern() {
+      const drum = drumState
+        .flat()
+        .map((v) => (v ? "1" : "0"))
+        .join("");
+      const synth = noteState
+        .flat()
+        .map((v) => (v ? "1" : "0"))
+        .join("");
+      return `${drum}.${synth}.${bpm}`;
+    }
+
+    function decodePattern(serialized) {
+      if (!serialized) return;
+      const [drumBits, synthBits, bpmBits] = serialized.split(".");
+      if (bpmBits) {
+        bpm = Math.min(Math.max(Number(bpmBits) || 118, 70), 170);
+        if (bpmSlider) bpmSlider.value = String(bpm);
+        if (bpmValue) bpmValue.textContent = String(bpm);
+      }
+
+      if (drumBits && drumBits.length === drumRows.length * steps) {
+        let i = 0;
+        for (let r = 0; r < drumRows.length; r++) {
+          for (let s = 0; s < steps; s++) {
+            drumState[r][s] = drumBits[i++] === "1";
+          }
+        }
+      }
+
+      if (synthBits && synthBits.length === noteRows.length * steps) {
+        let i = 0;
+        for (let r = 0; r < noteRows.length; r++) {
+          for (let s = 0; s < steps; s++) {
+            noteState[r][s] = synthBits[i++] === "1";
+          }
+        }
+      }
+    }
+
+    function syncUrl() {
+      const url = new URL(window.location.href);
+      url.searchParams.set("pattern", encodePattern());
+      history.replaceState({}, "", url);
+    }
+
+    function triggerStep(step, time) {
+      markStep(step);
+
+      if (drumState[0][step]) playKick(time);
+      if (drumState[1][step]) playSnare(time);
+      if (drumState[2][step]) playHat(time);
+
+      noteRows.forEach((note, rowIndex) => {
+        if (noteState[rowIndex][step]) {
+          playSynth(noteFreq[note], time, 0.24);
+        }
+      });
+    }
+
+    function tick() {
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
+      triggerStep(stepIndex, now + 0.01);
+      stepIndex = (stepIndex + 1) % steps;
+    }
+
+    function startSequencer() {
+      if (playing) return;
+      if (!ensureAudio()) return;
+      const intervalMs = (60 / bpm / 4) * 1000;
+      playing = true;
+      tick();
+      timer = setInterval(tick, intervalMs);
+      flashMessage("SEQUENCER ON", "success");
+    }
+
+    function stopSequencer() {
+      playing = false;
+      clearInterval(timer);
+      timer = null;
+      stepIndex = 0;
+      clearPlayingMarks();
+      flashMessage("SEQUENCER OFF");
+    }
+
+    function randomizePattern() {
+      drumState.forEach((row, r) => {
+        row.forEach((_, s) => {
+          const chance = r === 2 ? 0.38 : 0.24;
+          drumState[r][s] = Math.random() < chance;
+        });
+      });
+
+      noteState.forEach((row, r) => {
+        row.forEach((_, s) => {
+          const chance = r < 2 ? 0.08 : 0.14;
+          noteState[r][s] = Math.random() < chance;
+        });
+      });
+
+      renderGridState();
+      syncUrl();
+      flashMessage("RANDOM PATTERN", "accent");
+    }
+
+    function clearPattern() {
+      drumState.forEach((row) => row.fill(false));
+      noteState.forEach((row) => row.fill(false));
+      renderGridState();
+      syncUrl();
+      flashMessage("PATTERN CLEARED");
+    }
+
+    function renderGridState() {
+      $$(".cell[data-group='drum']").forEach((cell) => {
+        const r = Number(cell.dataset.row);
+        const s = Number(cell.dataset.step);
+        cell.classList.toggle("active", drumState[r][s]);
+      });
+
+      $$(".cell[data-group='synth']").forEach((cell) => {
+        const r = Number(cell.dataset.row);
+        const s = Number(cell.dataset.step);
+        cell.classList.toggle("active", noteState[r][s]);
+      });
+    }
+
+    function applyPatternFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      const pattern = params.get("pattern");
+      if (pattern) decodePattern(pattern);
+    }
+
+    // init
+    applyPatternFromUrl();
+    buildGrid(drumGridEl, drumRows, drumState, "drum");
+    buildGrid(synthGridEl, noteRows, noteState, "synth");
+    renderGridState();
+
+    if (bpmValue) bpmValue.textContent = String(bpm);
+
+    bpmSlider?.addEventListener("input", () => {
+      bpm = Number(bpmSlider.value);
+      if (bpmValue) bpmValue.textContent = String(bpm);
+      syncUrl();
+      if (playing) {
+        stopSequencer();
+        startSequencer();
+      }
     });
 
-    resize();
-    clear();
+    playBtn?.addEventListener("click", startSequencer);
+    stopBtn?.addEventListener("click", stopSequencer);
+    randomBtn?.addEventListener("click", randomizePattern);
+    clearBtn?.addEventListener("click", clearPattern);
 
-    return {
-      ensureGraph,
-      start: async () => {
-        const ok = await ensureGraph();
-        if (!ok) return false;
-        stop();
-        draw();
-        return true;
-      },
-      stop,
-      destroy: () => {
-        stop();
-        window.removeEventListener("resize", onResize);
-      }
-    };
-  }
-
-  // =========================================================
-  // TRACK LIST + SPECTRUM ANALYZER
-  // =========================================================
-  async function loadTracks(fileList = []) {
-    const listContainer = document.getElementById("trackList");
-    const template = document.getElementById("audio-template");
-
-    if (!listContainer || !template) return;
-
-    listContainer.innerHTML = "";
-
-    for (const file of fileList) {
-      const name = file?.name || "Unknown";
-      if (!isValidAudioFilename(name)) continue;
-
-      const clone = template.content.cloneNode(true);
-
-      const audio = $("audio", clone);
-      const canvas = $(".visualizer", clone);
-      const title = $(".track-title", clone);
-      const playBtn = $(".play-btn", clone);
-      const seek = $(".seek-bar", clone);
-      const volume = $(".volume-bar", clone);
-      const currentTimeEl = $(".current-time", clone);
-      const durationEl = $(".duration", clone);
-      const deleteBtn = $(".delete-btn", clone);
-      const likeBtn = $(".like-btn", clone);
-      const likeCount = $(".like-count", clone);
-
-      if (
-        !audio || !canvas || !title || !playBtn || !seek ||
-        !volume || !currentTimeEl || !durationEl
-      ) {
-        continue;
-      }
-
-      const spectrum = createSpectrumVisualizer(audio, canvas);
-
-      title.textContent = name.replace(/\.[^/.]+$/, "");
-      audio.src = file.url || file.publicUrl || "";
-      audio.preload = "metadata";
-
-      // delete
-      if (deleteBtn) {
-        deleteBtn.addEventListener("click", async () => {
-          const confirmDelete = confirm(`Delete track "${name}"?`);
-          if (!confirmDelete) return;
-
-          const supabase = await getSupabase();
-          if (!supabase) {
-            alert("❌ Supabase is not initialized.");
-            return;
-          }
-
-          const { error } = await supabase.storage.from(TRACKS_BUCKET).remove([name]);
-
-          if (error) {
-            alert("❌ Error deleting track: " + error.message);
-          } else {
-            alert(`🗑️ Deleted: ${name}`);
-            if (typeof window.listTracks === "function") {
-              await window.listTracks();
-            }
-          }
-        });
-      }
-
-      // likes
-      if (likeBtn && likeCount) {
-        const likeKey = `liked_${name}`;
-        let hasLiked = false;
-
-        try {
-          hasLiked = !!localStorage.getItem(likeKey);
-        } catch {}
-
-        if (hasLiked) {
-          likeBtn.classList.add("liked");
-        }
-
-        const supabase = await getSupabase();
-        if (supabase) {
-          supabase
-            .from("likes")
-            .select("likes")
-            .eq("filename", name)
-            .single()
-            .then(({ data }) => {
-              likeCount.textContent = String(data?.likes || 0);
-            })
-            .catch(() => {
-              likeCount.textContent = "0";
-            });
-
-          likeBtn.addEventListener("click", async () => {
-            try {
-              if (localStorage.getItem(likeKey)) return;
-            } catch {}
-
-            const { data, error } = await supabase.rpc("increment_like", {
-              filename_input: name
-            });
-
-            if (!error) {
-              likeCount.textContent = String(data?.likes ?? Number(likeCount.textContent || 0) + 1);
-              try {
-                localStorage.setItem(likeKey, "1");
-              } catch {}
-              likeBtn.classList.add("liked");
-              notify("TRACK LIKED", "accent");
-            }
-          });
-        }
-      }
-
-      // play/pause
-      playBtn.addEventListener("click", async () => {
-        if (audio.paused) {
-          $$("audio").forEach((a) => {
-            if (a !== audio) a.pause();
-          });
-
-          const started = await safePlay(audio);
-          if (started) {
-            await spectrum?.start();
-          }
+    shareBtn?.addEventListener("click", async () => {
+      syncUrl();
+      const url = window.location.href;
+      try {
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(url);
+          flashMessage("LINK COPIED", "success");
         } else {
-          audio.pause();
+          throw new Error("clipboard unsupported");
         }
-      });
+      } catch {
+        flashMessage("COPY FAILED", "error");
+      }
+    });
 
-      audio.addEventListener("play", async () => {
-        playBtn.textContent = "⏸";
-        await spectrum?.start();
-      });
-
-      audio.addEventListener("pause", () => {
-        playBtn.textContent = "▶";
-        spectrum?.stop();
-      });
-
-      audio.addEventListener("ended", () => {
-        playBtn.textContent = "▶";
-        spectrum?.stop();
-      });
-
-      audio.addEventListener("loadedmetadata", () => {
-        if (Number.isFinite(audio.duration)) {
-          seek.max = String(Math.floor(audio.duration));
-          durationEl.textContent = formatTime(audio.duration);
-        }
-      });
-
-      audio.addEventListener("timeupdate", () => {
-        seek.value = String(audio.currentTime || 0);
-        currentTimeEl.textContent = formatTime(audio.currentTime);
-      });
-
-      seek.addEventListener("input", () => {
-        audio.currentTime = Number(seek.value);
-      });
-
-      volume.addEventListener("input", () => {
-        audio.volume = Number(volume.value);
-      });
-
-      listContainer.appendChild(clone);
-    }
+    drumGridEl.addEventListener("click", debounce(syncUrl, 120));
+    synthGridEl.addEventListener("click", debounce(syncUrl, 120));
   }
 
-  window.loadTracks = loadTracks;
+  /* ==============================
+     9. SOUNDLAB (DRONE / NOISE / PULSE)
+     ============================== */
 
-  // =========================================================
-  // SCROLLSPY
-  // =========================================================
-  function initScrollSpy() {
-    const sections = $$("section[id]");
-    const navLinks = $$("nav a");
+  function initSoundLab() {
+    const initBtn = document.getElementById("soundLabInit");
+    const droneSlider = document.getElementById("ambienceDrone");
+    const noiseSlider = document.getElementById("ambienceNoise");
+    const pulseSlider = document.getElementById("ambiencePulse");
 
-    if (!sections.length || !navLinks.length) return;
-    if (!("IntersectionObserver" in window)) return;
+    if (!initBtn || !droneSlider || !noiseSlider || !pulseSlider) return;
+
+    let audioCtx = null;
+    let droneOsc = null;
+    let droneSub = null;
+    let droneGain = null;
+    let noiseSource = null;
+    let noiseGain = null;
+    let pulseOsc = null;
+    let pulseGain = null;
+    let lfo = null;
+    let lfoGain = null;
+    let ready = false;
+
+    function createNoiseBuffer(ctx, seconds = 2) {
+      const buffer = ctx.createBuffer(1, ctx.sampleRate * seconds, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < data.length; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+      return buffer;
+    }
+
+    function boot() {
+      if (ready) return true;
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return false;
+
+      audioCtx = new AC();
+
+      // Drone
+      droneOsc = audioCtx.createOscillator();
+      droneSub = audioCtx.createOscillator();
+      droneGain = audioCtx.createGain();
+      const droneFilter = audioCtx.createBiquadFilter();
+
+      droneOsc.type = "sawtooth";
+      droneSub.type = "triangle";
+      droneOsc.frequency.value = 55;
+      droneSub.frequency.value = 27.5;
+      droneFilter.type = "lowpass";
+      droneFilter.frequency.value = 320;
+      droneGain.gain.value = 0;
+
+      droneOsc.connect(droneFilter);
+      droneSub.connect(droneFilter);
+      droneFilter.connect(droneGain).connect(audioCtx.destination);
+
+      // Noise
+      noiseSource = audioCtx.createBufferSource();
+      noiseSource.buffer = createNoiseBuffer(audioCtx, 3);
+      noiseSource.loop = true;
+      noiseGain = audioCtx.createGain();
+      const noiseFilter = audioCtx.createBiquadFilter();
+      noiseFilter.type = "highpass";
+      noiseFilter.frequency.value = 2800;
+      noiseGain.gain.value = 0;
+      noiseSource.connect(noiseFilter).connect(noiseGain).connect(audioCtx.destination);
+
+      // Pulse
+      pulseOsc = audioCtx.createOscillator();
+      pulseGain = audioCtx.createGain();
+      pulseOsc.type = "square";
+      pulseOsc.frequency.value = 110;
+      pulseGain.gain.value = 0;
+
+      lfo = audioCtx.createOscillator();
+      lfoGain = audioCtx.createGain();
+      lfo.type = "sine";
+      lfo.frequency.value = 2.2;
+      lfoGain.gain.value = 0.018;
+      lfo.connect(lfoGain).connect(pulseGain.gain);
+
+      pulseOsc.connect(pulseGain).connect(audioCtx.destination);
+
+      droneOsc.start();
+      droneSub.start();
+      noiseSource.start();
+      pulseOsc.start();
+      lfo.start();
+
+      ready = true;
+      return true;
+    }
+
+    function applyValues() {
+      if (!ready) return;
+      const now = audioCtx.currentTime;
+      droneGain.gain.setTargetAtTime(
+        Number(droneSlider.value) / 500,
+        now,
+        0.08
+      );
+      noiseGain.gain.setTargetAtTime(
+        Number(noiseSlider.value) / 900,
+        now,
+        0.08
+      );
+      pulseGain.gain.setTargetAtTime(
+        Number(pulseSlider.value) / 800,
+        now,
+        0.08
+      );
+    }
+
+    initBtn.addEventListener("click", async () => {
+      const ok = boot();
+      if (!ok) {
+        flashMessage("WEB AUDIO NOT SUPPORTED", "error");
+        return;
+      }
+      if (audioCtx.state === "suspended") await audioCtx.resume();
+      applyValues();
+      flashMessage("SOUNDLAB ACTIVE", "success");
+    });
+
+    [droneSlider, noiseSlider, pulseSlider].forEach((slider) => {
+      slider.addEventListener("input", applyValues);
+    });
+  }
+
+  /* ==============================
+     10. TRACK ANATOMY
+     ============================== */
+
+  function initTrackAnatomy() {
+    const audio = document.getElementById("anatomyTrack");
+    const playBtn = document.getElementById("anatomyPlay");
+    const lowpass = document.getElementById("anatomyLowpass");
+    const drive = document.getElementById("anatomyDrive");
+    const now = document.getElementById("anatomyNow");
+    const seekMarkers = $$("[data-seek-anatomy]");
+
+    if (!audio || !playBtn || !lowpass || !drive) return;
+
+    let audioCtx = null;
+    let source = null;
+    let filter = null;
+    let distortion = null;
+    let outputGain = null;
+    let graphReady = false;
+
+    function makeDistortionCurve(amount = 20) {
+      const k = typeof amount === "number" ? amount : 0;
+      const n = 44100;
+      const curve = new Float32Array(n);
+      const deg = Math.PI / 180;
+
+      for (let i = 0; i < n; i++) {
+        const x = (i * 2) / n - 1;
+        curve[i] = ((3 + k) * x * 20 * deg) /
+          (Math.PI + k * Math.abs(x));
+      }
+      return curve;
+    }
+
+    async function ensureGraph() {
+      if (graphReady) {
+        if (audioCtx.state === "suspended") await audioCtx.resume();
+        return true;
+      }
+
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return false;
+
+      audioCtx = new AC();
+      source = audioCtx.createMediaElementSource(audio);
+      filter = audioCtx.createBiquadFilter();
+      distortion = audioCtx.createWaveShaper();
+      outputGain = audioCtx.createGain();
+
+      filter.type = "lowpass";
+      filter.frequency.value = Number(lowpass.value || 12000);
+      distortion.curve = makeDistortionCurve(Number(drive.value || 0));
+      distortion.oversample = "4x";
+      outputGain.gain.value = 0.95;
+
+      source.connect(filter);
+      filter.connect(distortion);
+      distortion.connect(outputGain);
+      outputGain.connect(audioCtx.destination);
+
+      if (audioCtx.state === "suspended") await audioCtx.resume();
+
+      graphReady = true;
+      return true;
+    }
+
+    playBtn.addEventListener("click", async () => {
+      const ok = await ensureGraph();
+      if (!ok) {
+        flashMessage("TRACK ANATOMY OFFLINE", "error");
+        return;
+      }
+
+      if (audio.paused) {
+        audio.play().catch(() => {});
+      } else {
+        audio.pause();
+      }
+    });
+
+    lowpass.addEventListener("input", () => {
+      if (filter) filter.frequency.value = Number(lowpass.value);
+    });
+
+    drive.addEventListener("input", () => {
+      if (distortion) distortion.curve = makeDistortionCurve(Number(drive.value));
+    });
+
+    seekMarkers.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        audio.currentTime = Number(btn.dataset.seekAnatomy || 0);
+      });
+    });
+
+    audio.addEventListener("timeupdate", () => {
+      if (now) now.textContent = formatTime(audio.currentTime);
+    });
+
+    audio.addEventListener("play", () => {
+      playBtn.textContent = "PAUSE TRACK";
+    });
+
+    audio.addEventListener("pause", () => {
+      playBtn.textContent = "PLAY TRACK";
+    });
+  }
+
+  /* ==============================
+     11. LAZY LOAD SOUNDCLOUD PLAYER
+     ============================== */
+
+  function initSoundCloudLazy() {
+    const section = document.getElementById("music");
+    const iframe = document.getElementById("scPlayer");
+    if (!section || !iframe) return;
 
     const observer = new IntersectionObserver(
-      (entries) => {
+      (entries, obs) => {
         entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-
-          const id = entry.target.getAttribute("id");
-          const link = document.querySelector(`nav a[href="#${id}"]`);
-          navLinks.forEach((a) => a.classList.remove("active"));
-          if (link) link.classList.add("active");
+          if (entry.isIntersecting && iframe.dataset.src) {
+            iframe.src = iframe.dataset.src;
+            obs.unobserve(entry.target);
+          }
         });
       },
-      {
-        rootMargin: "-30% 0px -60% 0px",
-        threshold: 0.1
-      }
+      { threshold: 0.25 }
     );
 
-    sections.forEach((section) => observer.observe(section));
-
-    const firstVisible = sections.find((sec) => sec.getBoundingClientRect().top >= 0) || sections[0];
-    if (firstVisible) {
-      const id = firstVisible.getAttribute("id");
-      const link = document.querySelector(`nav a[href="#${id}"]`);
-      navLinks.forEach((a) => a.classList.remove("active"));
-      if (link) link.classList.add("active");
-    }
+    observer.observe(section);
   }
 
-  // =========================================================
-  // SOUNDCLOUD LAZY LOAD
-  // =========================================================
-  function initSoundCloudLazyLoad() {
-    const scSection = document.getElementById("music");
-    const scIframe = document.getElementById("scPlayer");
+  /* ==============================
+     DOM READY
+     ============================== */
 
-    if (!scSection || !scIframe) return;
-
-    if (!("IntersectionObserver" in window)) {
-      if (scIframe.dataset.src) scIframe.src = scIframe.dataset.src;
-      return;
-    }
-
-    const scObserver = new IntersectionObserver((entries, obs) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting && scIframe.dataset.src) {
-          scIframe.src = scIframe.dataset.src;
-          obs.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.25 });
-
-    scObserver.observe(scSection);
-  }
-
-  // =========================================================
-  // UPLOAD
-  // =========================================================
-  function initUpload() {
-    const dropZone = document.getElementById("upload-area");
-    const fileInput = document.getElementById("fileInput");
-    const uploadStatus = document.getElementById("uploadStatus");
-    const uploadBtn = document.getElementById("uploadBtn");
-
-    if (!dropZone || !fileInput || !uploadStatus || !uploadBtn) return;
-
-    async function handleFile(file) {
-      if (!file || !isValidAudioFilename(file.name)) {
-        uploadStatus.textContent = "❌ Only .mp3 or .wav allowed.";
-        return;
-      }
-
-      const supabase = await getSupabase();
-      if (!supabase) {
-        uploadStatus.textContent = "❌ Supabase is not initialized.";
-        return;
-      }
-
-      const { error } = await supabase.storage.from(TRACKS_BUCKET).upload(file.name, file, {
-        cacheControl: "3600",
-        upsert: false
-      });
-
-      if (error) {
-        uploadStatus.textContent = `❌ Error: ${error.message}`;
-      } else {
-        uploadStatus.textContent = `✅ Uploaded: ${file.name}`;
-        notify(`UPLOADED: ${file.name}`, "success");
-        if (typeof window.listTracks === "function") {
-          await window.listTracks();
-        }
-      }
-    }
-
-    dropZone.addEventListener("dragover", (e) => {
-      e.preventDefault();
-      dropZone.classList.add("dragging");
-    });
-
-    dropZone.addEventListener("dragleave", () => {
-      dropZone.classList.remove("dragging");
-    });
-
-    dropZone.addEventListener("drop", (e) => {
-      e.preventDefault();
-      dropZone.classList.remove("dragging");
-      const file = e.dataTransfer?.files?.[0];
-      if (file) handleFile(file);
-    });
-
-    uploadBtn.addEventListener("click", () => {
-      const file = fileInput.files?.[0];
-      if (file) handleFile(file);
-      else uploadStatus.textContent = "❗ Choose a file first.";
-    });
-  }
-
-  // =========================================================
-  // BOOT
-  // =========================================================
   document.addEventListener("DOMContentLoaded", () => {
-    initLoaders();
+    initLoader();
     initSnow();
-    initEasterEggs();
-    initEasterProgress();
-    initMainAudioPlayer();
-    initClickSound();
     initScrollSpy();
-    initSoundCloudLazyLoad();
-    initUpload();
+    initEasterEggs();
+    initClickSound();
+    initGlobalPlayer();
+    initManifestGlitch();
+    initSequencer();
+    initSoundLab();
+    initTrackAnatomy();
+    initSoundCloudLazy();
   });
 })();
