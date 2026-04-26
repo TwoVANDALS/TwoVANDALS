@@ -96,6 +96,17 @@
       ></iframe>
     </section>
 
+<section id="spectrum-3d" aria-labelledby="spectrum-3d-title">
+  <h2 id="spectrum-3d-title">3D Spectrum</h2>
+  <p>
+    Real-time spectral field driven by the curated set.
+  </p>
+
+  <div id="spectrum3d-wrap">
+    <div id="spectrum3d-canvas" aria-hidden="true"></div>
+  </div>
+</section>
+    
     <!-- =======================================
          MANIFEST (GLITCH TEXT)
          ======================================= -->
@@ -794,5 +805,12 @@
       trackObserver.observe(trackFeed);
     }
   </script>
+  <script type="module">
+  import * as THREE from "https://unpkg.com/three@0.164.1/build/three.module.js";
+  import { OrbitControls } from "https://unpkg.com/three@0.164.1/examples/jsm/controls/OrbitControls.js";
+
+  window.THREE = THREE;
+  window.OrbitControls = OrbitControls;
+</script>
 </body>
 </html>
