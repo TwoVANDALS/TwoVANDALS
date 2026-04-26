@@ -1,170 +1,575 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="icon" type="image/png" href="favicon.png" />
   <meta charset="UTF-8" />
+  <title>TwoVANDALS / Trashwave Unit</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TwoVANDALS</title>
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+
+  <!-- Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=VT323&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Styles -->
   <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=VT323&display=swap" rel="stylesheet" />
 </head>
 
 <body>
-<div id="loader-screen">
-  <span id="loader-text">T</span>
-</div>
-  <!-- Preloader -->
-  <div id="loader">
+  <!-- =======================================
+       GLOBAL LOADER
+       ======================================= -->
+  <div id="loader-screen" aria-hidden="true">
+    <span id="loader-text">T</span>
+  </div>
+
+  <!-- Optional second loader overlay (kept for backward compat) -->
+  <div id="loader" class="sr-only" aria-hidden="true">
     <div class="glitch-loader">TwoVANDALS</div>
   </div>
 
-  <!-- Visual FX canvas -->
+  <!-- Background canvas (snow / particles) -->
   <canvas id="snow-canvas"></canvas>
 
-  <!-- Header -->
+  <!-- =======================================
+       HEADER
+       ======================================= -->
   <header>
-    <div class="logo">TwoVANDALS</div>
-    <p class="motto">Trashwave is not a genre. It’s a wound.</p>
-    <nav>
-      <a href="#music" class="nav-btn">Music</a>
-      <a href="#manifest" class="nav-btn">Manifest</a>
-      <a href="#contacts" class="nav-btn">Contact</a>
-    </nav>
+    <div class="header-inner">
+      <div class="logo" aria-label="TwoVANDALS">
+        TwoVANDALS
+      </div>
+      <p class="motto">
+        Trashwave is not a genre. It’s a wound.
+      </p>
+      <nav aria-label="Primary navigation">
+        <a href="#music" class="nav-btn">Music</a>
+        <a href="#manifest" class="nav-btn">Manifest</a>
+        <a href="#lab" class="nav-btn">Lab</a>
+        <a href="#contacts" class="nav-btn">Contact</a>
+      </nav>
+    </div>
   </header>
 
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="overlay"></div>
-    <div class="hero-content">
-      <h1>100+ tracks. No explanation.</h1>
-      <a href="https://soundcloud.com/vandalstwo" target="_blank" class="btn pixel-btn">LISTEN</a>
-    </div>
-  </section>
+  <!-- =======================================
+       HERO
+       ======================================= -->
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-content">
+        <h1 id="hero-title">100+ tracks. No explanation.</h1>
+        <p class="hero-sub">
+          Live cuts, half‑broken stems, and everything that should have stayed on the hard drive.
+        </p>
+        <div class="hero-actions">
+          <a
+            href="https://soundcloud.com/vandalstwo"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn pixel-btn"
+          >
+            Listen on SoundCloud
+          </a>
+        </div>
+      </div>
+    </section>
 
-  <!-- Popular Tracks Embed -->
-  <section id="music" class="music">
-    <h2>Our Popular Tracks</h2>
-    <iframe id="scPlayer" data-src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/vandalstwo/sets/popular&color=%23000000&auto_play=false&show_artwork=true&show_user=true" width="100%" height="450" scrolling="no" frameborder="no" allow="autoplay"></iframe>
-  </section>
+    <!-- =======================================
+         MUSIC / POPULAR TRACKS
+         ======================================= -->
+    <section id="music" class="music" aria-labelledby="music-title">
+      <h2 id="music-title">Popular Trashwave set</h2>
+      <p>
+        This is the surface noise. The algorithm likes these most.
+      </p>
+      <iframe
+        id="scPlayer"
+        title="TwoVANDALS SoundCloud playlist"
+        data-src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/vandalstwo/sets/popular&color=%23000000&auto_play=false&show_artwork=true&show_user=true"
+        width="100%"
+        height="450"
+        scrolling="no"
+        frameborder="0"
+        allow="autoplay"
+      ></iframe>
+    </section>
 
-  <!-- Manifest -->
-  <section id="manifest" class="manifest">
-    <h2>Manifest</h2>
-    <p>We promote nothing.<br>We make noise.<br>We live raw.</p>
-  </section>
+    <!-- =======================================
+         MANIFEST (GLITCH TEXT)
+         ======================================= -->
+    <section id="manifest" class="manifest" aria-labelledby="manifest-title">
+      <h2 id="manifest-title">Manifest</h2>
+      <p data-glitch>
+        We promote nothing.
+      </p>
+      <p data-glitch>
+        We make noise.
+      </p>
+      <p data-glitch>
+        We live raw.
+      </p>
+    </section>
 
-  <!-- Contacts & Discord -->
-  <section id="contacts" class="contacts">
-    <h2>Contact</h2>
-    <div class="socials">
-      <a href="https://www.instagram.com/twovandals/" target="_blank">Instagram</a>
-      <a href="https://open.spotify.com/artist/3KwllIZI6D6aQrffiZUnrZ" target="_blank">Spotify</a>
-      <a href="https://soundcloud.com/vandalstwo" target="_blank">SoundCloud</a>
-    </div>
-    <p>Email: <a href="mailto:vandalstwo@gmail.com">vandalstwo@gmail.com</a></p>
+    <!-- =======================================
+         PATTERN LAB / SEQUENCER
+         ======================================= -->
+    <section id="lab" aria-labelledby="lab-title">
+      <h2 id="lab-title">Pattern Lab</h2>
+      <p>
+        Build your own trashwave loop in sixteen steps. Click the grid, then hit PLAY.
+      </p>
 
-    <div class="discord-links">
-      <p><strong>Trashwave Community Discord:</strong> <a href="https://discord.gg/tf2X2ThCBM" target="_blank">Join here</a></p>
-      <p><strong>TwoVANDALS Private Server:</strong> <a href="https://discord.gg/CyzsWeQCZ8" target="_blank">Invite-only</a></p>
-    </div>
-  </section>
+      <!-- Drum grid -->
+      <div class="grid-wrapper">
+        <div class="grid-labels">
+          <div>KICK</div>
+          <div>SNARE</div>
+          <div>HAT</div>
+        </div>
+        <div id="drumGrid"></div>
+      </div>
 
-  <!-- Trashwave Creator Section -->
-<section id="trashwave-creator" class="trashwave-creator">
-  <h2>Create your own noisy chaos in the browser</h2>
-  <iframe 
-    src="trashwave-creator/index.html" 
-    width="100%" 
-    height="800" 
-    style="border: none; background: #000;" 
-    allowfullscreen
-  ></iframe>
-</section>
-  
-  <!-- Footer -->
+      <!-- Synth grid -->
+      <div class="grid-wrapper">
+        <div class="note-labels">
+          <div>C5</div>
+          <div>B4</div>
+          <div>A4</div>
+          <div>G4</div>
+          <div>F4</div>
+          <div>E4</div>
+          <div>D4</div>
+          <div>C4</div>
+        </div>
+        <div id="synthGrid"></div>
+      </div>
+
+      <div class="sequencer-actions">
+        <button id="seqPlayBtn" class="btn" type="button">
+          Play pattern
+        </button>
+        <button id="seqStopBtn" class="btn btn--outline" type="button">
+          Stop
+        </button>
+        <button id="seqRandomBtn" class="btn btn--outline" type="button">
+          Randomize
+        </button>
+        <button id="seqClearBtn" class="btn btn--outline" type="button">
+          Clear
+        </button>
+        <button id="seqShareBtn" class="btn btn--outline" type="button">
+          Copy pattern link
+        </button>
+      </div>
+
+      <div class="lab-meta">
+        <label for="seqBpm">BPM</label>
+        <input
+          id="seqBpm"
+          type="range"
+          min="70"
+          max="170"
+          value="118"
+        />
+        <span id="seqBpmValue">118</span>
+      </div>
+    </section>
+
+    <!-- =======================================
+         SOUNDLAB — ATMOSPHERE MIXER
+         ======================================= -->
+    <section id="soundlab" aria-labelledby="soundlab-title">
+      <h2 id="soundlab-title">Soundlab</h2>
+      <p>
+        Slow‑burn drone, broken noise and pulse. Pull faders until the room feels wrong.
+      </p>
+
+      <button id="soundLabInit" class="btn" type="button">
+        Activate Soundlab
+      </button>
+
+      <div class="lab-meta">
+        <label for="ambienceDrone">Drone</label>
+        <input
+          id="ambienceDrone"
+          type="range"
+          min="0"
+          max="100"
+          value="0"
+        />
+      </div>
+
+      <div class="lab-meta">
+        <label for="ambienceNoise">Noise</label>
+        <input
+          id="ambienceNoise"
+          type="range"
+          min="0"
+          max="100"
+          value="0"
+        />
+      </div>
+
+      <div class="lab-meta">
+        <label for="ambiencePulse">Pulse</label>
+        <input
+          id="ambiencePulse"
+          type="range"
+          min="0"
+          max="100"
+          value="0"
+        />
+      </div>
+    </section>
+
+    <!-- =======================================
+         TRACK ANATOMY
+         ======================================= -->
+    <section id="track-anatomy" aria-labelledby="track-anatomy-title">
+      <h2 id="track-anatomy-title">Track Anatomy</h2>
+      <p>
+        Soloed elements, lowpass screws and light drive. Walk inside one track.
+      </p>
+
+      <audio
+        id="anatomyTrack"
+        src="ybuocfiewu.mp3"
+        preload="metadata"
+        crossorigin="anonymous"
+      ></audio>
+
+      <div class="sequencer-actions">
+        <button id="anatomyPlay" class="btn" type="button">
+          Play track
+        </button>
+        <button
+          type="button"
+          class="btn btn--outline"
+          data-seek-anatomy="0"
+        >
+          Intro
+        </button>
+        <button
+          type="button"
+          class="btn btn--outline"
+          data-seek-anatomy="35"
+        >
+          Drop
+        </button>
+        <button
+          type="button"
+          class="btn btn--outline"
+          data-seek-anatomy="70"
+        >
+          Break
+        </button>
+      </div>
+
+      <div class="lab-meta">
+        <label for="anatomyLowpass">Lowpass</label>
+        <input
+          id="anatomyLowpass"
+          type="range"
+          min="200"
+          max="12000"
+          value="12000"
+        />
+      </div>
+
+      <div class="lab-meta">
+        <label for="anatomyDrive">Drive</label>
+        <input
+          id="anatomyDrive"
+          type="range"
+          min="0"
+          max="100"
+          value="0"
+        />
+      </div>
+
+      <div class="lab-meta">
+        <span>Now:</span>
+        <span id="anatomyNow">0:00</span>
+      </div>
+    </section>
+
+    <!-- =======================================
+         TRASHWAVE CREATOR (IFRAME)
+         ======================================= -->
+    <section id="trashwave-creator" class="trashwave-creator">
+      <h2>Browser‑side Trashwave machine</h2>
+      <p>
+        Full chaos mode. This is a separate lab, built just to break.
+      </p>
+      <iframe
+        src="trashwave-creator/index.html"
+        width="100%"
+        height="800"
+        style="border: none; background: #000;"
+        loading="lazy"
+        title="Trashwave Creator"
+      ></iframe>
+    </section>
+
+    <!-- =======================================
+         UPLOAD AREA (SUPABASE)
+         ======================================= -->
+    <section id="upload-area" class="drop-zone" aria-labelledby="upload-title">
+      <h2 id="upload-title">Upload your trashwave</h2>
+      <p>
+        Drop a file or pick it manually. Only .mp3 / .wav are accepted.
+      </p>
+
+      <input
+        type="file"
+        id="fileInput"
+        accept=".mp3, .wav, audio/*"
+      />
+      <button id="uploadBtn" class="btn btn--outline" type="button">
+        Upload
+      </button>
+      <div id="uploadStatus" role="status" aria-live="polite"></div>
+    </section>
+
+    <!-- =======================================
+         UPLOADED TRACK FEED
+         ======================================= -->
+    <section id="track-feed" aria-labelledby="feed-title">
+      <h2 id="feed-title">Uploaded trashwave feed</h2>
+      <p>
+        These are the signals people threw back at us.
+      </p>
+
+      <div id="trackList"></div>
+
+      <template id="audio-template">
+        <div class="track-player">
+          <h3 class="track-title"></h3>
+          <audio preload="metadata"></audio>
+          <canvas class="visualizer" width="600" height="60"></canvas>
+
+          <div class="controls">
+            <button class="play-btn" type="button">▶</button>
+            <input
+              class="seek-bar"
+              type="range"
+              min="0"
+              value="0"
+              step="1"
+            />
+            <span class="time current-time">0:00</span>
+            <span class="time">/</span>
+            <span class="time duration">0:00</span>
+            <input
+              class="volume-bar"
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value="0.5"
+            />
+          </div>
+
+          <div class="feed-actions">
+            <button class="like-btn" type="button">
+              ❤️ <span class="like-count">0</span>
+            </button>
+            <button class="delete-btn btn--outline" type="button">
+              Delete
+            </button>
+          </div>
+        </div>
+      </template>
+    </section>
+
+    <!-- =======================================
+         CONTACTS & DISCORD
+         ======================================= -->
+    <section id="contacts" class="contacts" aria-labelledby="contacts-title">
+      <h2 id="contacts-title">Contact / Signals</h2>
+
+      <div class="socials">
+        <a
+          href="https://www.instagram.com/twovandals/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Instagram
+        </a>
+        <a
+          href="https://open.spotify.com/artist/3KwllIZI6D6aQrffiZUnrZ"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Spotify
+        </a>
+        <a
+          href="https://soundcloud.com/vandalstwo"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          SoundCloud
+        </a>
+      </div>
+
+      <p>
+        Email:
+        <a href="mailto:vandalstwo@gmail.com">vandalstwo@gmail.com</a>
+      </p>
+
+      <div class="discord-links">
+        <a
+          href="https://discord.gg/tf2X2ThCBM"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Trashwave Community Discord
+        </a>
+        <a
+          href="https://discord.gg/CyzsWeQCZ8"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          TwoVANDALS Private Server (invite‑only)
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- =======================================
+       FOOTER
+       ======================================= -->
   <footer>
     <p>© TwoVANDALS / Noise never sleeps.</p>
   </footer>
 
-  <!-- Audio Player -->
+  <!-- =======================================
+       GLOBAL AUDIO PLAYER (CURATED SET)
+       ======================================= -->
   <div class="audio-player" id="audioPlayer">
-    <button id="togglePlayer" class="toggle-btn">▼</button>
-    <button id="prevTrackBtn">⏮</button>
-    <button id="playPauseBtn">▶ Listen to a curated Trashwave set</button>
-    <button id="nextTrackBtn">⏭</button>
+    <button id="togglePlayer" class="toggle-btn" type="button">▼</button>
+    <button id="prevTrackBtn" type="button">⏮</button>
+    <button id="playPauseBtn" type="button">
+      ▶ Listen to a curated Trashwave set
+    </button>
+    <button id="nextTrackBtn" type="button">⏭</button>
     <span id="trackTitle">Track 1</span>
     <span id="currentTime">0:00</span>
-    <input type="range" id="seekBar" value="0" step="1" />
+    <input
+      type="range"
+      id="seekBar"
+      value="0"
+      step="1"
+      min="0"
+    />
     <span id="duration">0:00</span>
-    <input id="volumeSlider" type="range" min="0" max="1" step="0.01" value="0.5" />
+    <input
+      id="volumeSlider"
+      type="range"
+      min="0"
+      max="1"
+      step="0.01"
+      value="0.5"
+    />
   </div>
+
   <audio id="bgTrack" src="ybuocfiewu.mp3" preload="metadata"></audio>
   <audio id="clickSound" src="click.mp3" preload="auto"></audio>
 
-  <!-- Hidden Easter Eggs -->
-  <a href="https://soundcloud.com/deadrazy" class="egg egg-blood" title="deadrazy"></a>
-  <a href="https://soundcloud.com/snybun" class="egg egg-water" title="snybun"></a>
-  <a href="https://soundcloud.com/princesssguilt" class="egg egg-electric" title="princesssguilt"></a>
-  <a href="https://soundcloud.com/3_66_7" class="egg egg-fire" title="3_66_7"></a>
-  <a href="https://soundcloud.com/vandal2012" class="egg egg-core" title="vandal2012"></a>
+  <!-- =======================================
+       HIDDEN EASTER EGGS
+       ======================================= -->
+  <a
+    href="https://soundcloud.com/deadrazy"
+    class="egg egg-blood"
+    title="deadrazy"
+    target="_blank"
+    rel="noopener noreferrer"
+  ></a>
+  <a
+    href="https://soundcloud.com/snybun"
+    class="egg egg-water"
+    title="snybun"
+    target="_blank"
+    rel="noopener noreferrer"
+  ></a>
+  <a
+    href="https://soundcloud.com/princesssguilt"
+    class="egg egg-electric"
+    title="princesssguilt"
+    target="_blank"
+    rel="noopener noreferrer"
+  ></a>
+  <a
+    href="https://soundcloud.com/3_66_7"
+    class="egg egg-fire"
+    title="3_66_7"
+    target="_blank"
+    rel="noopener noreferrer"
+  ></a>
+  <a
+    href="https://soundcloud.com/vandal2012"
+    class="egg egg-core"
+    title="vandal2012"
+    target="_blank"
+    rel="noopener noreferrer"
+  ></a>
 
-  <!-- Upload Area -->
-<section id="upload-area" class="drop-zone">
-  <h2>Upload Your Trashwave</h2>
-  <input type="file" id="fileInput" accept="audio/*" />
-  <button id="uploadBtn">Upload</button>
-  <div id="uploadStatus"></div>
-</section>
-
-
-  <!-- Uploaded Track Feed -->
-  <section id="track-feed">
-    <h2>Uploaded Trashwave</h2>
-    <div id="trackList"></div>
-
-    <template id="audio-template">
-      <div class="track-player">
-        <h3 class="track-title"></h3>
-        <audio preload="metadata"></audio>
-        <canvas class="visualizer" width="600" height="60"></canvas>
-        <div class="controls">
-          <button class="play-btn">▶</button>
-          <input class="seek-bar" type="range" min="0" value="0" step="1" />
-          <span class="time current-time">0:00</span> /
-          <span class="time duration">0:00</span>
-          <input class="volume-bar" type="range" min="0" max="1" step="0.01" value="0.5" />
-        </div>
-        <button class="like-btn">❤️ <span class="like-count">0</span></button>
-      </div>
-    </template>
-  </section>
-
-  <!-- Main Script -->
+  <!-- =======================================
+       MAIN SCRIPT (YOUR JS WITH AUDIO + LAB)
+       ======================================= -->
   <script src="script.js" defer></script>
 
-  <!-- Supabase Upload Logic -->
+  <!-- =======================================
+       SUPABASE MODULE (UPLOAD + FEED)
+       ======================================= -->
   <script type="module">
-    import { createClient } from 'https://esm.sh/@supabase/supabase-js'
+    import { createClient } from "https://esm.sh/@supabase/supabase-js";
 
     const supabase = createClient(
-      'https://qqffjsnlsbzhzhlvbexb.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFxZmZqc25sc2J6aHpobHZiZXhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkzMTM1MTksImV4cCI6MjA2NDg4OTUxOX0.LFrwLA5njJYak5RQ25Kd14TZE64HCV8WSsx31riL-0g'
+      "https://qqffjsnlsbzhzhlvbexb.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFxZmZqc25sc2J6aHpobHZiZXhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkzMTM1MTksImV4cCI6MjA2NDg4OTUxOX0.LFrwLA5njJYak5RQ25Kd14TZE64HCV8WSsx31riL-0g"
     );
 
-    async function listTracks() {
-      const { data: files, error } = await supabase.storage.from('tracks').list('', {
-        limit: 100
-      });
+    const trackListEl = document.getElementById("trackList");
+    const template = document.getElementById("audio-template");
+    const uploadBtn = document.getElementById("uploadBtn");
+    const fileInput = document.getElementById("fileInput");
+    const uploadStatus = document.getElementById("uploadStatus");
 
-      const listContainer = document.getElementById("trackList");
-      const template = document.getElementById("audio-template");
-      listContainer.innerHTML = "";
+    const formatTime = (s) => {
+      const m = Math.floor(s / 60);
+      const ss = Math.floor(s % 60)
+        .toString()
+        .padStart(2, "0");
+      return `${m}:${ss}`;
+    };
+
+    async function listTracks() {
+      const { data: files, error } = await supabase.storage
+        .from("tracks")
+        .list("", {
+          limit: 100
+        });
+
+      if (error) {
+        if (uploadStatus) {
+          uploadStatus.textContent = "❌ List error: " + error.message;
+        }
+        return;
+      }
+
+      if (!trackListEl || !template) return;
+      trackListEl.innerHTML = "";
 
       for (const file of files) {
         if (!file.name.match(/\.(mp3|wav)$/i)) continue;
 
-        const { data } = supabase.storage.from('tracks').getPublicUrl(file.name);
+        const { data } = supabase.storage
+          .from("tracks")
+          .getPublicUrl(file.name);
         const audioUrl = data.publicUrl;
 
         const clone = template.content.cloneNode(true);
@@ -175,103 +580,219 @@
         const volume = clone.querySelector(".volume-bar");
         const currentTimeEl = clone.querySelector(".current-time");
         const durationEl = clone.querySelector(".duration");
+        const likeBtn = clone.querySelector(".like-btn");
+        const likeCount = clone.querySelector(".like-count");
+        const deleteBtn = clone.querySelector(".delete-btn");
+        const canvas = clone.querySelector(".visualizer");
 
-        title.textContent = file.name.replace(/\.[^/.]+$/, "");
+        if (!audio || !title) continue;
         audio.src = audioUrl;
+        title.textContent = file.name.replace(/\.[^/.]+$/, "");
 
-        const formatTime = s => {
-          const m = Math.floor(s / 60);
-          const ss = Math.floor(s % 60).toString().padStart(2, "0");
-          return `${m}:${ss}`;
-        };
+        // Visualizer
+        if (canvas && canvas.getContext) {
+          const ctx = canvas.getContext("2d");
+          let audioCtx, analyser, source, animationId;
 
-        playBtn.addEventListener("click", () => {
-          document.querySelectorAll("audio").forEach(a => {
-            if (a !== audio) a.pause();
-          });
-          if (audio.paused) {
-            audio.play();
-          } else {
-            audio.pause();
+          function drawBars() {
+            if (!analyser) return;
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            analyser.getByteFrequencyData(dataArray);
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const barWidth = (canvas.width / bufferLength) * 2.5;
+            let x = 0;
+
+            for (let i = 0; i < bufferLength; i++) {
+              const barHeight = dataArray[i] / 2;
+              ctx.fillStyle = `rgb(${barHeight + 50},50,50)`;
+              ctx.fillRect(
+                x,
+                canvas.height - barHeight,
+                barWidth,
+                barHeight
+              );
+              x += barWidth + 1;
+            }
+
+            animationId = requestAnimationFrame(drawBars);
           }
-        });
 
-        audio.addEventListener("play", () => {
-          playBtn.textContent = "⏸";
-        });
+          audio.addEventListener("play", () => {
+            if (!audioCtx) {
+              const AC =
+                window.AudioContext || window.webkitAudioContext;
+              if (!AC) return;
+              audioCtx = new AC();
+              analyser = audioCtx.createAnalyser();
+              source = audioCtx.createMediaElementSource(audio);
+              source.connect(analyser);
+              analyser.connect(audioCtx.destination);
+              analyser.fftSize = 256;
+            }
+            drawBars();
+          });
 
-        audio.addEventListener("pause", () => {
-          playBtn.textContent = "▶";
-        });
+          audio.addEventListener("pause", () => {
+            cancelAnimationFrame(animationId);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+          });
+        }
 
-        audio.addEventListener("loadedmetadata", () => {
-          if (isFinite(audio.duration)) {
-            seek.max = Math.floor(audio.duration);
-            durationEl.textContent = formatTime(audio.duration);
-          } else {
-            audio.currentTime = 1e101;
-            audio.ontimeupdate = () => {
-              audio.ontimeupdate = null;
-              audio.currentTime = 0;
+        // Playback controls
+        if (playBtn && seek && volume && currentTimeEl && durationEl) {
+          playBtn.addEventListener("click", () => {
+            document.querySelectorAll("audio").forEach((a) => {
+              if (a !== audio) a.pause();
+            });
+            if (audio.paused) {
+              audio.play().catch(() => {});
+            } else {
+              audio.pause();
+            }
+          });
+
+          audio.addEventListener("play", () => {
+            playBtn.textContent = "⏸";
+          });
+
+          audio.addEventListener("pause", () => {
+            playBtn.textContent = "▶";
+          });
+
+          audio.addEventListener("loadedmetadata", () => {
+            if (isFinite(audio.duration)) {
               seek.max = Math.floor(audio.duration);
               durationEl.textContent = formatTime(audio.duration);
-            };
+            } else {
+              audio.currentTime = 1e101;
+              audio.ontimeupdate = () => {
+                audio.ontimeupdate = null;
+                audio.currentTime = 0;
+                seek.max = Math.floor(audio.duration);
+                durationEl.textContent = formatTime(audio.duration);
+              };
+            }
+          });
+
+          audio.addEventListener("timeupdate", () => {
+            seek.value = audio.currentTime;
+            currentTimeEl.textContent = formatTime(audio.currentTime);
+          });
+
+          seek.addEventListener("input", () => {
+            audio.currentTime = seek.value;
+          });
+
+          volume.addEventListener("input", () => {
+            audio.volume = volume.value;
+          });
+        }
+
+        // Likes (Supabase RPC + localStorage guard)
+        if (likeBtn && likeCount) {
+          const likeKey = `liked_${file.name}`;
+          const hasLiked = window.localStorage.getItem(likeKey);
+
+          if (hasLiked) {
+            likeBtn.classList.add("liked");
           }
-        });
 
-        audio.addEventListener("timeupdate", () => {
-          seek.value = audio.currentTime;
-          currentTimeEl.textContent = formatTime(audio.currentTime);
-        });
+          supabase
+            .from("likes")
+            .select("likes")
+            .eq("filename", file.name)
+            .single()
+            .then(({ data }) => {
+              likeCount.textContent = data?.likes || 0;
+            });
 
-        seek.addEventListener("input", () => {
-          audio.currentTime = seek.value;
-        });
+          likeBtn.addEventListener("click", async () => {
+            if (window.localStorage.getItem(likeKey)) return;
 
-        volume.addEventListener("input", () => {
-          audio.volume = volume.value;
-        });
+            const { data, error } = await supabase.rpc("increment_like", {
+              filename_input: file.name
+            });
 
-        listContainer.appendChild(clone);
+            if (!error && data) {
+              likeCount.textContent = data.likes;
+              window.localStorage.setItem(likeKey, "1");
+              likeBtn.classList.add("liked");
+            }
+          });
+        }
+
+        // Delete button
+        if (deleteBtn) {
+          deleteBtn.addEventListener("click", async () => {
+            const confirmDelete = window.confirm(
+              `Delete track "${file.name}"?`
+            );
+            if (!confirmDelete) return;
+            const { error } = await supabase.storage
+              .from("tracks")
+              .remove([file.name]);
+
+            if (error) {
+              alert("❌ Error deleting track: " + error.message);
+            } else {
+              alert(`🗑️ Deleted: ${file.name}`);
+              await listTracks();
+            }
+          });
+        }
+
+        trackListEl.appendChild(clone);
       }
     }
 
-    const uploadBtn = document.getElementById('uploadBtn');
-    const fileInput = document.getElementById('fileInput');
-    const uploadStatus = document.getElementById('uploadStatus');
+    if (uploadBtn && fileInput && uploadStatus) {
+      uploadBtn.addEventListener("click", async () => {
+        const file = fileInput.files[0];
+        if (!file) {
+          alert("Choose a file first!");
+          return;
+        }
+        if (!file.name.match(/\.(mp3|wav)$/i)) {
+          alert("Only .mp3 or .wav allowed!");
+          return;
+        }
 
-    uploadBtn.addEventListener('click', async () => {
-      const file = fileInput.files[0];
-      if (!file) return alert('Choose a file first!');
-      if (!file.name.match(/\.(mp3|wav)$/i)) return alert('Only .mp3 or .wav allowed!');
+        uploadStatus.textContent = "Uploading…";
 
-      const { error } = await supabase.storage.from('tracks').upload(file.name, file, {
-        cacheControl: '3600',
-        upsert: false
+        const { error } = await supabase.storage
+          .from("tracks")
+          .upload(file.name, file, {
+            cacheControl: "3600",
+            upsert: false
+          });
+
+        if (error) {
+          uploadStatus.textContent = `❌ Upload error: ${error.message}`;
+        } else {
+          uploadStatus.textContent = `✅ Uploaded: ${file.name}`;
+          await listTracks();
+        }
       });
-
-      if (error) {
-        uploadStatus.innerText = `Upload Error: ${error.message}`;
-      } else {
-        uploadStatus.innerText = `✅ Uploaded: ${file.name}`;
-        await listTracks();
-      }
-    });
+    }
 
     const trackFeed = document.getElementById("track-feed");
+    if (trackFeed) {
+      const trackObserver = new IntersectionObserver(
+        (entries, obs) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              listTracks();
+              obs.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.25 }
+      );
 
-const trackObserver = new IntersectionObserver((entries, obs) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      listTracks();
-      obs.unobserve(entry.target);
+      trackObserver.observe(trackFeed);
     }
-  });
-}, { threshold: 0.25 });
-
-if (trackFeed) trackObserver.observe(trackFeed);
   </script>
-
 </body>
 </html>
-
