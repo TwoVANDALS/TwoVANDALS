@@ -1134,17 +1134,279 @@
      DOM READY
      ============================== */
 
-  document.addEventListener("DOMContentLoaded", () => {
-    initLoader();
-    initSnow();
-    initScrollSpy();
-    initEasterEggs();
-    initClickSound();
-    initGlobalPlayer();
-    initManifestGlitch();
-    initSequencer();
-    initSoundLab();
-    initTrackAnatomy();
-    initSoundCloudLazy();
-  });
+document.addEventListener("DOMContentLoaded", () => {
+  initLoader();
+  initSnow();
+  initScrollSpy();
+  initEasterEggs();
+  initClickSound();
+  initGlobalPlayer();
+  initManifestGlitch();
+  initSequencer();
+  initSoundLab();
+  initTrackAnatomy();
+  initSoundCloudLazy();
+  initSpectrum3D();
+});
 })();
+/* ==============================
+   12. 3D SPECTRUM VISUALIZER
+   ============================== */
+function initSpectrum3D() {
+  const mount = document.getElementById("spectrum3d-canvas");
+  const audio = document.getElementById("bgTrack");
+
+  if (!mount || !audio) return;
+  if (!window.THREE) {
+    console.warn("THREE is not loaded");
+    return;
+  }
+
+  const THREE = window.THREE;
+  const OrbitControls = window.OrbitControls;
+
+  let renderer;
+  let scene;
+  let camera;
+  let controls;
+  let analyser;
+  let audioCtx;
+  let sourceNode;
+  let dataArray;
+  let bars = [];
+  let animationId = null;
+  let connected = false;
+
+  const BAR_COUNT = 96;
+  const RADIUS = 10;
+  const BAR_WIDTH = 0.22;
+  const BAR_DEPTH = 0.22;
+  const BASE_HEIGHT = 0.25;
+
+  function createAudioGraph() {
+    if (connected) return true;
+
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return false;
+
+    audioCtx = new AC();
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 256;
+    analyser.smoothingTimeConstant = 0.82;
+
+    sourceNode = audioCtx.createMediaElementSource(audio);
+    sourceNode.connect(analyser);
+    analyser.connect(audioCtx.destination);
+
+    dataArray = new Uint8Array(analyser.frequencyBinCount);
+    connected = true;
+    return true;
+  }
+
+  function initScene() {
+    scene = new THREE.Scene();
+    scene.fog = new THREE.Fog(0x020202, 18, 38);
+
+    const width = mount.clientWidth || 800;
+    const height = mount.clientHeight || 520;
+
+    camera = new THREE.PerspectiveCamera(55, width / height, 0.1, 100);
+    camera.position.set(0, 8, 18);
+
+    renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      alpha: true,
+      powerPreference: "high-performance"
+    });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(width, height);
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    mount.innerHTML = "";
+    mount.appendChild(renderer.domElement);
+
+    if (OrbitControls) {
+      controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.enablePan = false;
+      controls.minDistance = 10;
+      controls.maxDistance = 28;
+      controls.maxPolarAngle = Math.PI * 0.48;
+    }
+
+    const ambient = new THREE.AmbientLight(0xffffff, 0.45);
+    scene.add(ambient);
+
+    const pointA = new THREE.PointLight(0x00ff99, 2.2, 40, 2);
+    pointA.position.set(0, 10, 10);
+    scene.add(pointA);
+
+    const pointB = new THREE.PointLight(0x00eaff, 1.8, 40, 2);
+    pointB.position.set(0, 4, -12);
+    scene.add(pointB);
+
+    const floor = new THREE.Mesh(
+      new THREE.CircleGeometry(11, 64),
+      new THREE.MeshBasicMaterial({
+        color: 0x07110b,
+        transparent: true,
+        opacity: 0.75
+      })
+    );
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.y = -0.02;
+    scene.add(floor);
+
+    const ring = new THREE.Mesh(
+      new THREE.RingGeometry(9.6, 10.2, 128),
+      new THREE.MeshBasicMaterial({
+        color: 0x00ffaa,
+        transparent: true,
+        opacity: 0.22,
+        side: THREE.DoubleSide
+      })
+    );
+    ring.rotation.x = -Math.PI / 2;
+    ring.position.y = 0.01;
+    scene.add(ring);
+
+    const core = new THREE.Mesh(
+      new THREE.IcosahedronGeometry(1.2, 1),
+      new THREE.MeshStandardMaterial({
+        color: 0x99ffee,
+        emissive: 0x00ff99,
+        emissiveIntensity: 0.35,
+        roughness: 0.35,
+        metalness: 0.15
+      })
+    );
+    core.name = "core";
+    core.position.y = 1.4;
+    scene.add(core);
+
+    const barGeometry = new THREE.BoxGeometry(BAR_WIDTH, 1, BAR_DEPTH);
+
+    for (let i = 0; i < BAR_COUNT; i++) {
+      const angle = (i / BAR_COUNT) * Math.PI * 2;
+      const x = Math.cos(angle) * RADIUS;
+      const z = Math.sin(angle) * RADIUS;
+
+      const material = new THREE.MeshStandardMaterial({
+        color: new THREE.Color(`hsl(${140 + (i / BAR_COUNT) * 60}, 100%, 50%)`),
+        emissive: new THREE.Color(`hsl(${140 + (i / BAR_COUNT) * 60}, 100%, 28%)`),
+        emissiveIntensity: 0.28,
+        roughness: 0.45,
+        metalness: 0.08
+      });
+
+      const bar = new THREE.Mesh(barGeometry, material);
+      bar.position.set(x, BASE_HEIGHT / 2, z);
+      bar.lookAt(0, BASE_HEIGHT / 2, 0);
+      bar.userData.angle = angle;
+      bar.userData.index = i;
+      scene.add(bar);
+      bars.push(bar);
+    }
+  }
+
+  function updateSpectrum() {
+    if (!analyser || !dataArray) return;
+
+    analyser.getByteFrequencyData(dataArray);
+
+    const core = scene.getObjectByName("core");
+    let energySum = 0;
+
+    for (let i = 0; i < BAR_COUNT; i++) {
+      const dataIndex = Math.floor((i / BAR_COUNT) * dataArray.length);
+      const value = dataArray[dataIndex] || 0;
+      const normalized = value / 255;
+      energySum += normalized;
+
+      const bar = bars[i];
+      const h = BASE_HEIGHT + normalized * 8.5;
+
+      bar.scale.y += (h - bar.scale.y) * 0.22;
+      bar.position.y += ((h / 2) - bar.position.y) * 0.22;
+
+      const pulseRadius = RADIUS + normalized * 1.3;
+      bar.position.x = Math.cos(bar.userData.angle) * pulseRadius;
+      bar.position.z = Math.sin(bar.userData.angle) * pulseRadius;
+
+      const hue = 135 + normalized * 70 + i * 0.15;
+      bar.material.color.setHSL((hue % 360) / 360, 1, 0.5);
+      bar.material.emissive.setHSL((hue % 360) / 360, 1, 0.24 + normalized * 0.2);
+      bar.material.emissiveIntensity = 0.22 + normalized * 0.9;
+    }
+
+    const avg = energySum / BAR_COUNT;
+
+    if (core) {
+      core.rotation.x += 0.004 + avg * 0.03;
+      core.rotation.y += 0.006 + avg * 0.04;
+      const s = 1 + avg * 0.45;
+      core.scale.setScalar(s);
+      core.material.emissiveIntensity = 0.25 + avg * 1.15;
+    }
+
+    scene.rotation.y += 0.0018 + avg * 0.005;
+  }
+
+  function animate() {
+    updateSpectrum();
+    controls?.update();
+    renderer.render(scene, camera);
+    animationId = requestAnimationFrame(animate);
+  }
+
+  function onResize() {
+    if (!renderer || !camera) return;
+    const width = mount.clientWidth || 800;
+    const height = mount.clientHeight || 520;
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+    renderer.setSize(width, height);
+  }
+
+  function startVisualizer() {
+    if (!connected) {
+      const ok = createAudioGraph();
+      if (!ok) return;
+    }
+
+    if (audioCtx && audioCtx.state === "suspended") {
+      audioCtx.resume().catch(() => {});
+    }
+
+    if (!animationId) animate();
+  }
+
+  function stopVisualizer() {
+    if (animationId) {
+      cancelAnimationFrame(animationId);
+      animationId = null;
+    }
+  }
+
+  initScene();
+  onResize();
+  window.addEventListener("resize", onResize);
+
+  audio.addEventListener("play", startVisualizer);
+  audio.addEventListener("pause", () => {
+    // оставляем сцену живой ещё чуть-чуть, но без обязательной остановки
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) stopVisualizer();
+    else if (!audio.paused) startVisualizer();
+  });
+
+  // first user gesture fallback
+  document.addEventListener(
+    "click",
+    () => {
+      if (!connected && !audio.paused) startVisualizer();
+    },
+    { once: false }
+  );
+}
