@@ -1115,3 +1115,46 @@ footer {
     padding-bottom: 6rem;
   }
 }
+
+#spectrum-3d {
+  content-visibility: auto;
+  contain-intrinsic-size: 700px;
+}
+
+#spectrum3d-wrap {
+  position: relative;
+  width: 100%;
+  min-height: 520px;
+  margin-top: 1rem;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 30%, rgba(0,255,128,0.08), transparent 40%),
+    radial-gradient(circle at 50% 70%, rgba(0,247,255,0.08), transparent 45%),
+    #030303;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.02),
+    0 16px 40px rgba(0,0,0,0.35);
+}
+
+#spectrum3d-canvas {
+  width: 100%;
+  height: 520px;
+}
+
+#spectrum3d-canvas canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+@media (max-width: 768px) {
+  #spectrum3d-wrap {
+    min-height: 380px;
+  }
+
+  #spectrum3d-canvas {
+    height: 380px;
+  }
+}
