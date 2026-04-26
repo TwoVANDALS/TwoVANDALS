@@ -1410,3 +1410,226 @@ function initSpectrum3D() {
     { once: false }
   );
 }
+/* =========================================================
+   TWOVANDALS SECRET GLITCH / BLEED EASTER EGG
+   Добавить в конец текущего JS
+   ========================================================= */
+
+(() => {
+  "use strict";
+
+  const state = {
+    eggsFoundClicks: 0,
+    keySequenceProgress: 0,
+    keySequenceStartedAt: 0,
+    heroDoubleClicked: false,
+    triggered: false
+  };
+
+  const REQUIRED_KEYS = ["KeyT", "KeyV", "KeyD"];
+  const KEY_TIMEOUT = 4000;
+
+  function initTwoVandalsSecretBanner() {
+    const banner = document.getElementById("tv-easter-banner");
+    const title = document.getElementById("tv-easter-title");
+    if (!banner || !title) return;
+
+    bindEggProgressWatcher();
+    bindKeySequenceWatcher();
+    bindFinalDoubleClickWatcher();
+  }
+
+  function bindEggProgressWatcher() {
+    document.addEventListener("click", (e) => {
+      const egg = e.target.closest(".egg");
+      if (!egg) return;
+
+      if (state.eggsFoundClicks < 3) {
+        state.eggsFoundClicks += 1;
+      }
+    });
+  }
+
+  function bindKeySequenceWatcher() {
+    document.addEventListener("keydown", (e) => {
+      if (state.triggered) return;
+      if (state.eggsFoundClicks < 3) return;
+
+      const now = Date.now();
+
+      if (!state.keySequenceStartedAt || now - state.keySequenceStartedAt > KEY_TIMEOUT) {
+        state.keySequenceProgress = 0;
+        state.keySequenceStartedAt = now;
+      }
+
+      const expected = REQUIRED_KEYS[state.keySequenceProgress];
+
+      if (e.code === expected) {
+        state.keySequenceProgress += 1;
+
+        if (state.keySequenceProgress === REQUIRED_KEYS.length) {
+          state.keySequenceStartedAt = now;
+          pulsePageHint();
+        }
+      } else {
+        state.keySequenceProgress = e.code === REQUIRED_KEYS[0] ? 1 : 0;
+        state.keySequenceStartedAt = now;
+      }
+    });
+  }
+
+  function bindFinalDoubleClickWatcher() {
+    const candidates = [
+      document.querySelector(".logo"),
+      document.querySelector(".brand"),
+      document.querySelector(".hero"),
+      document.querySelector("header h1"),
+      document.querySelector("nav"),
+      document.body
+    ].filter(Boolean);
+
+    candidates.forEach((el) => {
+      el.addEventListener("dblclick", () => {
+        if (state.triggered) return;
+        if (state.eggsFoundClicks < 3) return;
+        if (state.keySequenceProgress < REQUIRED_KEYS.length) return;
+        if (Date.now() - state.keySequenceStartedAt > KEY_TIMEOUT) return;
+
+        state.heroDoubleClicked = true;
+        revealTwoVandalsBanner();
+      });
+    });
+  }
+
+  function pulsePageHint() {
+    document.documentElement.style.transition = "filter 120ms ease";
+    document.documentElement.style.filter = "contrast(1.12) brightness(1.05)";
+    setTimeout(() => {
+      document.documentElement.style.filter = "";
+    }, 120);
+  }
+
+  function revealTwoVandalsBanner() {
+    if (state.triggered) return;
+
+    const banner = document.getElementById("tv-easter-banner");
+    const title = document.getElementById("tv-easter-title");
+    if (!banner || !title) return;
+
+    state.triggered = true;
+
+    banner.classList.add("active", "flash");
+    document.body.classList.add("tv-secret-awakened");
+
+    playFabricTearSound().catch(() => {});
+    launchMicroGlitches(title);
+    launchScreenFlicker();
+
+    setTimeout(() => banner.classList.remove("flash"), 260);
+  }
+
+  async function playFabricTearSound() {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+
+    const ctx = new AudioCtx();
+    if (ctx.state === "suspended") {
+      await ctx.resume();
+    }
+
+    const now = ctx.currentTime;
+    const duration = 0.55;
+    const bufferSize = Math.floor(ctx.sampleRate * duration);
+    const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = noiseBuffer.getChannelData(0);
+
+    for (let i = 0; i < bufferSize; i++) {
+      const t = i / bufferSize;
+      const burst = Math.random() * 2 - 1;
+      const grain = Math.sin(i * 0.018) * 0.15;
+      const rasp = Math.sin(i * 0.09) * 0.07;
+      data[i] = burst * (1 - t * 0.55) + grain + rasp;
+    }
+
+    const source = ctx.createBufferSource();
+    source.buffer = noiseBuffer;
+
+    const bandpass = ctx.createBiquadFilter();
+    bandpass.type = "bandpass";
+    bandpass.frequency.setValueAtTime(1450, now);
+    bandpass.Q.setValueAtTime(0.9, now);
+
+    const highpass = ctx.createBiquadFilter();
+    highpass.type = "highpass";
+    highpass.frequency.setValueAtTime(500, now);
+
+    const lowpass = ctx.createBiquadFilter();
+    lowpass.type = "lowpass";
+    lowpass.frequency.setValueAtTime(5200, now);
+
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.linearRampToValueAtTime(0.9, now + 0.018);
+    gain.gain.exponentialRampToValueAtTime(0.22, now + 0.12);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+    source.connect(bandpass);
+    bandpass.connect(highpass);
+    highpass.connect(lowpass);
+    lowpass.connect(gain);
+    gain.connect(ctx.destination);
+
+    source.start(now);
+    source.stop(now + duration + 0.02);
+
+    source.onended = () => {
+      setTimeout(() => ctx.close().catch(() => {}), 80);
+    };
+  }
+
+  function launchMicroGlitches(title) {
+    let bursts = 0;
+
+    const interval = setInterval(() => {
+      bursts += 1;
+
+      title.style.transform = `
+        translate(${rand(-4, 4)}px, ${rand(-2, 2)}px)
+        skewX(${rand(-8, 8)}deg)
+      `;
+
+      title.style.filter = `
+        contrast(${1 + Math.random() * 0.45})
+        saturate(${1 + Math.random() * 0.35})
+        blur(${Math.random() * 0.8}px)
+      `;
+
+      if (bursts > 14) {
+        clearInterval(interval);
+        title.style.transform = "";
+        title.style.filter = "";
+      }
+    }, 70);
+  }
+
+  function launchScreenFlicker() {
+    let count = 0;
+    const flicker = setInterval(() => {
+      count += 1;
+      document.body.style.filter =
+        count % 2
+          ? "contrast(1.18) saturate(1.08) brightness(1.02)"
+          : "contrast(0.96) brightness(0.98)";
+      if (count > 7) {
+        clearInterval(flicker);
+        document.body.style.filter = "";
+      }
+    }, 45);
+  }
+
+  function rand(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+
+  document.addEventListener("DOMContentLoaded", initTwoVandalsSecretBanner);
+})();
